@@ -27,6 +27,25 @@ var _map = function(a, b) {
     return m;
 };
 
+var _pad = function(num) {
+    var norm = Math.abs(Math.floor(num));
+    return (norm < 10 ? '0' : '') + norm;
+};
+
+var _timestamp = function() {
+    var local = new Date(),
+        tzo = -local.getTimezoneOffset(),
+        sign = tzo >= 0 ? '+' : '-';
+    return local.getFullYear() 
+        + '-' + _pad(local.getMonth()+1)
+        + '-' + _pad(local.getDate())
+        + 'T' + _pad(local.getHours())
+        + ':' + _pad(local.getMinutes()) 
+        + ':' + _pad(local.getSeconds()) 
+        + sign + _pad(tzo / 60) 
+        + ':' + _pad(tzo % 60);
+};
+
 /**
   * ExtractorManager
   *
@@ -213,7 +232,7 @@ var ExtractorManager = {
         
         chrome.runtime.onMessage.addListener(_callback(function(e) {
             var u = {user: null};
-            
+
             if(e.t === 'pageview') {
                 u.user = {
                     email: this.user,
@@ -228,7 +247,8 @@ var ExtractorManager = {
                     },
                     url: {
                         id: e.d.id
-                    }
+                    },
+                    timestamp: _timestamp()
                 };
             }
             else if(e.t === 'linkevent') {
@@ -245,7 +265,8 @@ var ExtractorManager = {
                     },
                     url: {
                         id: e.d.id
-                    }
+                    },
+                    timestamp: _timestamp()
                 };
             }
             else if(e.t === 'viewquote') {
@@ -264,7 +285,8 @@ var ExtractorManager = {
                     },
                     url: {
                         id: e.d.id
-                    }
+                    },
+                    timestamp: _timestamp()
                 };
             }
             

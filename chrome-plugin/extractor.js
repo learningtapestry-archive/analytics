@@ -40,7 +40,7 @@ var Extractor = {
         Array.prototype.forEach.call(document.getElementsByTagName('a'), _callback(this.processAnchor, this));
         
         /*
-         * Use MutationObserver to look for anchor tags added/changed AFTER the script has ran.
+         * Uses MutationObserver to look for anchor tags added/changed AFTER the script has ran.
          */
         o = new MutationObserver(_callback(function(ms) {
             ms.forEach(_callback(function(m) {
@@ -80,6 +80,11 @@ var Extractor = {
         }
     },
     
+    /**
+      * processAnchor
+      *
+      * Listens to click events on the anchor tag passed as argument.
+      */
     processAnchor: function(a) {
         if(/#.+$/.test(a.href)) {
             return;

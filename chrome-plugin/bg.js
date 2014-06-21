@@ -1,3 +1,9 @@
+/**
+  * bg.js
+  *
+  * The main script which is always running, it manages data extraction and sending data.
+  */
+
 var _callback = function(fn, ctx) {
     return function() {
         fn.apply(ctx, arguments);
@@ -21,6 +27,12 @@ var _map = function(a, b) {
     return m;
 };
 
+/**
+  * ExtractorManager
+  *
+  * The main object which handles everything - site list and email storage, data extraction and sending data.
+  */
+
 var ExtractorManager = {
     user: null,
     sites: null,
@@ -37,8 +49,16 @@ var ExtractorManager = {
         sites: 'store_sites_data'
     },
     
+    /**
+      * init
+      *
+      * Initializes the ExtractorManager. Looks is user already exists in storage, otherwise
+      * opens page to enter email. Also looks for site list in storage, and fetches sites if
+      * they are not there.
+      */
     init: function() {
-        //chrome.storage.local.clear();
+        chrome.browserAction.onClicked.addListener(_callback(this.getUser, this));
+        
         chrome.storage.local.get([this.storage_keys.user, this.storage_keys.sites], _callback(function(o) {
             var u = this.storage_keys.user,
                 s = this.storage_keys.sites;
@@ -62,6 +82,13 @@ var ExtractorManager = {
         }, this));
     },
     
+    /**
+      * getUser
+      *
+      * Opens the tab to allow the user to enter their email. It maintains
+      * the id of the tab in user_tab to ensure that only one tab is opened
+      * for user_url at any time.
+      */
     getUser: function() {     
         if(!this.user_tab) {
             chrome.tabs.create({url: this.user_url}, _callback(function(t) {
@@ -84,6 +111,14 @@ var ExtractorManager = {
         }, this));
     },
     
+    /**
+      * setUser
+      *
+      * Called by the script in user_tab. Stores the email, and starts watching
+      * pages if not already watching.
+      *
+      * It also closes the user_tab since it is no longer needed.
+      */
     setUser: function(u) {
         if(typeof u !== 'string' || !u) {
             return;
@@ -100,6 +135,12 @@ var ExtractorManager = {
         }
     },
     
+    /**
+      * getSites
+      *
+      * Fetches approved sites' list and stores them as a RegExp.
+      * Starts watching pages if user email available and not already watching.
+      */
     getSites: function() {
         var r = new XMLHttpRequest, x;
         
@@ -128,6 +169,11 @@ var ExtractorManager = {
         r.send();
     },
     
+    /**
+      * sendData
+      *
+      * Sends extracted data as JSON to the server.
+      */
     sendData: function(ujson) {
         var r = new XMLHttpRequest();
         
@@ -148,6 +194,16 @@ var ExtractorManager = {
         r.send(ujson);
     },
     
+    /**
+      * watch
+      *
+      * Starts main function of ExtractorManager - watching all pages to see if
+      * they match the approved sites, and running the Extractor script on them
+      * if they do.
+      *
+      * Registers listeners to listen for events from Extractor script in each 
+      * tab. Listeners populate correct JSON based on event and send it to server.
+      */
     watch: function() {
         if(!this.user || !this.sites || this.watching) {
             return;
@@ -160,7 +216,7 @@ var ExtractorManager = {
             
             if(e.t === 'pageview') {
                 u.user = {
-                    email: 'mailto:' + this.user,
+                    email: this.user,
                     action: {
                         id: 'verbs/viewed',
                         display: {
@@ -177,7 +233,7 @@ var ExtractorManager = {
             }
             else if(e.t === 'linkevent') {
                 u.user = {
-                    email: 'mailto:' + this.user,
+                    email: this.user,
                     action: {
                         id: 'verbs/clicked',
                         display: {
@@ -194,7 +250,7 @@ var ExtractorManager = {
             }
             else if(e.t === 'viewquote') {
                 u.user = {
-                    email: 'mailto:' + this.user,
+                    email: this.user,
                     action: {
                         id: 'verbs/quoted',
                         display: {
@@ -228,6 +284,11 @@ var ExtractorManager = {
         }, this));
     },
     
+    /**
+      * attachExtractor
+      *
+      * Attaches the Extractor script to the tab with given id.
+      */
     attachExtractor: function(id) {
         chrome.tabs.executeScript(id, {file: 'extractor.js', runAt: 'document_end'}, function() {});
     }

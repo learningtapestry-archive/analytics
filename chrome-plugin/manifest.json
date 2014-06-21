@@ -2,10 +2,19 @@
 	"manifest_version": 2,
 	"name": "Simple Financial Data Extractor",
 	"version": "0.0.0.0",
-	"description": "__MSG_desc__",
-    
-    "default_locale": "en",
+	"description": "Extension description goes here.",
 
+    "icons": {
+        "16": "icon-off-16.png",
+        "48": "icon-off-48.png",
+        "128": "icon-off-128.png"
+    },
+    
+    "browser_action": {
+        "default_title": "Simple Financial Data Extractor",
+        "default_icon": "icon-off-48.png"
+    },
+    
     "background": {
         "scripts": ["bg.js"]
     },

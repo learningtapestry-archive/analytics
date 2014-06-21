@@ -1,9 +1,21 @@
+/**
+  * extractor.js
+  *
+  * This script is ran on each page which matches the approved sites'
+  * list. It extracts data based on events.
+  */
+  
 var _callback = function(fn, ctx) {
     return function() {
         fn.apply(ctx, arguments);
     };
 };
 
+/**
+  * Extractor
+  *
+  * The main object of the script; handles all events and data extraction.
+  */
 var Extractor = {
     time: null,
     google_quote: /^https?:\/\/(?:www\.)?(?:google\.com\/finance\?q=.+)/,
@@ -11,26 +23,80 @@ var Extractor = {
     H: 3600,
     M: 60,
     
+    /**
+      * init
+      * 
+      * Initializes the time the page was opened, listens for unload to know
+      * when page is closedm listens for clicks on all links of the page, and 
+      * if the page is a Google Finance Quote, extracts quote data.
+      */
     init: function() {
+        var o;
+        
         this.time = +Date.now();
         
         window.addEventListener('unload', _callback(this.pageView, this));
         
-        Array.prototype.forEach.call(document.getElementsByTagName('a'), _callback(function(a) {
-            if(/#.+$/.test(a.href)) {
-                return;
-            }
-            
-            a.addEventListener('click', _callback(function() {
-                this.linkEvent(a.href);
+        Array.prototype.forEach.call(document.getElementsByTagName('a'), _callback(this.processAnchor, this));
+        
+        /*
+         * Use MutationObserver to look for anchor tags added/changed AFTER the script has ran.
+         */
+        o = new MutationObserver(_callback(function(ms) {
+            ms.forEach(_callback(function(m) {
+                var ns = m.addedNodes, nn;
+                
+                if(!ns || !ns.length) {
+                    if(m.target.nodeType === 1 && m.target.tagName.toLowerCase() === 'a') {
+                        this.processAnchor(m.target);
+                    }
+                    return;
+                }
+                
+                for(var i=0; i<ns.length; ++i) {
+                    nn = ns[i];
+                    if(nn.nodeType === 1 && nn.tagName.toLowerCase() === 'a') {
+                        this.processAnchor(nn);
+                    }
+                    else {
+                        nn = nn.getElementsByTagName('a');
+                        for(var j=0; j<nn.length; ++j) {
+                            this.processAnchor(nn[j]);
+                        }
+                    }
+                }
             }, this));
         }, this));
+        
+        o.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            characterData: false
+        });
         
         if(this.google_quote.test(document.location.href)) {
             this.viewQuote();
         }
     },
     
+    processAnchor: function(a) {
+        if(/#.+$/.test(a.href)) {
+            return;
+        }
+            
+        a.addEventListener('click', _callback(function(e) {
+            this.linkEvent(a.href);
+        }, this));
+    },
+        
+    /**
+      * pageView
+      *
+      * Called just before page is closed/navigated away from. Calculates
+      * total duration for which page was open, and sends message to 
+      * ExtractorManager for event 'pageview'.
+      */
     pageView: function() {
         var s = '', t;
         
@@ -57,6 +123,12 @@ var Extractor = {
         });
     },
     
+    /**
+      * linkEvent
+      *
+      * Called when link on page is clicked. Sends message to ExtractorManager
+      * with proper link for event 'linkevent'.
+      */
     linkEvent: function(href) {
         chrome.runtime.sendMessage({
             t: 'linkevent', 
@@ -67,6 +139,12 @@ var Extractor = {
         });
     },
     
+    /**
+      * viewQuote
+      *
+      * Called when page is Google Finance Quote. Extracts quote data and sends
+      * it to ExtractorManager for event 'viewquote'.
+      */
     viewQuote: function() {
         var q = document.location.href.match(/\?q=([^&]+)/)[1],
             p = document.querySelector('div#price-panel .pr > span'),

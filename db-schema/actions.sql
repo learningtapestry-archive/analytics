@@ -15,4 +15,4 @@ CREATE TABLE "public"."actions" (
 	"insert_date" timestamp(6) NULL DEFAULT now()
 )
 WITH (OIDS=FALSE);
-ALTER TABLE "public"."actions" OWNER TO "jason";
+ALTER TABLE "public"."actions" OWNER TO "learntac";

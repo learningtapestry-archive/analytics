@@ -60,8 +60,8 @@ var ExtractorManager = {
     user_tab: null,
     user_url: 'user.html',
     
-    sites_url: 'http://finance.betaspaces.com/api/v1/user/approved-sites',
-    event_url: 'http://finance.betaspaces.com/api/v1/statements/',
+    sites_url: 'http://lt-api.eddata.us/api/v1/user/approved-sites',
+    event_url: 'http://lt-api.eddata.us/api/v1/statements/',
     
     storage_keys: {
         user: 'store_user_data',

@@ -1,7 +1,7 @@
 <?php
 
-	$connectionString = "pgsql:host=localhost;port=5432;dbname=learntac;user=jason";
-	$messageDirectory = "/Users/jason/Desktop/messages/"; //important this ends with a slash
+	$connectionString = "pgsql:host=amazon-free.cath2wp0uca8.us-east-1.rds.amazonaws.com;port=5432;dbname=learntac;user=learntac;password=learn00tac!!";
+	$messageDirectory = "/var/www/learntaculous/mock-php-host/api/v1/statements/data/"; //important this ends with a slash
 
 	$connectionSuccess = false;
 	$connection = null;
@@ -10,6 +10,7 @@
 		$connection = new PDO($connectionString);
 		$connectionSuccess = true; // if we don't connect, we'll get an exception, otherwise let's assume we're connected.
 	} catch (Exception $e) {
+		print_r($e);
 		//TODO:  log an error - can't connect to database
 	}
 
@@ -22,6 +23,7 @@
 	function processJsonFiles($messageDirectory, &$connection) { 
 		
 		$files = scandir($messageDirectory);
+		$lastFile = "";
 
 		foreach ($files as $file) {
 			try {	
@@ -62,8 +64,12 @@
 					}
 				}
 			} catch (Exception $e) {
-	    		echo 'Caught exception: ',  $e->getMessage(), "\n";
+	    			echo 'Caught exception: ',  $e->getMessage(), "\n";
 			}
+		}
+
+		foreach (array_filter(glob("$messageDirectory\/*.json") ,"is_file") as $f) {
+  			rename ($f, $f . ".done");
 		}
 	}
 
@@ -95,6 +101,12 @@
 		}
 
 		echo "\n";
+	}
+
+	function markFileProcessed($filename) {
+		if (file_exists($filename)) {
+			rename($filename, $filename . ".done");
+		}
 	}
 
 ?>

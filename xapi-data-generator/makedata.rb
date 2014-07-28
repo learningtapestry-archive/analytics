@@ -1,6 +1,7 @@
 #!/usr/bin/ruby
 
 require 'csv'
+require 'json'
 
 ##
 # {
@@ -68,14 +69,23 @@ go = gets.chomp.downcase
 if go == "y" or go == ""
 	students = CSV.read(user_file_name)
 
+	student_list = []
+
 	## Check to see if file header is in the format
 	if students 
 		if students.size > 1 and students[0] == ["StudentID", "FirstName", "LastName", "Email"]
 			for index in 1 ... students.size
-  				puts "students[#{index}] = #{students[index].inspect}"
+				student = { :student_id => students[index][0],
+							:first_name => students[index][1],
+							:last_name => students[index][2],
+							:email => students[index][3] }
+				student_list.push(student)
+  				##puts "students[#{index}] = #{students[index].inspect}"
   			end
 		end
 	end
+
+	puts JSON.pretty_generate student_list
 
 	#for index in 0 ... students.size
   		#puts "students[#{index}] = #{students[index].inspect}"

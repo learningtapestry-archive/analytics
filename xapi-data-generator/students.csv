@@ -1,4 +1,4 @@
-StudentID,FirstName,LastName,Email
+student_id,first_name,last_name,email
 1000,John,Doe,john.doe@school.il.us
 1001,Jane,Doen,jane.doen@school.il.us
 1002,Julie,Doey,julie.doey@school.il.us

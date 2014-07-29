@@ -73,21 +73,21 @@ if go == "y" or go == ""
 
 	if students 
 		if students.size > 0 and 
-			students.headers.include?("StudentID") and
-			students.headers.include?("FirstName") and
-			students.headers.include?("LastName") and
-			students.headers.include?("Email")			
+			students.headers.include?("student_id") and
+			students.headers.include?("first_name") and
+			students.headers.include?("last_name") and
+			students.headers.include?("email")			
 			for index in 0 ... students.size
 				student = { :id => SecureRandom.uuid,
 							:actor => {
-								:mbox => students[index]["Email"],
-								:name => students[index]["FirstName"] + " " + students[index]["LastName"],
-								:id => students[index]["StudentID"]
+								:mbox => students[index]["email"],
+								:name => students[index]["first_name"] + " " + students[index]["last_name"],
+								:id => students[index]["student_id"]
 							},
 							:verb => {
-								:id => "test_id",
+								:id => "http://adlnet.gov/expapi/verbs/answered",
 								:display => {
-									:en => "test display"
+									:en => "answered"
 								}
 							}
 						}

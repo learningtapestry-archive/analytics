@@ -2,6 +2,7 @@
 
 require 'csv'
 require 'json'
+require 'securerandom'
 
 ##
 # {
@@ -27,10 +28,10 @@ puts "\n*** xAPI Test Data Generator ***\n"
 puts "This script will generate test data in the xAPI format various different actions as selected."
 puts "---------------------------------------------------------------------------------------------\n\n"
 
-print "User list file name [students.txt]: "
+print "User list file name [students.csv]: "
 user_file_name = gets.chomp
 if user_file_name.length == 0
-	user_file_name = "students.txt"
+	user_file_name = "students.csv"
 end
 puts
 
@@ -67,27 +68,33 @@ print "Generate data? [Y/n] "
 go = gets.chomp.downcase
 
 if go == "y" or go == ""
-	students = CSV.read(user_file_name)
-
+	students = CSV.read(user_file_name, :headers => true)
 	student_list = []
 
-	## Check to see if file header is in the format
 	if students 
-		if students.size > 1 and students[0] == ["StudentID", "FirstName", "LastName", "Email"]
-			for index in 1 ... students.size
-				student = { :student_id => students[index][0],
-							:first_name => students[index][1],
-							:last_name => students[index][2],
-							:email => students[index][3] }
+		if students.size > 0 and 
+			students.headers.include?("StudentID") and
+			students.headers.include?("FirstName") and
+			students.headers.include?("LastName") and
+			students.headers.include?("Email")			
+			for index in 0 ... students.size
+				student = { :id => SecureRandom.uuid,
+							:actor => {
+								:mbox => students[index]["Email"],
+								:name => students[index]["FirstName"] + " " + students[index]["LastName"],
+								:id => students[index]["StudentID"]
+							},
+							:verb => {
+								:id => "test_id",
+								:display => {
+									:en => "test display"
+								}
+							}
+						}
 				student_list.push(student)
-  				##puts "students[#{index}] = #{students[index].inspect}"
   			end
 		end
 	end
 
 	puts JSON.pretty_generate student_list
-
-	#for index in 0 ... students.size
-  		#puts "students[#{index}] = #{students[index].inspect}"
-	#end
 end

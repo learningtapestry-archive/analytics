@@ -4,23 +4,6 @@ require 'csv'
 require 'json'
 require 'securerandom'
 
-##
-# {
-#    "id": "12345678-1234-5678-1234-567812345678",
-#    "actor":{
-#        "mbox":"mailto:xapi@adlnet.gov"
-#    },
-#    "verb":{
-#        "id":"http://adlnet.gov/expapi/verbs/created",
-#        "display":{
-#            "en-US":"created"
-#        }
-#    },
-#    "object":{
-#        "id":"http://example.adlnet.gov/xapi/example/activity"
-#    }
-# }
-
 ACTION_VERBS = Array["answered", "completed", "experienced", "failed", "passed", "scored"]
 ACTIVITIES = Array["assessment", "course", "interaction", "lesson", "media", "question"]
 
@@ -69,6 +52,8 @@ go = gets.chomp.downcase
 
 if go == "y" or go == ""
 	students = CSV.read(user_file_name, :headers => true)
+	activities = CSV.read("activites.csv", :headers => true)
+	verbs = CSV.read("verbs.csv", :headers => true)
 	student_list = []
 
 	if students 
@@ -89,6 +74,9 @@ if go == "y" or go == ""
 								:display => {
 									:en => "answered"
 								}
+							},
+							:object => {
+								:id => "http://object.null/object_id"
 							}
 						}
 				student_list.push(student)
@@ -98,3 +86,9 @@ if go == "y" or go == ""
 
 	puts JSON.pretty_generate student_list
 end
+
+def get_random_item()
+
+end
+
+

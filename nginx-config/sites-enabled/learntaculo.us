@@ -1,0 +1,29 @@
+server {
+	listen 80 default_server;
+	#listen [::]:80 default_server ipv6only=on;
+
+	root /var/www;
+	index index.html index.htm;
+
+	# Make site accessible from http://localhost/
+	server_name localhost;
+
+	location / {
+		# First attempt to serve request as file, then
+		# as directory, then fall back to displaying a 404.
+		try_files $uri $uri/ =404;
+		# Uncomment to enable naxsi on this location
+		# include /etc/nginx/naxsi.rules
+	}
+
+	location /rest/v1/assert {
+		default_type 'text/plain';
+		content_by_lua_file "lt_lua_modules/api_key_validate.lua";
+		lua_code_cache off;
+	}
+
+	location ~ /\nginx_lua_modules {
+		deny all;
+	}
+}
+

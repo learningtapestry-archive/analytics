@@ -27,13 +27,13 @@ else
         end
 
 	-- Retrieve API key
-	local key, err = red:hget(api_key, "user")
-        if not key or key == ngx.null then
-        	ngx.log(ngx.ERR, "API key does not exist", err)
+	local queue, err = red:hget(api_key, "queue")
+        if not queue or queue == ngx.null then
+        	-- ngx.log(ngx.ERR, "API key does not exist: " .. api_key, err)
         	return ngx.exit(401)
 	else
-		ngx.say("API key exists")
-		ngx.say(key)
+		ngx.say("API key and queue exists")
+		ngx.say(queue)
 		ngx.say(api_key)
 		return ngx.exit(200)
         end

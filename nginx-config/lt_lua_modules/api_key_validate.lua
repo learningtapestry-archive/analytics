@@ -12,8 +12,29 @@ if ngx.req.get_method() ~= "POST" or
    ngx.req.get_headers()["X-LT-API-Key"] == nil or
    string.match(ngx.req.get_headers()["X-LT-API-Key"], GUID_MATCH) == nil or
    string.len(string.match(ngx.req.get_headers()["X-LT-API-Key"], GUID_MATCH)) ~= 36 then
-	ngx.exit(400);
+	return ngx.exit(400)
 else
-	api_key = ngx.req.get_headers()["X-LT-API-Key"];
-	ngx.say(api_key);
+	api_key = ngx.req.get_headers()["X-LT-API-Key"]
+	local redis = require "resty.redis"
+	local red = redis:new()
+	red:set_timeout(1000)
+
+	-- Connect to Redis at localhost
+	local ok, err = red:connect("127.0.0.1", 6379)
+        if not ok then
+        	ngx.log(ngx.ERR, "failed to connect to redis: ", err)
+        	return ngx.exit(500)
+        end
+
+	-- Retrieve API key
+	local key, err = red:hget(api_key, "user")
+        if not key or key == ngx.null then
+        	ngx.log(ngx.ERR, "API key does not exist", err)
+        	return ngx.exit(401)
+	else
+		ngx.say("API key exists")
+		ngx.say(key)
+		ngx.say(api_key)
+		return ngx.exit(200)
+        end
 end

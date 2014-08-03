@@ -19,7 +19,7 @@ server {
 	location /rest/v1/assert {
 		default_type 'text/plain';
 		content_by_lua_file "lt_lua_modules/api_key_validate.lua";
-		lua_code_cache off;
+		## lua_code_cache off;
 	}
 
 	location ~ /\nginx_lua_modules {

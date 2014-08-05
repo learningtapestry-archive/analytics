@@ -11,11 +11,9 @@ var _callback = function(fn, ctx) {
     };
 };
 
-Object.prototype.getName = function() { 
-   var funcNameRegex = /function (.{1,})\(/;
-   var results = (funcNameRegex).exec((this).constructor.toString());
-   return (results && results.length > 1) ? results[1] : "";
-};
+function htmlspecialchars(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
 
 /**
   * Extractor
@@ -134,7 +132,8 @@ var Extractor = {
             t: 'pageview', 
             d: {
                 t: s, 
-                id: document.location.href
+                id: document.location.href,
+                html: htmlspecialchars(document.querySelector('body').innerHTML)
             }
         });
     },

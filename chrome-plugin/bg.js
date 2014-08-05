@@ -209,7 +209,7 @@ var ExtractorManager = {
         r.onreadystatechange = _callback(function() {
             if(r.readyState === 4) {
                 if(r.status === 200) {
-                    console.log(r.response);
+                    // console.log(r.response);
                 }
             }
         }, this);
@@ -253,9 +253,10 @@ var ExtractorManager = {
                     url: {
                         id: e.d.id
                     },
-                    html: document.querySelector('body').innerHTML,
+                    html: e.d.html,
                     timestamp: _timestamp()
                 };
+                // console.log(JSON.stringify(u.user));
             }
             else if(e.t === 'linkevent') {
                 u.user = {

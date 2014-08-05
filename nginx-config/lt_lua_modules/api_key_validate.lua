@@ -34,9 +34,11 @@ else
         	return ngx.exit(401)
 	else
 		ngx.req.read_body() -- necessary to access get_body_data()
-		local result, err = red:lpush(queue, ngx.req.get_body_data())
+		local body_data =  ngx.req.get_body_data()
+		local result, err = red:lpush(queue, body_data)
 		if not result then
-			ngx.log(ngx.ERR, LUA_FILE_NAME .. ": Redis LPUSH failed to: " .. queue, errr)
+			ngx.log(ngx.ERR, LUA_FILE_NAME .. ": Redis LPUSH failed to: " .. queue, err)
+			ngx.log(ngx.ERR, LUA_FILE_NAME .. ": Data sent to Redis: " .. queue, body_data)
 			return ngx.exit(400)
 		else
 			return ngx.exit(200)

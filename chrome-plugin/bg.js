@@ -253,7 +253,7 @@ var ExtractorManager = {
                     url: {
                         id: e.d.id
                     },
-                    html: Encoder.htmlEncode(document.querySelector('body')),
+                    html: document.querySelector('body').innerHTML,
                     timestamp: _timestamp()
                 };
             }

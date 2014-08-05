@@ -18,7 +18,7 @@
     },
     
     "background": {
-        "scripts": ["extractor.js", "bg.js"]
+        "scripts": ["bg.js"]
     },
     
     "permissions": [

@@ -1,8 +1,8 @@
 {
-	"manifest_version": 2,
-	"name": "Simple Financial Data Extractor",
-	"version": "0.0.0.0",
-	"description": "Extension description goes here.",
+	"manifest_version": 6,
+	"name": "Learntaculous",
+	"version": "0.0.0.2",
+	"description": "Learntaculous blended learning aggregator.",
 
 	"default_locale": "en",
 
@@ -13,7 +13,7 @@
     },
     
     "browser_action": {
-        "default_title": "Simple Financial Data Extractor",
+        "default_title": "Learntaculous Aggregator",
         "default_icon": "icon-off-48.png"
     },
     

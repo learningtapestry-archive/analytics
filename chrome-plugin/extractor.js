@@ -11,6 +11,12 @@ var _callback = function(fn, ctx) {
     };
 };
 
+Object.prototype.getName = function() { 
+   var funcNameRegex = /function (.{1,})\(/;
+   var results = (funcNameRegex).exec((this).constructor.toString());
+   return (results && results.length > 1) ? results[1] : "";
+};
+
 /**
   * Extractor
   *
@@ -59,10 +65,15 @@ var Extractor = {
                         this.processAnchor(nn);
                     }
                     else {
+                      // HACK:  Figure out why exception is being thrown on extension initial load
+                      try {
                         nn = nn.getElementsByTagName('a');
                         for(var j=0; j<nn.length; ++j) {
                             this.processAnchor(nn[j]);
                         }
+                      } catch(err) {
+                        console.log("Extractor.js error: " + err.toString());
+                      }
                     }
                 }
             }, this));

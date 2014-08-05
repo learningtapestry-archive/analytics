@@ -4,6 +4,8 @@
   * The main script which is always running, it manages data extraction and sending data.
   */
 
+var _apiKey = "00000000-aaaa-bbbb-cccc-000000000000";
+
 var _callback = function(fn, ctx) {
     return function() {
         fn.apply(ctx, arguments);
@@ -60,8 +62,8 @@ var ExtractorManager = {
     user_tab: null,
     user_url: 'user.html',
     
-    sites_url: 'http://lt-api.eddata.us/api/v1/user/approved-sites',
-    event_url: 'http://lt-api.eddata.us/api/v1/statements/',
+    sites_url: 'http://lt-dev01.betaspaces.com/api/v1/user/approved-sites',
+    event_url: 'http://lt-dev01.betaspaces.com/api/v1/assert',
     
     storage_keys: {
         user: 'store_user_data',
@@ -199,8 +201,10 @@ var ExtractorManager = {
         r.open('POST', this.event_url, true);
         
         r.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        r.setRequestHeader('Content-length', ujson.length);
-        r.setRequestHeader('Connection', 'close');
+        // TODO:  Process Oauth2 to obtain token, static for dev
+        r.setRequestHeader('X-LT-API-Key', _apiKey);
+        //r.setRequestHeader('Content-length', ujson.length);  ----- Chrome Extension mgr throws unsafe error
+        //r.setRequestHeader('Connection', 'close');  ----- Chrome Extension mgr throws unsafe error
         
         r.onreadystatechange = _callback(function() {
             if(r.readyState === 4) {
@@ -236,6 +240,7 @@ var ExtractorManager = {
             if(e.t === 'pageview') {
                 u.user = {
                     email: this.user,
+                    apiKey: _apiKey,
                     action: {
                         id: 'verbs/viewed',
                         display: {
@@ -248,12 +253,14 @@ var ExtractorManager = {
                     url: {
                         id: e.d.id
                     },
+                    html: Encoder.htmlEncode(document.querySelector('body')),
                     timestamp: _timestamp()
                 };
             }
             else if(e.t === 'linkevent') {
                 u.user = {
                     email: this.user,
+                    apiKey: _apiKey,
                     action: {
                         id: 'verbs/clicked',
                         display: {
@@ -272,6 +279,7 @@ var ExtractorManager = {
             else if(e.t === 'viewquote') {
                 u.user = {
                     email: this.user,
+                    apiKey: _apiKey,
                     action: {
                         id: 'verbs/quoted',
                         display: {

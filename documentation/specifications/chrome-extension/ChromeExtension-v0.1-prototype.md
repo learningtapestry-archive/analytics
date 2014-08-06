@@ -6,6 +6,7 @@ This project is a simple Google Chrome extension to gather activity data on a us
 
 
 ### Installation
+
    1. On plug-in install, ask the user for their email.
    2. Store this email in local cache.
    3. Read the approved site list at http://finance.betaspaces.com/api/v1/user/approved-sites.
@@ -13,6 +14,7 @@ This project is a simple Google Chrome extension to gather activity data on a us
 
 
 ### Usage
+
    1. Do the following for ONLY web sites that are listed in the approved list above (1c) – see below for sample event messages.
       1. Capture Event Message
          1. PageView - http://en.wikipedia.org/wiki/ISO_8601
@@ -25,16 +27,13 @@ This project is a simple Google Chrome extension to gather activity data on a us
 
 POST to http://finance.betaspaces.com/api/v1/statements/.  If you POST successfully, you’ll receive a 200 OK and a JSON filename as a response (i.e. “14032276987067.json”).  Otherwise, you’ll receive a 404.
 
-
-
-
 1.) Page View
 
 	{
     	"user":{
         	"email":"mailto:user1@email.null"
         	},
-        	"action":{
+        "action":{
             	"id":"verbs/viewed",
             	"display":{
                 	"en-US":"viewed"
@@ -42,11 +41,10 @@ POST to http://finance.betaspaces.com/api/v1/statements/.  If you POST successfu
             	"value":{
                 	"time":"3M14S"
             	}
-	        },
-    	    "url":{
-        	    "id":"https://www.google.com/finance?q=GOOG"
+	       },
+    	"url":{
+        	"id":"https://www.google.com/finance?q=GOOG"
         	}
-    	}
 	}
 
 

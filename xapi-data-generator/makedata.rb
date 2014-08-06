@@ -4,8 +4,13 @@ require 'csv'
 require 'json'
 require 'securerandom'
 
-ACTION_VERBS = Array["answered", "completed", "experienced", "failed", "passed", "scored"]
-ACTIVITIES = Array["assessment", "course", "interaction", "lesson", "media", "question"]
+def get_random_item(list)
+	if list 
+		return list[Random.rand(list.size)]
+	else
+		return nil
+	end
+end
 
 puts "\n*** xAPI Test Data Generator ***\n"
 puts "This script will generate test data in the xAPI format various different actions as selected."
@@ -32,13 +37,15 @@ if record_count.to_s == "" or !record_count.is_a? Integer
 end
 puts
 
-puts "Action types available: " + ACTION_VERBS.join(", ");
-print "Type of actions to generate (all or comma separated list) [all]: "
-verbs = gets.chomp
-if verbs.to_s == ""
+## Temporarily until can enumerate from CSV table
+
+#puts "Action types available: " + ACTION_VERBS.join(", ");
+#print "Type of actions to generate (all or comma separated list) [all]: "
+#verbs = gets.chomp
+#if verbs.to_s == ""
 	verbs = "all"
-end
-puts
+#end
+#puts
 
 puts "---------------------------------------------------------------------------------------------\n\n"
 puts "Ready to generate test xAPI data using the following parameters:"
@@ -63,6 +70,7 @@ if go == "y" or go == ""
 			students.headers.include?("last_name") and
 			students.headers.include?("email")			
 			for index in 0 ... students.size
+				verb = get_random_item(verbs)
 				student = { :id => SecureRandom.uuid,
 							:actor => {
 								:mbox => students[index]["email"],
@@ -70,9 +78,9 @@ if go == "y" or go == ""
 								:id => students[index]["student_id"]
 							},
 							:verb => {
-								:id => "http://adlnet.gov/expapi/verbs/answered",
+								:id => verb["uri"],
 								:display => {
-									:en => "answered"
+									:en => verb["name"]
 								}
 							},
 							:object => {
@@ -86,9 +94,4 @@ if go == "y" or go == ""
 
 	puts JSON.pretty_generate student_list
 end
-
-def get_random_item()
-
-end
-
 

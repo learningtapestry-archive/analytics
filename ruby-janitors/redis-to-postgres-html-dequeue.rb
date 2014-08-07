@@ -16,13 +16,17 @@ CONFIG_FILE = "config.json"
 require 'json'
 require 'pg'
 require 'redis'
+require 'logger'
+
+logger = Logger.new($stdout)
 
 # Read configuration from file, store in config variable (hash)
 config = JSON.parse(File.read('config.json'))
 
 # If configuration doesn't parse or doesn't contain first element, stop and throw error
 if !config || !config["configuration"] then
-	abort("Configuration file (config.json) not found or invalid format.")
+	logger.error("Configuration file (config.json) not found or invalid format.")
+	abort()
 end
 
 # Connect to Redis
@@ -30,16 +34,18 @@ redis = Redis.new(:url => config["configuration"]["redis_url"])
 begin
 	redis.ping # connect to Redis server
 rescue Exception => e
-	abort("Cannot connect to Redis, connect url: " + config["configuration"]["redis_url"] + 
+	logger.error("Cannot connect to Redis, connect url: " + config["configuration"]["redis_url"] + 
 		", error: " + e.message)
+	abort()
 end
 
 # Connect to Postgres
 begin
 	pg = PG::Connection.open(config["configuration"]["postgres_connection_string"])
 rescue Exception => e
-	abort("Cannot connect to Postgres, connect url: " + config["configuration"]["postgres_connection_string"] + 
+	logger.error("Cannot connect to Postgres, connect url: " + config["configuration"]["postgres_connection_string"] + 
 		", error: " + e.message)
+	abort()
 end
 
-puts "I can connect to both Redis and Postgres, now ready to do some work."
+logger.info "I can connect to both Redis and Postgres, now ready to do some work."

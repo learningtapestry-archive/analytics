@@ -11,7 +11,7 @@
 # corresponds with that customer.  This script is intended to be called by a 
 # cron job.
 
-CONFIG_FILE = "config.json"
+CONFIG_FILE = "config/config.json"
 
 require 'json'
 require 'pg'
@@ -43,7 +43,7 @@ end
 begin
 	pg = PG::Connection.open(config["configuration"]["postgres_connection_string"])
 rescue Exception => e
-	logger.error("Cannot connect to Postgres, connect url: " + config["configuration"]["postgres_connection_string"] + 
+	logger.error("Cannot connect to Postgres, connect string: " + config["configuration"]["postgres_connection_string"] + 
 		", error: " + e.message)
 	abort()
 end

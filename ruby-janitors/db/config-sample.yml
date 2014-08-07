@@ -1,0 +1,8 @@
+development:
+  adapter: postgresql
+  encoding: unicode
+  database: development_database
+  pool: 5
+  host: 127.0.0.1
+  username: development_dbo
+  password: development_pw

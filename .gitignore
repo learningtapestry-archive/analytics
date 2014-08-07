@@ -1,6 +1,8 @@
 *.gem
 *.rbc
 config.json
+config.yml
+database.yml
 /.config
 /coverage/
 /InstalledFiles

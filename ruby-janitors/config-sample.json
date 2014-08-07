@@ -1,0 +1,11 @@
+{
+	"configuration" : {
+		"redis_server": "127.0.0.1",
+		"redis_queue_name": "queue_in",
+		"postgres_host": "127.0.0.1",
+		"postgres_user": "username",
+		"postgres_pass": "password",
+		"postgres_dbname": "database",
+		"postgres_queue_name": "queue_out"
+	}
+}

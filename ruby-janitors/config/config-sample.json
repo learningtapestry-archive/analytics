@@ -1,8 +1,6 @@
 {
 	"configuration" : {
 		"redis_url": "redis://127.0.0.1:6379/0",
-		"redis_queue_name": "queue_in",
-		"postgres_connection_string": "hostaddr=127.0.0.1 port=5432 dbname=database user=username password=password",
-		"postgres_table_name": "queue_out"
+		"redis_queue_name": "queue_in"
 	}
 }

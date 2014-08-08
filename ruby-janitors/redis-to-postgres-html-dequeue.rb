@@ -37,6 +37,7 @@ end
 
 # Connect to Redis
 redis = Redis.new(:url => config["configuration"]["redis_url"])
+redis_queue_name = config["configuration"]["redis_queue_name"]
 begin
 	redis.ping # connect to Redis server
 rescue Exception => e
@@ -55,8 +56,22 @@ rescue Exception => e
 	abort()
 end
 
+# If the Redis queue has messages, RPOP messages until empty
+if (redis.llen redis_queue_name) > 0 then
+	message = redis.rpop redis_queue_name
+	until message.nil?
+		puts message
 
-#=begin
+		#Next steps:
+		# => Attempt to parse into JSON, if no, dump to error file queue
+		# => Is JSON in LT format?  if no, dump to error file queue
+		# => Save into Postgres (if error, dump to db error file queue)
+
+		message = redis.rpop redis_queue_name
+	end
+end
+
+=begin
 logger.info "I can connect to both Redis and Postgres, now ready to do some work."
 
 sample_message = RawMessage.new
@@ -66,4 +81,4 @@ sample_message.email = "jasonhoekstra@gmail.com"
 sample_message.action = "viewed/view"
 sample_message.save
 puts sample_message.id
-#=end
+=end

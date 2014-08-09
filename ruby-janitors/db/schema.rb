@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140808170235) do
+ActiveRecord::Schema.define(:version => 20140809134106) do
 
   create_table "raw_messages", :force => true do |t|
     t.string "status",        :null => false
@@ -19,7 +19,7 @@ ActiveRecord::Schema.define(:version => 20140808170235) do
     t.string "email",         :null => false
     t.string "action"
     t.string "url"
-    t.string "html"
+    t.text   "html"
     t.date   "date_captured"
     t.date   "date_created"
     t.date   "date_updated"

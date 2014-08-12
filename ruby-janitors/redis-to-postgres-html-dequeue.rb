@@ -11,7 +11,7 @@
 # corresponds with that customer.  This script is intended to be called by a 
 # cron job.
 
-CONFIG_FILE = "config/config.json"
+CONFIG_FILE = "./config/config.json"
 
 require 'json'
 require 'pg'
@@ -21,6 +21,7 @@ require 'rubygems'
 require 'active_record'
 require 'yaml'
 require 'htmlentities'
+require './lib/configuration.rb'
 
 class RawMessage < ActiveRecord::Base
 end
@@ -28,36 +29,21 @@ end
 logger = Logger.new($stdout)
 html_decoder = HTMLEntities.new
 
-# Read configuration from file, store in config variable (hash)
-config = JSON.parse(File.read(CONFIG_FILE))
+config = Configuration.new(File.expand_path(CONFIG_FILE)) # Load Configuration class with a normalized full file path
 
-# If configuration doesn't parse or doesn't contain first element, stop and throw error
-if !config || !config["configuration"] then
-	logger.error("Configuration file (config.json) not found or invalid format.")
-	abort()
-end
-
-redis_url = config["configuration"]["redis_url"]
-redis_queue_name = config["configuration"]["redis_queue_name"]
-message_error_dir = config["configuration"]["message_error_dir"]
-message_dberror_dir = config["configuration"]["message_dberror_dir"]
-
-# Ensure error directories exist, error out if no, normalize paths if so
-if File.directory?(message_error_dir) && File.directory?(message_dberror_dir) then
-	message_error_dir = File.expand_path(message_error_dir)
-	message_dberror_dir = File.expand_path(message_dberror_dir)
-else
-	logger.error("Message error directories do not exist, error dir: #{message_error_dir} and db error dir: #{message_dberror_dir}")
+# If configuration is not fully initialized, then log error and abort execution
+if !config.is_initialized then
+	logger.error("Configuration not initialized, error: #{config.error_message}")
 	abort()
 end
 
 # Connect to Redis
-redis = Redis.new(:url => redis_url)
+redis = Redis.new(:url => config.redis_url)
 
 begin
 	redis.ping # connect to Redis server
 rescue Exception => e
-	logger.error("Cannot connect to Redis, connect url: " + redis_url + ", error: " + e.message)
+	logger.error("Cannot connect to Redis, connect url: #{redis_url}, error: #{e.message}")
 	abort()
 end
 
@@ -66,15 +52,14 @@ begin
 	dbconfig = YAML::load(File.open('db/config.yml'))
 	ActiveRecord::Base.establish_connection(dbconfig['development'])
 rescue Exception => e
-	logger.error("Cannot connect to Postgres, connect string: " + dbconfig['development'] + 
-		", error: " + e.message)
+	logger.error("Cannot connect to Postgres, connect string: #{dbconfig['development']}, error: #{e.message}")
 	abort()
 end
 
 counter = 0 # For unique filenames upon error
 # If the Redis queue has messages, RPOP messages until empty
-if (redis.llen redis_queue_name) > 0 then
-	message = redis.rpop redis_queue_name
+if (redis.llen config.redis_queue_name) > 0 then
+	message = redis.rpop config.redis_queue_name
 	until message.nil?
 		begin
 			json_message = JSON.parse(message)
@@ -100,16 +85,16 @@ if (redis.llen redis_queue_name) > 0 then
 				end
 
 				begin
-						raw_message.save
+					raw_message.save
 				rescue Exception => e
 					file_name = Time.now.strftime('%Y%m%d%H%M%S%L') + "-#{counter}.json"
-					logger.warn("Cannot save message into database, dumping to #{message_dberror_dir}/#{file_name}, error: " + e.message)
+					logger.warn("Cannot save message into database, dumping to #{message_dberror_dir}/#{file_name}, error: #{e.message}")
 					File.open(message_dberror_dir + '/' + file_name, 'w') {|f| f.write(message) } # Dump to disk
 				end
 			end
 		rescue Exception => e
 			file_name = Time.now.strftime('%Y%m%d%H%M%S%L') + "-#{counter}.json"
-			logger.warn("Cannot parse message into JSON, dumping to #{message_error_dir}/#{file_name}, error: " + e.message)
+			logger.warn("Cannot parse message into JSON, dumping to #{message_error_dir}/#{file_name}, error: #{e.message}")
 			File.open(message_error_dir + '/' + file_name, 'w') {|f| f.write(message) } # Dump to disk
 		end
 
@@ -117,15 +102,3 @@ if (redis.llen redis_queue_name) > 0 then
 		counter += 1
 	end
 end
-
-=begin
-logger.info "I can connect to both Redis and Postgres, now ready to do some work."
-
-sample_message = RawMessage.new
-sample_message.status = "OK"
-sample_message.api_key = "123"
-sample_message.email = "jasonhoekstra@gmail.com"
-sample_message.action = "viewed/view"
-sample_message.save
-puts sample_message.id
-=end

@@ -21,10 +21,8 @@ require 'rubygems'
 require 'active_record'
 require 'yaml'
 require 'htmlentities'
-require './lib/configuration.rb'
-
-class RawMessage < ActiveRecord::Base
-end
+require './lib/util/configuration.rb'
+require './lib/model/raw_message.rb'
 
 logger = Logger.new($stdout)
 html_decoder = HTMLEntities.new

@@ -20,11 +20,13 @@ require 'logger'
 require 'rubygems'
 require 'active_record'
 require 'yaml'
+require 'htmlentities'
 
 class RawMessage < ActiveRecord::Base
 end
 
 logger = Logger.new($stdout)
+html_decoder = HTMLEntities.new
 
 # Read configuration from file, store in config variable (hash)
 config = JSON.parse(File.read(CONFIG_FILE))
@@ -94,11 +96,11 @@ if (redis.llen redis_queue_name) > 0 then
 				raw_message.date_created = Time.now
 
 				if json_message["user"].key?("html") then
-					raw_message.html = json_message["user"]["html"]
+					raw_message.html = html_decoder.decode json_message["user"]["html"]
 				end
 
 				begin
-					raw_message.save
+						raw_message.save
 				rescue Exception => e
 					file_name = Time.now.strftime('%Y%m%d%H%M%S%L') + "-#{counter}.json"
 					logger.warn("Cannot save message into database, dumping to #{message_dberror_dir}/#{file_name}, error: " + e.message)

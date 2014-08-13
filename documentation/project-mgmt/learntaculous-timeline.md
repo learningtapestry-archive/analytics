@@ -15,7 +15,7 @@
 
 ### Goal:  End to end concept functional
 
-- [In-progress] Finish Redis to Postgres queue janitor
+- [DONE] Finish Redis to Postgres queue janitor
 - Deliver Postgres HTML info extractor janitor (http://nokogiri.org/)
 - Standup basic web interface (http://startbootstrap.com/template-overviews/sb-admin/)
 

@@ -11,18 +11,32 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140809134106) do
+ActiveRecord::Schema.define(:version => 20140813130123) do
 
   create_table "raw_messages", :force => true do |t|
-    t.string "status",        :null => false
-    t.string "api_key",       :null => false
-    t.string "email",         :null => false
-    t.string "action"
-    t.string "url"
-    t.text   "html"
-    t.date   "date_captured"
-    t.date   "date_created"
-    t.date   "date_updated"
+    t.string   "status",        :null => false
+    t.string   "api_key",       :null => false
+    t.string   "email",         :null => false
+    t.string   "action"
+    t.string   "url"
+    t.text     "html"
+    t.datetime "date_captured"
+    t.datetime "date_created"
+    t.datetime "date_updated"
+  end
+
+  create_table "statements", :force => true do |t|
+    t.integer  "user_id",         :null => false
+    t.string   "actor",           :null => false
+    t.string   "verb",            :null => false
+    t.string   "object",          :null => false
+    t.string   "context"
+    t.string   "result_string"
+    t.float    "result_number"
+    t.datetime "result_datetime"
+    t.datetime "date_captured"
+    t.datetime "date_created"
+    t.datetime "date_updated"
   end
 
 end

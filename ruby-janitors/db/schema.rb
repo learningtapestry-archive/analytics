@@ -60,7 +60,7 @@ ActiveRecord::Schema.define(:version => 20140814153703) do
   end
 
   create_table "extraction_maps", :force => true do |t|
-    t.integer  "approved_sites_id",        :null => false
+    t.integer  "approved_site_id",         :null => false
     t.string   "target_field"
     t.string   "css_selector",             :null => false
     t.integer  "parent_extraction_map_id"

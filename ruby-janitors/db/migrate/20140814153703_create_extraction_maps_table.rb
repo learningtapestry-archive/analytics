@@ -1,7 +1,7 @@
 class CreateExtractionMapsTable < ActiveRecord::Migration
   def up
   	create_table :extraction_maps do |t|
-  		t.belongs_to :approved_sites, null: false
+  		t.belongs_to :approved_site, null: false
   		t.string :target_field
       t.string :css_selector, null: false
       t.integer :parent_extraction_map_id

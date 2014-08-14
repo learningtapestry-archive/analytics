@@ -11,7 +11,45 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140813130123) do
+ActiveRecord::Schema.define(:version => 20140814144812) do
+
+  create_table "course_offerings", :force => true do |t|
+    t.integer  "course_id",    :null => false
+    t.string   "sis_id"
+    t.string   "other_id"
+    t.date     "date_start"
+    t.date     "date_end"
+    t.datetime "date_created"
+    t.datetime "date_updated"
+  end
+
+  create_table "courses", :force => true do |t|
+    t.string   "course_code"
+    t.string   "sis_id"
+    t.string   "other_id"
+    t.string   "name",                    :null => false
+    t.string   "description"
+    t.string   "subject_area"
+    t.boolean  "high_school_requirement"
+    t.datetime "date_created"
+    t.datetime "date_updated"
+  end
+
+  create_table "districts", :force => true do |t|
+    t.string   "state_id"
+    t.string   "nces_id"
+    t.string   "sis_id"
+    t.string   "other_id"
+    t.string   "name",         :null => false
+    t.string   "address"
+    t.string   "city"
+    t.string   "state"
+    t.string   "phone"
+    t.string   "grade_low"
+    t.string   "grade_high"
+    t.datetime "date_created"
+    t.datetime "date_updated"
+  end
 
   create_table "raw_messages", :force => true do |t|
     t.string   "status",        :null => false
@@ -21,6 +59,49 @@ ActiveRecord::Schema.define(:version => 20140813130123) do
     t.string   "url"
     t.text     "html"
     t.datetime "date_captured"
+    t.datetime "date_created"
+    t.datetime "date_updated"
+  end
+
+  create_table "schools", :force => true do |t|
+    t.string   "state_id"
+    t.string   "nces_id"
+    t.string   "sis_id"
+    t.string   "other_id"
+    t.string   "name",         :null => false
+    t.string   "address"
+    t.string   "city"
+    t.string   "state"
+    t.string   "phone"
+    t.string   "grade_low"
+    t.string   "grade_high"
+    t.datetime "date_created"
+    t.datetime "date_updated"
+  end
+
+  create_table "sections", :force => true do |t|
+    t.string   "section_code"
+    t.integer  "course_offering_id", :null => false
+    t.string   "sis_id"
+    t.string   "other_id"
+    t.string   "name",               :null => false
+    t.datetime "date_created"
+    t.datetime "date_updated"
+  end
+
+  create_table "staff_members", :force => true do |t|
+    t.string   "state_id"
+    t.string   "sis_id"
+    t.string   "other_id"
+    t.string   "staff_member_type", :null => false
+    t.string   "first_name",        :null => false
+    t.string   "middle_name"
+    t.string   "last_name",         :null => false
+    t.string   "gender"
+    t.string   "login"
+    t.string   "password"
+    t.string   "email"
+    t.date     "date_of_birth"
     t.datetime "date_created"
     t.datetime "date_updated"
   end
@@ -35,6 +116,23 @@ ActiveRecord::Schema.define(:version => 20140813130123) do
     t.float    "result_number"
     t.datetime "result_datetime"
     t.datetime "date_captured"
+    t.datetime "date_created"
+    t.datetime "date_updated"
+  end
+
+  create_table "students", :force => true do |t|
+    t.string   "state_id"
+    t.string   "sis_id"
+    t.string   "other_id"
+    t.string   "first_name",    :null => false
+    t.string   "middle_name"
+    t.string   "last_name",     :null => false
+    t.string   "gender"
+    t.string   "login"
+    t.string   "password"
+    t.string   "email"
+    t.string   "grade_level"
+    t.date     "date_of_birth"
     t.datetime "date_created"
     t.datetime "date_updated"
   end

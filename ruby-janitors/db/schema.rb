@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140814153703) do
+ActiveRecord::Schema.define(:version => 20140815042607) do
 
   create_table "approved_sites", :force => true do |t|
     t.string   "hash_id",      :null => false
@@ -62,7 +62,7 @@ ActiveRecord::Schema.define(:version => 20140814153703) do
   create_table "extraction_maps", :force => true do |t|
     t.integer  "approved_site_id",         :null => false
     t.string   "target_field"
-    t.string   "css_selector",             :null => false
+    t.string   "xpath_selector",           :null => false
     t.integer  "parent_extraction_map_id"
     t.datetime "date_created"
     t.datetime "date_updated"

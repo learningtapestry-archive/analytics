@@ -59,7 +59,7 @@ raw_messages.each do |raw_message|
 				iterator_map = approved_site.extraction_maps.where("target_field IS NULL AND parent_extraction_map_id IS NULL")
 
 				if iterator_map && iterator_map.count == 1 then
-					iterator = html.css(iterator_map[0].css_selector)
+					iterator = html.xpath(iterator_map[0].xpath_selector)
 
 					iterator.each do |snippet|
 						statement = Statement.new
@@ -70,21 +70,19 @@ raw_messages.each do |raw_message|
 						# Extract non-repeating elements
 						snippet_maps = approved_site.extraction_maps.where("parent_extraction_map_id IS NULL AND target_field IS NOT NULL")
 						snippet_maps.each do |snippet_map|
-							#print snippet_map.target_field + " - " + snippet_map.css_selector + " - "
-							#puts html.at_xpath(snippet_map.css_selector).content
-							statement[snippet_map.target_field] = html.at_xpath(snippet_map.css_selector).content
+							statement[snippet_map.target_field] = html.at_xpath(snippet_map.xpath_selector).content
 						end
 
 						# Extract repeating elements
 						snippet_maps = approved_site.extraction_maps.where("parent_extraction_map_id IS NOT NULL AND target_field IS NOT NULL")
 						snippet_maps.each do |snippet_map|
-							#print snippet_map.target_field + " - " + snippet_map.css_selector + " - "
-							#puts snippet.at_xpath(snippet_map.css_selector).content
-							statement[snippet_map.target_field] = snippet.at_xpath(snippet_map.css_selector).content
+							statement[snippet_map.target_field] = snippet.at_xpath(snippet_map.xpath_selector).content
 						end
 
+						statement.date_created = DateTime.now
 						statement.save
 						raw_message.status = "OK"
+						raw_message.date_updated = DateTime.now
 						raw_message.save
 					end
 				else
@@ -96,17 +94,20 @@ raw_messages.each do |raw_message|
 					# Extract non-repeating elements
 					snippet_maps = approved_site.extraction_maps.where("parent_extraction_map_id IS NULL")
 					snippet_maps.each do |snippet_map|
-						statement[snippet_map.target_field] = html.at_xpath(snippet_map.css_selector)
+						statement[snippet_map.target_field] = html.at_xpath(snippet_map.xpath_selector)
 					end
 
+					statement.date_created = DateTime.now
 					statement.save
 					raw_message.status = "OK"
+					raw_message.date_updated = DateTime.now
 					raw_message.save
 				end
 			end
 		rescue Exception => e
 			logger.error("Error parsing raw message: #{raw_message.id}, error: #{e.message})")
 			raw_message.status = "ERROR"
+			raw_message.date_updated = DateTime.now
 			raw_message.save
 		end
 	end

@@ -12,7 +12,6 @@
 
 # STATUS:  PROTOTYPE and WORK IN PROGRESS
 
-require 'rubygems'
 require 'active_record'
 require 'yaml'
 require 'htmlentities'
@@ -28,6 +27,8 @@ logger = Logger.new($stdout)
 # Connect to Postgres
 begin
 	dbconfig = YAML::load(File.open('db/config.yml'))
+	##BUG: The following line won't work outside of development.
+	##     Need a framework for setting up environment variables
 	ActiveRecord::Base.establish_connection(dbconfig['development'])
 rescue Exception => e
 	logger.error("Cannot connect to Postgres, connect string: #{dbconfig['development']}, error: #{e.message}")

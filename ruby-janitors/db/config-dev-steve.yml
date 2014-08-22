@@ -8,13 +8,3 @@ development:
   username: learntaculous
   password: lt_dev_xyz_123
   tablespace: learntaculous_ts
-
-development-old:
-  adapter: postgresql
-  encoding: unicode
-  database: development_database
-  pool: 5
-  host: 127.0.0.1
-  port: 5432
-  username: development_dbo
-  password: development_pw

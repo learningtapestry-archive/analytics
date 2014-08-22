@@ -1,0 +1,13 @@
+# To use Gemfiles see bundler.io
+# To install: sudo gem install bundler
+# To use: bundler install or bundler update
+# To remove all gems not reuqired in this file:
+#   sudo bundle clean --force
+# This helps ensure that you aren't depending on a gem that isn't installed from this list
+source 'https://rubygems.org'
+gem 'standalone_migrations', '>= 2.1.4'
+gem 'htmlentities', '>= 4.3.2'
+gem 'nokogiri', '>= 1.6.3.1'
+gem 'pg', '>= 0.17.1'
+gem 'logger'
+gem 'rake'

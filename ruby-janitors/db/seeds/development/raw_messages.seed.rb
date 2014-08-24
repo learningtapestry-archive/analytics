@@ -13,4 +13,5 @@ RawMessage.create(
   :action=>'GET',
   :html=>'<html><body><a href="bar">link</a></body></html>',
   :date_captured=>Time::now)
+puts "******DEVELOPMENT"
 LT::Janitor::logger.info("Raw Message seeding complete")

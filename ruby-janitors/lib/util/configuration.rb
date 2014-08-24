@@ -5,8 +5,17 @@
 # Unauthorized copying of this file, via any medium is strictly prohibited
 # Proprietary and confidential
 
+# TODO:
+# This appears to be the reddis configuration
+# Move this configurator class into Module LT somewhere (LT::Redis?)
+# Update dependencies
 class Configuration
 
+	# TODO/INPUT:
+	# SM: Avoid class instance variables whenever possible. 
+	# Try to hold state outside of classes when you can
+	# @error_message in particular seems like it should be solved stateless
+	# @is_initialized would make more sense (to me) if caller & init were multi-threaded
 	@is_initialized = false # this will remain false until config loaded successfully
 	@error_message = ""
 

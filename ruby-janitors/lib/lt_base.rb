@@ -75,46 +75,6 @@ module LT
     end # run_test
   end # class << self (LT)
 
-	# Module mix-in to enable seeding in seed files
-	# Usage in seed file (seed files are named *.seeds.rb)
-	#   require './lt_base.rb'
-	#   include LT::Seedlib
-	#   seed do # block of seeding code; end
-	# Nb. You can override the filename for seed with:
-	#   seed(:file=>"filename...")
-	# Usage to run seeds
-	#   Call Seedlib::seed!(name) # to run name
-	#   e.g. if file was "./db/seeds/raw_messages.seeds.rb"
-	#        name is "RawMessage"
-	#        so seed: Seedlib::seed!("RawMessage")
-	module Seedlib
-	  @seed_blocks = {}
-	  class << self
-	    attr_accessor :seed_blocks
-	    def seed(opts={},block)
-	      id = opts[:id]
-	      id = File::basename(id).match(/(.*?)\./)[1].classify
-	      Seedlib::seed_blocks[id] = {:block => block}
-	    end
-	    def seed_all!
-	      Seedlib::seed_blocks.each do |key,val|
-	        puts key.inspect
-	        val[:block].call
-	      end
-	    end
-	    def seed!(id)
-	      Seedlib::seed_blocks[id][:block].call
-	    end
-	  end
-	  def seed(opts = {}, &block)
-	    # get the filename where the block came from (warning: voodoo)
-	    file = eval("__FILE__", block.binding)
-	    file = opts[:file] if opts[:file]
-	    Seedlib::seed({:id =>file},block)
-	  end
-	end
-
-
   module Janitor
     class << self
       # root_dir holds application root (where this Rake file is located)
@@ -150,18 +110,20 @@ module LT
           # This will run all seeds for environment, eg "test"
           env_seeds = File::join('./',run_env)
           LT::Janitor::Seeds::load_seeds(env_seeds)
-          seed_all!
         end
 	      # This looks in the path provided for files globbing SEED_FILES, 
 	      # "requiring" each one.
 	      # The assumption is that each file will know how to load itself
 	      def load_seeds(path = './')
 	        fullpath = File::expand_path(File::join(LT::Janitor::seed_path,path))
-	        seedfiles=Dir::glob(File::join(fullpath,'*'+SEED_FILES))
+	        seedfiles = Dir::glob(File::join(fullpath,'*'+SEED_FILES))
 	        seedfiles.each do |seedfile|
-	          require File::expand_path(seedfile)
+						load_seed(seedfile)	          
 	        end
 	      end # load_seeds
+	      def load_seed(seedfile)
+	      	load File::expand_path(seedfile)
+	      end
       end #class << self
     end # Seeds module
   end # Janitor module

@@ -31,6 +31,11 @@ module LT
 			#     Loop through IDs and pull objects one at a time, to reduce memory loading
 			raw_messages = RawMessage.where(status: "READY")  
 			approved_sites = ApprovedSite.all
+			raw_messages.each do |raw_message|
+				html = Nokogiri.parse(raw_message.html)
+				# ...
+				# TODO seed approved_sites with sample data
+			end
 		end
 	end end # Loaders class << self
 end

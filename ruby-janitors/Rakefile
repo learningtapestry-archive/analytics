@@ -2,73 +2,9 @@ require 'active_record'
 require 'logger'
 require 'pg'
 require 'yaml'
-
+require './lib/lt_base.rb'
 require 'standalone_migrations'
 StandaloneMigrations::Tasks.load_tasks
-
-module LT
-  class BaseException < Exception;end;
-  class Critical < BaseException;end;
-  class << self
-    def testing?
-      # we are only in a testing environment if RAILS_ENV and run_env agree on it
-      (self.run_env == ('test' && ENV['RAILS_ENV'] = 'test'))
-    end
-    # raise an exception if we are not in testing mode
-    def testing!(msg="Expected to be in testing env, but was not.")
-      raise LT::Critical.new(msg) if !LT::testing?
-    end
-    # run_env holds running environment: production|staging|test|development
-    attr_accessor :run_env
-  end
-
-  module Janitor
-    class << self
-      # root_dir holds application root (where this Rake file is located)
-      # model_path holds the folder where our models are stored
-      # test_path holds folder where the tests are stored
-      attr_accessor :logger, :root_dir, :model_path, :test_path, :seed_path
-      # will test all files in test folder: *_test.rb
-      def run_tests
-        testfiles = Dir::glob(File::join(LT::Janitor::test_path, '*_test.rb'))
-        testfiles.each do |testfile| 
-          full_testfile =  File::join(LT::Janitor::test_path, File::basename(testfile))
-          run_test(full_testfile)
-        end
-        LT::Janitor::logger.info('Tests complete')
-      end
-      # will test a single file in test folder
-      # test file must self-run when "required"
-      def run_test(testfile)
-        LT::testing!
-        LT::Janitor::logger.info("Running Test #{File::basename(testfile)}")
-        # add testing path if it is missing from file
-        if testfile == File::basename(testfile) then
-          testfile = File::join(LT::Janitor::test_path, File::basename(testfile))
-        end
-        require testfile
-      end # run_test
-    end # class << self
-    module Seeds
-      SEED_FILES = '*.seeds.rb'
-      class << self
-        def seed!
-          run_env = LT::run_env
-          LT::Janitor::Seeds::exec_seeds('./')
-          LT::Janitor::Seeds::exec_seeds(File::join('./',run_env))
-          LT::Janitor::logger.info("Seeding complete")
-        end
-        def exec_seeds (path)
-          fullpath = File::expand_path(File::join(LT::Janitor::seed_path,path))
-          seedfiles=Dir::glob(File::join(fullpath,SEED_FILES))
-          seedfiles.each do |seedfile|
-            require File::join(seedfile)
-          end
-        end # exec_seeds
-      end #class << self
-    end # Seeds module
-  end # Janitor module
-end # LT module
 
 desc 'Default does nothing at the moment - just used to check if rake compiles'
 task :default do
@@ -111,7 +47,7 @@ namespace :lt do
       task :run_test, [:testfile] => [:'lt:janitor:test:boot', 
         :'lt:janitor:test:db:migrate_tables'] do |t, args|
         filename = args[:testfile]
-        LT::Janitor::run_test(filename)
+        LT::run_test(filename, LT::Janitor::test_path)
       end
 
       task :boot do
@@ -152,48 +88,22 @@ namespace :lt do
       
       desc "Setup janitor logger"
       task :setup_logger do
-        LT::Janitor.logger = Logger.new($stdout)
+        LT::Janitor.init_logger
       end
 
       desc "Define the environment we are running in (prod, test, dev)"
       task :set_env do
-        # null out empty string env vars
-        if ENV['RAILS_ENV'] && ENV['RAILS_ENV'].empty? then
-          ENV['RAILS_ENV'] = nil
-        end
-        if ENV['RACK_ENV'] && ENV['RACK_ENV'].empty? then
-          ENV['RACK_ENV'] = nil
-        end
-        LT::run_env = ENV['RAILS_ENV'] || ENV['RACK_ENV'] || 'development'
-        ENV['RAILS_ENV'] = LT::run_env
-        Rails.env = LT::run_env
-        LT::Janitor::root_dir = File::expand_path(File::dirname(__FILE__)) # Rake.application.original_dir seems better but points to db/seeds for unknown reasons
-        LT::Janitor::model_path = File::expand_path(File::join(LT::Janitor::root_dir, '/lib/model'))
-        LT::Janitor::test_path = File::expand_path(File::join(LT::Janitor::root_dir, '/test'))
-        LT::Janitor::seed_path = File::expand_path(File::join(LT::Janitor::root_dir, '/db/seeds'))
+        LT::setup_environment(File::dirname(__FILE__))
       end
       
       desc "Load all AR models from ./lib/model"
       task :load_all_models do
-        models = Dir::glob(File::join(LT::Janitor::model_path, '*.rb'))
-        models.each do |file| 
-          full_file =  File::join(LT::Janitor::model_path, File::basename(file))
-          require full_file
-        end
+        LT::load_all_models
       end
 
       desc "Establish connection to janitor database"
       task :boot_janitor_db do
-        # Connect to DB
-        begin
-          dbconfig = YAML::load(File.open('db/config.yml'))
-          ActiveRecord::Base.establish_connection(dbconfig[LT::run_env])
-        rescue Exception => e
-          LT::Janitor::logger.error("Cannot connect to Postgres, connect string: #{dbconfig['development']}, error: #{e.message}")
-          # SM: Re-raising an error is better than eating it, IMO, so I'm removing the abort
-          raise e
-          #abort()
-        end
+        LT::boot_db(File::expand_path('./db/config.yml'))
       end # boot_janitor_db
     end #boot namespace
   end # janitor namespace

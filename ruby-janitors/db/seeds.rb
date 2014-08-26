@@ -5,6 +5,3 @@
 # For table data that are common across all environments create files
 # In this folder: ./approved_sites.seeds.rb
 
-# exec all seed files in path by requiring them
-
-LT::Janitor::Seeds::seed!

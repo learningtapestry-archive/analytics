@@ -16,6 +16,7 @@ class HTMLExtractTest < Minitest::Test
   def setup
     # set database transaction, so we can revert seeds
     DatabaseCleaner.start
+    ## TODO: Question should seed! go up into before_suite to reduce reload time?
     # re-seed data for each test
     LT::Janitor::Seeds::seed!
   end
@@ -24,7 +25,7 @@ class HTMLExtractTest < Minitest::Test
   end
 
   def test_extract_html
-    #LT::Loaders::extract_html
+    LT::Loaders::extract_html
     msgs = RawMessage.where(status: "READY")
     assert_equal 2, msgs.count
   end

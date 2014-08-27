@@ -62,7 +62,6 @@ GEM
     rake (10.3.2)
     rdoc (3.12.2)
       json (~> 1.4)
-    seedbank (0.3.0)
     sprockets (2.2.2)
       hike (~> 1.2)
       multi_json (~> 1.0)
@@ -88,5 +87,4 @@ DEPENDENCIES
   nokogiri (>= 1.6.3.1)
   pg (>= 0.17.1)
   rake
-  seedbank (>= 0.3.0)
   standalone_migrations (>= 2.1.4)

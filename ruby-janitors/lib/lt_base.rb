@@ -71,6 +71,7 @@ module LT
       if testfile == File::basename(testfile) then
         testfile = File::join(test_path, File::basename(testfile))
       end
+      #TODO: This should be load not require I think (for re-entrant code running)
       require testfile
     end # run_test
   end # class << self (LT)

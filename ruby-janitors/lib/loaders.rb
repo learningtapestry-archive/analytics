@@ -23,6 +23,8 @@ require 'nokogiri'
 # require './lib/model/extraction_map.rb'
 
 module LT
+	# TODO
+	# add module Janitor here and refactor
 	module Loaders class << self
 		# Extract html from raw messages 
 		def extract_html
@@ -35,7 +37,7 @@ module LT
 				html = Nokogiri.parse(raw_message.html)
 				# ...
 				# TODO seed approved_sites with sample data
-			end
+			end # raw_messages.each...
 		end
 	end end # Loaders class << self
 end

@@ -26,12 +26,13 @@ module LT
 	# TODO
 	# add module Janitor here and refactor
 	module Loaders class << self
+		ID_LIMIT = 1000
 		# Extract html from raw messages 
 		def extract_html
 			#TODO Limit number of records pulled
 			#     Only pull IDs, rather than objects
 			#     Loop through IDs and pull objects one at a time, to reduce memory loading
-			raw_messages = RawMessage.where(status: "READY")  
+			msg_ids = ActiveRecord::Base.connection.exec_query("select * from raw_messages where status = 'READY' limit 1000")
 			approved_sites = ApprovedSite.all
 			raw_messages.each do |raw_message|
 				html = Nokogiri.parse(raw_message.html)

@@ -4,4 +4,4 @@
 #   ./test/raw_messages.seeds.rb to seed the testing database
 # For table data that are common across all environments create files
 # In this folder: ./approved_sites.seeds.rb
-
+LT::Janitor::Seeds::seed!

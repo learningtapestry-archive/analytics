@@ -10,9 +10,16 @@ module LT
       # we are only in a testing environment if RAILS_ENV and run_env agree on it
       (self.run_env == ('test' && ENV['RAILS_ENV'] = 'test'))
     end
+    def development?
+      # we are only in a development environment if RAILS_ENV and run_env agree on it
+      (self.run_env == ('development' && ENV['RAILS_ENV'] = 'development'))
+    end
     # raise an exception if we are not in testing mode
     def testing!(msg="Expected to be in testing env, but was not.")
       raise LT::Critical.new(msg) if !LT::testing?
+    end
+    def development!(msg="Expected to be in testing env, but was not.")
+      raise LT::Critical.new(msg) if !LT::development?
     end
     # run_env holds running environment: production|staging|test|development
     attr_accessor :run_env
@@ -118,7 +125,7 @@ module LT
 	      def load_seeds(path = './')
 	        fullpath = File::expand_path(File::join(LT::Janitor::seed_path,path))
 	        seedfiles = Dir::glob(File::join(fullpath,'*'+SEED_FILES))
-	        seedfiles.each do |seedfile|
+          seedfiles.each do |seedfile|
 						load_seed(seedfile)	          
 	        end
 	      end # load_seeds

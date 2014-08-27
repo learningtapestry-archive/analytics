@@ -4,6 +4,7 @@ require 'pg'
 require 'yaml'
 require './lib/lt_base.rb'
 require 'standalone_migrations'
+require 'irb'
 StandaloneMigrations::Tasks.load_tasks
 
 desc 'Default does nothing at the moment - just used to check if rake compiles'
@@ -19,14 +20,26 @@ task :tests do
   Rake::Task[:'lt:janitor:test:run_tests'].invoke
 end
 
+task :console do
+  Rake::Task[:'lt:janitor:console'].invoke
+end
 
 
 namespace :lt do
   namespace :janitor do
+    desc "Boot up a console in Janitor context"
+    task :console => [:boot] do
+      IRB.setup nil
+      IRB.conf[:MAIN_CONTEXT] = IRB::Irb.new.context
+      require 'irb/ext/multi-irb'
+      IRB.irb nil, self
+    end
+
     desc "Boot Janitor system"
     task :boot => [:'boot:set_env', :'boot:setup_logger', :'boot:boot_janitor_db', :'boot:load_all_models'] do
       LT::Janitor::logger.info("Janitor booted")
     end
+
     desc "Seed environment db with data (generally speaking, don't do this in testing env)"
     task :seed => [:'lt:janitor:boot', :'db:seed']
 

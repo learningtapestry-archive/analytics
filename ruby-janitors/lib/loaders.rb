@@ -26,19 +26,20 @@ module LT
 	# TODO
 	# add module Janitor here and refactor
 	module Loaders class << self
-		ID_LIMIT = 1000
+		ID_LIMIT = 10000
 		# Extract html from raw messages 
 		def extract_html
 			#TODO Limit number of records pulled
 			#     Only pull IDs, rather than objects
 			#     Loop through IDs and pull objects one at a time, to reduce memory loading
-			msg_ids = ActiveRecord::Base.connection.exec_query("select * from raw_messages where status = 'READY' limit 1000")
+			msg_ids = ActiveRecord::Base.connection.exec_query("select id from raw_messages where status = 'READY' limit #{ID_LIMIT}")
 			approved_sites = ApprovedSite.all
-			raw_messages.each do |raw_message|
-				html = Nokogiri.parse(raw_message.html)
-				# ...
-				# TODO seed approved_sites with sample data
-			end # raw_messages.each...
+			msg_ids.rows.each do |row|
+				msg_id = row[0]
+				msg = RawMessage.find(msg_id)
+				html = Nokogiri.parse(msg.html)
+
+			end
 		end
 	end end # Loaders class << self
 end

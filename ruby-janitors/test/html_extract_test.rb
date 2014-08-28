@@ -27,7 +27,7 @@ class HTMLExtractTest < Minitest::Test
   def test_extract_html
     LT::Loaders::extract_html
     msgs = RawMessage.where(status: "READY")
-    assert_equal 2, msgs.count
+    assert_equal 3, msgs.count
   end
 
   def test_sample
@@ -36,7 +36,5 @@ class HTMLExtractTest < Minitest::Test
     #puts result.class.instance_methods.inspect
     #puts "wait"
     #STDIN.gets
-    msgs = RawMessage.where(status: "READY")
-    assert_equal 2, msgs.count
   end
 end

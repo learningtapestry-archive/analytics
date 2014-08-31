@@ -26,14 +26,21 @@ Ruby-Pg dequeue
 # Gemfiles
 
 To use Gemfiles see bundler.io
+
 To install: sudo gem install bundler
+
 To use: bundler install or bundler update
+
 To remove all gems not required in this file:
+
   sudo bundle clean --force # Note: normally sudo isn't good for bundle but this is an exception
+  
 This helps ensure that you aren't depending on a gem that isn't installed from this list
+
 To bundle gems for production or staging, recommend:
+  
   bundle install --without test
+
 If you want to manage different ruby installations with different gemsets for different projects
+
 Consider installing RVM to help manage that.
-
-

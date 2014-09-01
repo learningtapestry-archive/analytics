@@ -9,7 +9,7 @@
 # If you want to manage different ruby installations with different gemsets for different projects
 # Consider installing RVM to help manage that.
 source 'https://rubygems.org'
-gem 'logfger'
+gem 'logger'
 gem 'rake'
 gem 'pg', '>= 0.17.1'
 gem 'standalone_migrations', '>= 2.1.4'

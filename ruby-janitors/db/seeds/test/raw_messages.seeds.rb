@@ -1,26 +1,26 @@
 #id,status,api_key,email,action,url,html,date_captured,date_created,date_updated
 RawMessage.create(
   :api_key=>'api_key_1_invalid',
-  :status=>'READY',
   :email=>'foo@bar.com',
   :action=>'GET',
+  :url => 'http://foo.bar',
   :html=>'<html><body><a href="foo">link</a></body></html>',
-  :date_captured=>Time::now
+  :captured_at=>Time::now
 )
 RawMessage.create(
   :api_key=>'00000000-aaaa-bbbb-cccc-000000000000',
-  :status=>'READY',
   :email=>'bar@bar.com',
   :action=>'GET',
+  :url => 'http://foo.bar',
   :html=>'<html><body><a href="bar">link</a></body></html>',
-  :date_captured=>Time::now
+  :captured_at=>Time::now
 )
 RawMessage.create({
   :api_key=>'00000000-aaaa-bbbb-dddd-000000000000',
-  :status=>'READY',
   :email=>'foo@bar.com',
   :action=>'GET',
-  :date_captured=>Time::now,
+  :captured_at=>Time::now,
+  :url => 'http://www.codeacademy.com/learn/pageFoo',
   :html=> <<-eos
      <article class=fit-fixed>
         <article class=fit-fixed id=header__nav-container>

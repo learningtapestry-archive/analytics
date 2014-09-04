@@ -24,9 +24,9 @@ class HTMLExtractTest < Minitest::Test
     DatabaseCleaner.clean # cleanup of the database
   end
 
-  def test_extract_html
-    LT::Loaders::extract_html
-    msgs = RawMessage.where(status: "READY")
+  def test_CodeAcademy_extract
+    LT::Loaders::CodeAcademy::extract
+    msgs = RawMessage.where('id > 0')
     assert_equal 3, msgs.count
   end
 

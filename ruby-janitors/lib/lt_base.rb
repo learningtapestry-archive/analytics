@@ -4,6 +4,7 @@ require 'active_support/inflector' # required by module Seedlib
 
 module LT
   class BaseException < Exception;end;
+  class ParameterMissing < BaseException;end
   class Critical < BaseException;end;
   class << self
     def testing?

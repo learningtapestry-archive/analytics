@@ -25,25 +25,27 @@ require 'nokogiri'
 module LT
 	# TODO
 	# add module Janitor here and refactor
-	module Loaders class << self
-		ID_LIMIT = 10000
-		# Extract html from raw messages 
-		def extract_html
-			#TODO Limit number of records pulled
-			#     Only pull IDs, rather than objects
-			#     Loop through IDs and pull objects one at a time, to reduce memory loading
-			msg_ids = ActiveRecord::Base.connection.exec_query("select id from raw_messages where status = 'READY' limit #{ID_LIMIT}")
-			approved_sites = ApprovedSite.all
-			msg_ids.rows.each do |row|
-				msg_id = row[0]
-				msg = RawMessage.find(msg_id)
-				html = Nokogiri.parse(msg.html)
-
-			end
-		end
-	end end # Loaders class << self
+	module Loaders 
+		ROW_LIMIT = 10000
+		module CodeAcademy
+			class << self
+				# we never process more than ROW_LIMIT per query/operation
+				# Extract html from raw messages 
+				def extract
+					#TODO Limit number of records pulled
+					#     Only pull IDs, rather than objects
+					#     Loop through IDs and pull objects one at a time, to reduce memory loading
+					RawCodeAcademy.each_row(:status=>"READY",:limit=>LT::Loaders::ROW_LIMIT) do |raw_message|
+						html = Nokogiri.parse(raw_message.html)
+					end
+				end # extract_html
+			end # class << self
+		end # CodeAcademy
+	end # Loaders
 end
 
+#TODO remove this code section - it is not used - just for reference while
+# building out new loader
 def temp
 
 

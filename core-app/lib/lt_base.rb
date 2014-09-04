@@ -53,7 +53,7 @@ module LT
     def boot_db(config_file)
       # Connect to DB
       begin
-        dbconfig = YAML::load(File.open1(config_file))
+        dbconfig = YAML::load(File.open(config_file))
         ActiveRecord::Base.establish_connection(dbconfig[LT::run_env])
       rescue Exception => e
         LT::Janitor::logger.error("Cannot connect to Postgres, connect string: #{dbconfig['development']}, error: #{e.message}")

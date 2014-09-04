@@ -9,8 +9,8 @@ Project.configure do |project|
   # Build the project by invoking shell script "build_my_app.sh". Keep in mind that when the script is invoked,
   project.build_command = './core-app/run-tests.sh'
 
-  project.scheduler.polling_interval = 15.minutes
-  project.scheduler.always_build = false # to build only when there are source control changes
+  project.scheduler.polling_interval = 5.minutes
+  project.scheduler.always_build = false # build only when there are source control changes
    
   # Set environment variables passed into the build
   project.environment['RACK_ENV'] = 'test'

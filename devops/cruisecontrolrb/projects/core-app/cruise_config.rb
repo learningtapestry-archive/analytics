@@ -1,6 +1,6 @@
 Project.configure do |project|
 
-  project.email_notifier.emails = ['jasonhoekstra@gmail.com']
+  project.email_notifier.emails = ['jasonhoekstra@gmail.com', 'steve.midgley@mixrun.com']
   project.email_notifier.from = 'learntac-build@betaspaces.com'
 
   # Build the project by invoking rake task 'custom'

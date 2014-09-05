@@ -16,17 +16,17 @@
 ### Goal:  End to end concept functional
 
 - [DONE] Finish Redis to Postgres queue janitor
-- Deliver Postgres HTML info extractor janitor (http://nokogiri.org/)
+- [IN-PROCESS, refactor] Deliver Postgres HTML info extractor janitor (http://nokogiri.org/)
 - Standup basic web interface (http://startbootstrap.com/template-overviews/sb-admin/)
 
 ## Early-Mid September 2014
 
 ### Goal:  Solidify the code base
 
-- Focus on building unit testing
-- Implement continuous integration system (Jenkins)
-- Contract:  enhance Chome JS extension:  process Oauth2, get custom site list with extract cues, local storage/remote dequeue, event chaining
-- User authentication and Oauth2 (both for Chomr extension and web login)
+- [DONE] Focus on building unit testing
+- [DONE] Implement continuous integration system (short term, CruiseControl.rb)
+- Enhance Chome JS extension:  process Oauth2, get custom site list with extract cues, local storage/remote dequeue, event chaining
+- User authentication and Oauth2 (both for Chorme extension and web login)
 - Develop admin panel to for HTML info extraction
 
 ## Mid-End September 2014

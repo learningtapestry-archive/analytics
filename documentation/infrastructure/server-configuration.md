@@ -18,7 +18,9 @@ Server Configuration
 
 * Automated updates are set for this machine for "security" and "updates".  **Important:** The machine will automatically reboot when new updates are detected and a reboot is required.  The machine may disappear for 2-3 minutes at anytime during security updates.  This happens once per week or so, however defaulting on better security as opposed to max uptime on a single box.
 
-* This server is using CruiseControl.rb (CCrb) for CI.  The user context is "learntac".  CCrb is set to run on startup in /etc/rc.local (tested).  CCrb will pull from GitHub science/lt project every 5 minutes.  If a change has been detected, it will kick off a new build.  If the status changes been success to failure or vise-versa, it will send an email to Jason and Steve.  CCrb has a web dashboard to view job status at port 3333, however this is currently blocked by the firewall. Planning to make accessible only via SSH or OpenVPN access for security in future.
+* This server is using CruiseControl.rb (CCrb) for CI.  The user context is "learntac".  CCrb is set to run on startup in /etc/rc.local (tested).  CCrb will pull from GitHub science/lt project every 5 minutes.  If a change has been detected, it will kick off a new build.  If the status changes been success to failure or vise-versa, it will send an email to Jason and Steve.  CCrb has a web dashboard to view job status at port 3333, however this is currently blocked by the firewall. Planning to make accessible only via SSH or OpenVPN access for security in future.  Project directory is /home/learntac/.cruise/projects/learntaculous/work.  CCrb is /home/learntac/Procjects/cruisecontrol.rb. **NOTE:**  learntac doesn't have sudo access, so new gems may break a build until ran manually on server.
+
+
 
 ### To Dos
 
@@ -27,3 +29,7 @@ Server Configuration
 * Install OpenVPN for private dev access.
 
 * Improvement:  git can't pull down just sub-folders, so CCrb uses ./core-app/run-tests.rb to trigger builds.  Because not a sub-folder, builds will trigger on any LT git check-in.
+
+* Improvement:  figure out how to properly handle bundle install updates for learntac wo/ sudo access if can be avoided.
+
+* Improvement:  Start CCrb in a process monitor for better durability.

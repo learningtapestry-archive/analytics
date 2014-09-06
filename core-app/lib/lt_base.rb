@@ -63,11 +63,10 @@ module LT
       end
     end
     def run_tests(test_path)
-    	test_file_glob = File::expand_path(File::join(test_path, '*_test.rb'))
+    	test_file_glob = File::expand_path(File::join(test_path, '**/*_test.rb'))
       testfiles = Dir::glob(test_file_glob)
-      testfiles.each do |testfile| 
-        full_testfile =  File::join(test_path, File::basename(testfile))
-        run_test(full_testfile, test_path)
+      testfiles.each do |testfile|
+        run_test(testfile, test_path)
       end
     end
     # will test a single file in test folder

@@ -60,7 +60,7 @@ var ExtractorManager = {
     watching: null,
     
     user_tab: null,
-    user_url: 'user.html',
+    user_url: 'login.html',
     
     sites_url: 'http://lt-dev01.betaspaces.com/api/v1/user/approved-sites',
     event_url: 'http://lt-dev01.betaspaces.com/api/v1/assert',

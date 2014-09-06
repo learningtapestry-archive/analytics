@@ -95,6 +95,8 @@ class InitSchema < ActiveRecord::Migration
       t.timestamps
     end
 
+    add_index :users, :username, :unique => true
+
     create_table "emails", :force => true do |t|
       t.integer "user_id",     :null => false
       t.string   "email"

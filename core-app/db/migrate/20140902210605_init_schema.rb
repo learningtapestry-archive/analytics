@@ -93,6 +93,7 @@ class InitSchema < ActiveRecord::Migration
       t.string   "password"
       t.date     "date_of_birth"
       t.timestamps
+
     end
 
     add_index :users, :username, :unique => true

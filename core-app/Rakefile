@@ -67,8 +67,8 @@ namespace :lt do
       # TODO:  Get this to work (covered by all tests however)
       #desc "Run Redis Raw Message Test"
       #task :redis_raw_messages do
-      #  #LT::run_test("redis_configuration_test.rb", LT::Janitor::test_path)
-      #  #Rake::Task[:'lt:janitor:test:run_test[./test/redis_configuration_test.rb]'].invoke
+      #  #LT::run_test("redisserver_test.rb", LT::Janitor::test_path)
+      #  #Rake::Task[:'lt:janitor:test:run_test[./test/redisserver_test.rb]'].invoke
       #end
 
       task :boot do

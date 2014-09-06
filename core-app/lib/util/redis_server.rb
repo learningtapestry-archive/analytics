@@ -33,28 +33,37 @@ module LT
         @@redis.del @@queue_raw_message
       end
 
+      def raw_message_push(message)
+        @@redis.lpush @@queue_raw_message, message
+      end
+
+      def raw_message_pop
+        @@redis.rpop @@queue_raw_message
+      end
+
+      def raw_message_queue_length
+        @@redis.llen @@queue_raw_message
+      end
+
+
       def api_keys_hashlist_clear
         @@redis.del @@hashlist_api_keys
       end
 
-      def raw_message_push(message)
-        @@redis.lpush(@@queue_raw_message, message)
-      end
-
-      def raw_message_pop
-        @@redis.rpop(@@queue_raw_message)
-      end
-
-      def raw_message_length
-        @@redis.llen(@@queue_raw_message)
-      end
-
       def api_key_get(key)
-        @@redis.hget(@@hashlist_api_keys, key)
+        @@redis.hget @@hashlist_api_keys, key
       end
 
       def api_key_set(key, value)
-        @@redis.hset(@@hashlist_api_keys, key, value)
+        @@redis.hset @@hashlist_api_keys, key, value
+      end
+
+      def api_key_remove(key)
+        @@redis.hdel @@hashlist_api_keys, key
+      end
+
+      def api_key_hashlist_length
+        @@redis.hlen @@hashlist_api_keys
       end
 
     end

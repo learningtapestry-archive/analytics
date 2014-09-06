@@ -1,8 +1,0 @@
-{
-	"configuration" : {
-		"redis_url": "redis://127.0.0.1:6379/0",
-		"redis_queue_name": "queue_in",
-		"message_error_dir": "/tmp/error/",
-		"message_dberror_dir": "/tmp/dberror/"
-	}
-}

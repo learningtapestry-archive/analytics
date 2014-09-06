@@ -3,6 +3,7 @@ require 'logger'
 require 'pg'
 require 'yaml'
 require './lib/lt_base.rb'
+require './lib/util/redis_server.rb'
 require 'standalone_migrations'
 require 'irb'
 StandaloneMigrations::Tasks.load_tasks
@@ -63,6 +64,13 @@ namespace :lt do
         LT::run_test(filename, LT::Janitor::test_path)
       end
 
+      # TODO:  Get this to work (covered by all tests however)
+      #desc "Run Redis Raw Message Test"
+      #task :redis_raw_messages do
+      #  #LT::run_test("redis_configuration_test.rb", LT::Janitor::test_path)
+      #  #Rake::Task[:'lt:janitor:test:run_test[./test/redis_configuration_test.rb]'].invoke
+      #end
+
       task :boot do
         # Force us into testing environment, then boot janitor
         ENV['RAILS_ENV'] = 'test'
@@ -118,6 +126,11 @@ namespace :lt do
       task :boot_janitor_db do
         LT::boot_db(File::expand_path('./db/config.yml'))
       end # boot_janitor_db
+
+      desc "Establish connection to Redis server"
+      task :boot_redis_server do
+        LT::RedisServer::boot_redis(File::expand_path('./db/redis.yml'))
+      end # boot_redis_server
     end #boot namespace
   end # janitor namespace
 end # lt namespace

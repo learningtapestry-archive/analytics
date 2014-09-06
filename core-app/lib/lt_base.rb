@@ -3,6 +3,7 @@ require 'active_record'
 require 'active_support/inflector' # required by module Seedlib
 
 module LT
+  # TODO:  Namespace this Exceptions
   class BaseException < Exception;end;
   class ParameterMissing < BaseException;end
   class InvalidParameter < BaseException;end
@@ -10,6 +11,8 @@ module LT
   class LoginError < BaseException;end;
   class UserNotFound < LoginError;end;
   class PasswordInvalid < LoginError;end;
+
+
   class << self
     def testing?
       # we are only in a testing environment if RAILS_ENV and run_env agree on it

@@ -14,6 +14,7 @@ module LT
           raise LT::ParameterMissing, "Username or password is not provided"
         else
           begin
+            # TODO: Think about logic to re-use api key if session is already active
             user = User.ValidateUser(username, password)
             api_key = ApiKey.CreateApiKey(user.id)
             # TODO: Refactor to use active ActiveRecord connection from LT base

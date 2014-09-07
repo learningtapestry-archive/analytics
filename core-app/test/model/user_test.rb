@@ -30,6 +30,22 @@ class UserModelTest < Minitest::Test
     DatabaseCleaner.clean # cleanup of the database
   end
 
+  def test_CreateUser
+    user = User.CreateUser("testuser1", "testpass1", "First1", "Last1")
+
+    assert_equal "testuser1", user.username
+    assert_equal Digest::MD5.hexdigest("testpass1"), user.password
+    assert_equal "First1", user.first_name
+    assert_equal "Last1", user.last_name
+  end
+
+  def test_CreateUserFromJson_EmptyUsername
+    # Missing parameter
+    assert_raises LT::ParameterMissing do
+      User.CreateUser("", "", "", "")
+    end
+  end
+
   def test_CreateUserFromJson_EmptyBadInvalidJson
     # Missing parameter
     assert_raises LT::ParameterMissing do

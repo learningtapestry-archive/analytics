@@ -20,20 +20,29 @@ class User < ActiveRecord::Base
           first_name = parsed_json['first_name'] unless !parsed_json.has_key?('first_name')
           last_name = parsed_json['last_name'] unless !parsed_json.has_key?('last_name')
 
-          # Use AR to save user
-          user = User.new
-          user.username = username
-          user.password = Digest::MD5.hexdigest(password)
-          user.first_name = first_name
-          user.last_name = last_name
-          user.save
-
           # Return back the newly created user
-          return user
+          return CreateUser(username, password, first_name, last_name)
         end
       rescue Exception => e
         raise LT::InvalidParameter, "Invalid JSON: " + e.message
       end
+    end
+  end
+
+  def self.CreateUser(username, password, first_name = "", last_name = "")
+
+    if username.nil? || username.empty? || password.nil? || password.empty? then
+      raise LT::ParameterMissing, "Username or password is not provided"
+    else
+      # Use AR to save user
+      user = User.new
+      user.username = username
+      user.password = Digest::MD5.hexdigest(password)
+      user.first_name = first_name
+      user.last_name = last_name
+      user.save
+
+      return user
     end
   end
 

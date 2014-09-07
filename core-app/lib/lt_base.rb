@@ -61,6 +61,7 @@ module LT
       # Connect to DB
       begin
         dbconfig = YAML::load(File.open(config_file))
+        # TODO:  Need better error message of LT::run_env is not defined; occurred multiple times in testing
         ActiveRecord::Base.establish_connection(dbconfig[LT::run_env])
       rescue Exception => e
         LT::Janitor::logger.error("Cannot connect to Postgres, connect string: #{dbconfig['development']}, error: #{e.message}")

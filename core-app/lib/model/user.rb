@@ -52,10 +52,10 @@ class User < ActiveRecord::Base
     else
       user = User.where(username: username).first
       if user.nil?
-        raise UserNotFound, "Username not found: " + username
+        raise LT::UserNotFound, "Username not found: " + username
       else 
         if Digest::MD5.hexdigest(password) != user.password then
-          raise PasswordInvalid, "Password invalid, user: " + username
+          raise LT::PasswordInvalid, "Password invalid, user: " + username
         else
           return user
         end

@@ -18,6 +18,7 @@ class SessionManagerTest < Minitest::Test
   def setup
     # set database transaction, so we can revert seeds
     DatabaseCleaner.start
+    LT::RedisServer::boot_redis(File::expand_path('./db/redis.yml'))
   end
   def teardown
     DatabaseCleaner.clean # cleanup of the database
@@ -30,9 +31,7 @@ class SessionManagerTest < Minitest::Test
     end
   end
 
-  def test_ValidateUser_GetApiKey
-    LT::RedisServer::boot_redis(File::expand_path('./db/redis.yml'))
-
+  def test_ValidateUser_GetApiKey_ValidUser
     # Create new user as target for new API key
     user = User.CreateUser("testuser", "testpass", "First", "Last")
 
@@ -58,5 +57,14 @@ class SessionManagerTest < Minitest::Test
 
     # Remove API key from Redis (API key will be removed from Postgres in transaction)
     LT::RedisServer.api_key_remove(api_key)
+  end
+
+  def test_ValidateUser_GetApiKey_InvalidUser
+
+    # Invalid username test
+    assert_raises LT::UserNotFound do
+      api_key = LT::SessionManager.ValidateUser("invaliduser", "invalidpass")
+    end
+
   end
 end

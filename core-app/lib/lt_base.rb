@@ -64,10 +64,13 @@ module LT
         ActiveRecord::Base.establish_connection(dbconfig[LT::run_env])
       rescue Exception => e
         LT::Janitor::logger.error("Cannot connect to Postgres, connect string: #{dbconfig['development']}, error: #{e.message}")
-        # SM: Re-raising an error is better than eating it, IMO, so I'm removing the abort
         raise e
-        #abort()
       end
+    end
+    def get_db_name(config_file)
+      # TODO:  Refactor to utilize current AR connection
+      dbconfig = YAML::load(File.open(config_file))
+      return dbconfig[LT::run_env]["database"]
     end
     def run_tests(test_path)
     	test_file_glob = File::expand_path(File::join(test_path, '**/*_test.rb'))

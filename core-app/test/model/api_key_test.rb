@@ -24,17 +24,17 @@ class ApiKeyModelTest < Minitest::Test
   def test_CreateApiKey_EmptyBadInvalidUserId
     # Missing parameter
     assert_raises LT::ParameterMissing do
-      ApiKey.GetApiKey(nil)
+      ApiKey.CreateApiKey(nil)
     end
 
     # Invalid JSON
     assert_raises LT::InvalidParameter do
-      ApiKey.GetApiKey("junk")
+      ApiKey.CreateApiKey("junk")
     end
   end
 
   def test_CreateApiKey_ValidApiKey
-    api_key = ApiKey.GetApiKey(1)
+    api_key = ApiKey.CreateApiKey(1)
     # Check we have a GUID formatted api key
     match = /^[A-Za-z0-9]{8}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{12}$/.match(api_key)    
     refute_nil match

@@ -13,6 +13,13 @@
 
 ActiveRecord::Schema.define(:version => 20140902210605) do
 
+  create_table "api_keys", :force => true do |t|
+    t.integer  "user_id",    :null => false
+    t.string   "key",        :null => false
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
   create_table "approved_sites", :force => true do |t|
     t.string   "hash_id",      :null => false
     t.string   "url_pattern",  :null => false

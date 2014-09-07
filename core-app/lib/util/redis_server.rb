@@ -10,7 +10,7 @@ module LT
         # Connect to Redis
         begin
           redis_config = YAML::load(File.open(config_file))
-          # TODO:  Ask SM what is the right way to startup w/ environment path
+          # QUESTION:  Ask SM what is the right way to startup w/ environment path
           LT::setup_environment(".")
           @redis_url = redis_config[LT::run_env]["url"]
           

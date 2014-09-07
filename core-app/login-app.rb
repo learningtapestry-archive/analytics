@@ -4,7 +4,7 @@ require 'json'
 require './lib/model/user.rb'
 require './lib/lt_base.rb'
 
-LT::run_env = "development"
+LT::run_env = ENV['RACK_ENV']
 LT::boot_db(File::expand_path('./db/config.yml'))
 
 post '/api/v1/login' do

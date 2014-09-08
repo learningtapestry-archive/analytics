@@ -15,6 +15,7 @@ class RawCodeAcademy < RawMessage
     limit = opts[:limit] || 50
     status = opts[:status] || (raise ParameterMissing.new)
     # lock rows that we are going to work on
+    
     # grab ids of all locked rows
     msg_ids = ActiveRecord::Base.connection.exec_query("select id from raw_messages limit #{limit}")
        # TODO Make sql pull only code academy raw_messages that haven't or aren't being processed

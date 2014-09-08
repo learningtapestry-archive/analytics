@@ -123,9 +123,9 @@ DEPENDENCIES
   nokogiri (>= 1.6.3.1)
   pg (>= 0.17.1)
   rake
-  redis
+  redis (>= 3.1.0)
   rerun
-  sinatra
-  sinatra-contrib
+  sinatra (>= 1.4.5)
+  sinatra-contrib (>= 1.4.2)
   standalone_migrations (>= 2.1.4)
-  thin
+  thin (>= 1.6.2)

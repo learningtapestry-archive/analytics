@@ -27,6 +27,28 @@ end
 
 
 namespace :lt do
+  namespace :webapp do
+    desc "Run WebApp tests"
+    task :run_tests do
+      ENV['RAILS_ENV'] = 'test'
+      LT::setup_environment(File::dirname(__FILE__))
+      LT::boot_db(File::expand_path('./db/config.yml'))
+      LT::run_test('webapp_test.rb', File::expand_path('./test'))
+    end
+    desc "Boot WebApp environment"
+    task :boot do
+      LT::setup_environment(File::dirname(__FILE__))
+    end
+    desc "Run WebApp server - this starts the webserver"
+    task :start_webapp => [:boot] do 
+      path = File::expand_path(File::dirname(__FILE__))
+      rackup_file = File::join(path, 'lib', 'webapp.ru')
+      # TODO - set port/server from environment var
+      run_cmd = "rackup -p 8080 -o localhost #{rackup_file}"
+      $stdout.sync = true
+      Kernel.system(run_cmd)
+    end
+  end
   namespace :janitor do
     desc "Boot up a console in Janitor context"
     task :console => [:boot] do

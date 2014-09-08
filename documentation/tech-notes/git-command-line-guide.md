@@ -72,10 +72,15 @@ It is best to use git to rename or move a file so the action is intentionally kn
 ## Jason's Typical Cycle
 
 `git pull` - Start of the project cycle
-[ MAKE CODE ] 
+
+[ MAKE CODE ]
+
 `git status` (What files have I added/changed/deleted)
+
 `git add <filenames> or <filepath wildcards>` (If new files have been created, add them)
+
 `git commit -m "My long comment message about everything that changed" <filenames or wildcard path>` or `git commit -am` (commit everything)
+
 `git push` back up to the GitHub.com repo
   
 #### To Do

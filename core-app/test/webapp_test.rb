@@ -5,6 +5,7 @@ require 'fileutils'
 require 'tempfile'
 require 'debugger'
 #require 'chronic'
+#require 'timecop'
 require 'uri'
 require 'database_cleaner'
 
@@ -15,7 +16,7 @@ class WebAppTest < Minitest::Test
   def test_webapp_root
     get "/"
     assert_equal 200, last_response.status, last_response.body
-    assert_equal "Hello world", last_response.body
+    assert last_response.body.match(/Hello world/)
   end
 
   def self.before_suite

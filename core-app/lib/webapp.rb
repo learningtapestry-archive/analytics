@@ -2,7 +2,7 @@ require 'sinatra/base'
 module LT
   class WebApp < Sinatra::Base 
     get "/" do
-      "Hello world"
+      erb :home, :locals => {:hello_world => "Hello world"}
     end
   end
 end

@@ -7,10 +7,31 @@ class InitSchema < ActiveRecord::Migration
       t.timestamps
     end
     
-    create_table "status", :force => true do |t|
-      t.string "status_type" # what are the status of the rows
-      t.string "worker_type" # what extractor is it?
-      t.string "job_id"      # what specific extractor 
+    create_table "janitor_jobs", :force => true do |t|
+      t.string   "job_status"   # what are the status of the rows "IN PROGRESS" "FINISHED"
+      t.string   "janitor_type" # what extractor is it?
+      t.string   "job_id"       # what specific extractor 
+      t.string   "table_name"
+      t.integer  "table_id"
+      t.timestamps
+    end
+
+for each site
+  get each page 
+    Show site / page activity data
+
+
+    "user id X viewed this page http://xyz (display "Understanding Fractions") at this time"
+    create_table "user_actions", :force => true do |t|
+      t.string "subject"
+      t.string "verb"
+      t.string "object" # site
+      t.string "object_detail" # page
+      t.string/json? "result"
+        #"display title"
+        #"display site"
+      t.datetime "occured_at"
+      t.timestamps
     end
 
     create_table "raw_messages", :force => true do |t|
@@ -98,8 +119,9 @@ class InitSchema < ActiveRecord::Migration
     add_index :users, :username, :unique => true
 
     create_table "emails", :force => true do |t|
-      t.integer "user_id",     :null => false
+      t.integer  "user_id",     :null => false
       t.string   "email"
+      t.boolean  "primary"
     end
 
     create_table "api_keys", :force => true do |t|
@@ -113,7 +135,7 @@ class InitSchema < ActiveRecord::Migration
       t.string   "sis_id"
       t.string   "other_id"
       t.string   "grade_level"
-      t.integer "user_id", :null => false
+      t.integer  "user_id", :null => false
       t.timestamps
     end
 
@@ -122,7 +144,7 @@ class InitSchema < ActiveRecord::Migration
       t.string   "sis_id"
       t.string   "other_id"
       t.string   "staff_member_type", :null => false
-      t.integer "user_id", :null => false
+      t.integer  "user_id", :null => false
       t.timestamps
     end 
   end #def change

@@ -18,6 +18,12 @@ class WebAppTest < Minitest::Test
     assert_equal 200, last_response.status, last_response.body
     assert last_response.body.match(/Hello world/)
   end
+  def test_dashboard
+    get "/dashboard"
+    assert_equal 200, last_response.status, last_response.body
+    assert last_response.body.match(/Your Dashboard/)
+  end
+
 
   def self.before_suite
     DatabaseCleaner.strategy = :transaction

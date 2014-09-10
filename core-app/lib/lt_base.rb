@@ -30,7 +30,11 @@ module LT
       raise LT::Critical.new(msg) if !LT::development?
     end
     # run_env holds running environment: production|staging|test|development
-    attr_accessor :run_env
+    # root_dir holds application root (where this Rake file is located)
+    # model_path holds the folder where our models are stored
+    # test_path holds folder where the tests are stored
+    attr_accessor :run_env,:logger, :root_dir, :model_path, :test_path, :seed_path, :lib_path
+
     # app_root_dir is the path to the root of the application being booted
     def setup_environment(app_root_dir)
       # null out empty string env vars
@@ -43,17 +47,16 @@ module LT
       LT::run_env = ENV['RAILS_ENV'] || ENV['RACK_ENV'] || 'development'
       ENV['RAILS_ENV'] = LT::run_env
       Rails.env = LT::run_env if defined? Rails
-      # TODO These folders need to be offloaded into module Janitor somehow
-      LT::Janitor::root_dir = File::expand_path(app_root_dir)
-      LT::Janitor::model_path = File::expand_path(File::join(LT::Janitor::root_dir, '/lib/model'))
-      LT::Janitor::lib_path = File::expand_path(File::join(LT::Janitor::root_dir, '/lib'))
-      LT::Janitor::test_path = File::expand_path(File::join(LT::Janitor::root_dir, '/test'))
-      LT::Janitor::seed_path = File::expand_path(File::join(LT::Janitor::root_dir, '/db/seeds'))    
+      LT::root_dir = File::expand_path(app_root_dir)
+      LT::model_path = File::expand_path(File::join(LT::root_dir, '/lib/model'))
+      LT::lib_path = File::expand_path(File::join(LT::root_dir, '/lib'))
+      LT::test_path = File::expand_path(File::join(LT::root_dir, '/test'))
+      LT::seed_path = File::expand_path(File::join(LT::root_dir, '/db/seeds'))    
     end
     def load_all_models
-      models = Dir::glob(File::join(LT::Janitor::model_path, '*.rb'))
+      models = Dir::glob(File::join(LT::model_path, '*.rb'))
       models.each do |file| 
-        full_file =  File::join(LT::Janitor::model_path, File::basename(file))
+        full_file =  File::join(LT::model_path, File::basename(file))
         require full_file
       end
     end
@@ -64,7 +67,7 @@ module LT
         # TODO:  Need better error message of LT::run_env is not defined; occurred multiple times in testing
         ActiveRecord::Base.establish_connection(dbconfig[LT::run_env])
       rescue Exception => e
-        LT::Janitor::logger.error("Cannot connect to Postgres, connect string: #{dbconfig['development']}, error: #{e.message}")
+        LT::logger.error("Cannot connect to Postgres, connect string: #{dbconfig['development']}, error: #{e.message}")
         raise e
       end
     end
@@ -73,7 +76,7 @@ module LT
       dbconfig = YAML::load(File.open(config_file))
       return dbconfig[LT::run_env]["database"]
     end
-    def run_tests(test_path)
+    def run_tests(test_path = LT::test_path)
     	test_file_glob = File::expand_path(File::join(test_path, '**/*_test.rb'))
       testfiles = Dir::glob(test_file_glob)
       testfiles.each do |testfile|
@@ -82,7 +85,7 @@ module LT
     end
     # will test a single file in test folder
     # test file must self-run when "required"
-    # TODO: Fix Rake which calls LT::Janitor for this function with a different signature
+    # TODO: Fix Rake which calls this function with a different signature
     def run_test(testfile, test_path)
       LT::testing!
       # add testing path if it is missing from file
@@ -92,58 +95,51 @@ module LT
       #TODO: This should be load not require I think (for re-entrant code running)
       require testfile
     end # run_test
+
+    # will test all files in test folder: *_test.rb
+    def init_logger
+      self.logger = Logger.new($stdout)
+    end
   end # class << self (LT)
+
+  module Seeds
+    SEED_FILES = '.seeds.rb'
+    class << self
+      # execute all the seeds loaded to date
+      def seed_all!
+        LT::Seedlib::seed_all!
+      end
+      # execute only seed specified
+      # Nb. id will generally be the "classify" name of the seed file
+      # e.g., raw_messages.seeds.rb will have id="RawMessage"
+      def seed!(id)
+        LT::Seedlib::seed!(id)
+      end
+      def seed!
+        run_env = LT::run_env
+        LT::Seeds::load_seeds
+        # This will run all seeds for environment, eg "test"
+        env_seeds = File::join('./',run_env)
+        LT::Seeds::load_seeds(env_seeds)
+      end
+      # This looks in the path provided for files globbing SEED_FILES, 
+      # "requiring" each one.
+      # The assumption is that each file will know how to load itself
+      def load_seeds(path = './')
+        fullpath = File::expand_path(File::join(LT::seed_path,path))
+        seedfiles = Dir::glob(File::join(fullpath,'*'+SEED_FILES))
+        seedfiles.each do |seedfile|
+          load_seed(seedfile)           
+        end
+      end # load_seeds
+      def load_seed(seedfile)
+        load File::expand_path(seedfile)
+      end
+    end #class << self
+  end # Seeds module
 
   module Janitor
     class << self
-      # root_dir holds application root (where this Rake file is located)
-      # model_path holds the folder where our models are stored
-      # test_path holds folder where the tests are stored
-      attr_accessor :logger, :root_dir, :model_path, :test_path, :seed_path, :lib_path
-      # will test all files in test folder: *_test.rb
-      def init_logger
-        self.logger = Logger.new($stdout)
-      end
-      def run_tests
-      	LT::run_tests(LT::Janitor::test_path)
-        LT::Janitor::logger.info('Tests complete')
-      end
     end # class << self
-
-    module Seeds
-      SEED_FILES = '.seeds.rb'
-      class << self
-	      # execute all the seeds loaded to date
-			  def seed_all!
-			    LT::Seedlib::seed_all!
-			  end
-			  # execute only seed specified
-			  # Nb. id will generally be the "classify" name of the seed file
-			  # e.g., raw_messages.seeds.rb will have id="RawMessage"
-			  def seed!(id)
-			    LT::Seedlib::seed!(id)
-			  end
-        def seed!
-          run_env = LT::run_env
-          LT::Janitor::Seeds::load_seeds
-          # This will run all seeds for environment, eg "test"
-          env_seeds = File::join('./',run_env)
-          LT::Janitor::Seeds::load_seeds(env_seeds)
-        end
-	      # This looks in the path provided for files globbing SEED_FILES, 
-	      # "requiring" each one.
-	      # The assumption is that each file will know how to load itself
-	      def load_seeds(path = './')
-	        fullpath = File::expand_path(File::join(LT::Janitor::seed_path,path))
-	        seedfiles = Dir::glob(File::join(fullpath,'*'+SEED_FILES))
-          seedfiles.each do |seedfile|
-						load_seed(seedfile)	          
-	        end
-	      end # load_seeds
-	      def load_seed(seedfile)
-	      	load File::expand_path(seedfile)
-	      end
-      end #class << self
-    end # Seeds module
   end # Janitor module
 end # LT module

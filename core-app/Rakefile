@@ -5,6 +5,7 @@ require 'yaml'
 require './lib/lt_base.rb'
 require './lib/util/redis_server.rb'
 require 'standalone_migrations'
+require 'activerecord-postgres-json'
 require 'irb'
 StandaloneMigrations::Tasks.load_tasks
 
@@ -14,15 +15,15 @@ task :default do
 end
 
 task :full_tests do
-  Rake::Task[:'lt:janitor:test:run_full_tests'].invoke
+  Rake::Task[:'lt:test:run_full_tests'].invoke
 end
 
 task :tests do
-  Rake::Task[:'lt:janitor:test:run_tests'].invoke
+  Rake::Task[:'lt:test:run_tests'].invoke
 end
 
 task :console do
-  Rake::Task[:'lt:janitor:console'].invoke
+  Rake::Task[:'lt:console'].invoke
 end
 
 
@@ -49,112 +50,111 @@ namespace :lt do
       Kernel.system(run_cmd)
     end
   end
-  namespace :janitor do
-    desc "Boot up a console in Janitor context"
-    task :console => [:boot] do
-      IRB.setup nil
-      IRB.conf[:MAIN_CONTEXT] = IRB::Irb.new.context
-      require 'irb/ext/multi-irb'
-      IRB.irb nil, self
+
+  desc "Boot up a console with required context"
+  task :console => [:boot] do
+    IRB.setup nil
+    IRB.conf[:MAIN_CONTEXT] = IRB::Irb.new.context
+    require 'irb/ext/multi-irb'
+    IRB.irb nil, self
+  end
+
+  desc "Boot Core-app system"
+  task :boot => [:'boot:set_env', :'boot:setup_logger', :'boot:boot_db', :'boot:load_all_models'] do
+    LT::logger.info("Core-app booted")
+  end
+
+  desc "Seed environment db with data (generally speaking, don't do this in testing env)"
+  task :seed => [:'lt:boot', :'db:seed']
+
+  namespace :test do
+    desc "Run complete test suite include DB teardown/rebuild/reseed"
+    task :run_full_tests => [:'lt:test:boot', :'db:full_reset'] do
+      LT::logger.info("Test setup complete. Running all tests.")
+      LT::run_tests
+    end
+    
+    desc "Run complete test suite w/out DB reset"
+    task :run_tests => [:'lt:test:boot', 
+      :'lt:test:db:migrate_tables'] do
+      LT::run_tests
     end
 
-    desc "Boot Janitor system"
-    task :boot => [:'boot:set_env', :'boot:setup_logger', :'boot:boot_janitor_db', :'boot:load_all_models'] do
-      LT::Janitor::logger.info("Janitor booted")
+    desc "Run single test file"
+    task :run_test, [:testfile] => [:'lt:test:boot', 
+      :'lt:test:db:migrate_tables'] do |t, args|
+      filename = args[:testfile]
+      LT::run_test(filename, LT::test_path)
     end
 
-    desc "Seed environment db with data (generally speaking, don't do this in testing env)"
-    task :seed => [:'lt:janitor:boot', :'db:seed']
+    # TODO:  Get this to work (covered by all tests however)
+    #desc "Run Redis Raw Message Test"
+    #task :redis_raw_messages do
+    #  #LT::run_test("redisserver_test.rb", LT::test_path)
+    #  #Rake::Task[:'lt:test:run_test[./test/redisserver_test.rb]'].invoke
+    #end
 
-    namespace :test do
-      desc "Run complete test suite include DB teardown/rebuild/reseed"
-      task :run_full_tests => [:'lt:janitor:test:boot', :'db:full_reset'] do
-        LT::Janitor::logger.info("Test setup complete. Running all tests.")
-        LT::Janitor::run_tests
+    task :boot do
+      # Force us into testing environment, then boot core-app
+      ENV['RAILS_ENV'] = 'test'
+      Rake::Task[:'lt:boot'].invoke
+      LT::testing!
+    end
+    namespace :db do
+      desc "Drop and recreate test db, run migrations"
+      task :full_reset => [:'lt:boot', :drop_db, :create_db, :migrate_tables] do
+        LT::logger.info("Performing full DB testing reset")
       end
-      
-      desc "Run complete test suite w/out DB reset"
-      task :run_tests => [:'lt:janitor:test:boot', 
-        :'lt:janitor:test:db:migrate_tables'] do
-        LT::Janitor::run_tests
-      end
-
-      desc "Run single test file"
-      task :run_test, [:testfile] => [:'lt:janitor:test:boot', 
-        :'lt:janitor:test:db:migrate_tables'] do |t, args|
-        filename = args[:testfile]
-        LT::run_test(filename, LT::Janitor::test_path)
-      end
-
-      # TODO:  Get this to work (covered by all tests however)
-      #desc "Run Redis Raw Message Test"
-      #task :redis_raw_messages do
-      #  #LT::run_test("redisserver_test.rb", LT::Janitor::test_path)
-      #  #Rake::Task[:'lt:janitor:test:run_test[./test/redisserver_test.rb]'].invoke
-      #end
-
-      task :boot do
-        # Force us into testing environment, then boot janitor
-        ENV['RAILS_ENV'] = 'test'
-        Rake::Task[:'lt:janitor:boot'].invoke
+      desc "Drop test db"
+      task :drop_db do
+        ## BUG: If DB can't be dropped, this command does not raise an exception
+        ##      It only prints a screen warning which is easy to miss
+        ## Rec: Raise exception if DB exists after dropping?
         LT::testing!
+        LT::logger.info("Dropping testing DB")
+        Rake::Task[:'db:drop'].invoke
       end
-      namespace :db do
-        desc "Drop and recreate test db, run migrations"
-        task :full_reset => [:'lt:janitor:boot', :drop_db, :create_db, :migrate_tables] do
-          LT::Janitor::logger.info("Performing full DB testing reset")
-        end
-        desc "Drop test db"
-        task :drop_db do
-          ## BUG: If DB can't be dropped, this command does not raise an exception
-          ##      It only prints a screen warning which is easy to miss
-          ## Rec: Raise exception if DB exists after dropping?
-          LT::testing!
-          LT::Janitor::logger.info("Dropping testing DB")
-          Rake::Task[:'db:drop'].invoke
-        end
-        task :create_db do
-          LT::testing!
-          LT::Janitor::logger.info("Creating testing DB")
-          Rake::Task[:'db:create'].invoke
-        end
-        task :migrate_tables do
-          LT::testing!
-          LT::Janitor::logger.info("Migrating testing DB")
-          Rake::Task[:'db:migrate'].invoke
-        end
+      task :create_db do
+        LT::testing!
+        LT::logger.info("Creating testing DB")
+        Rake::Task[:'db:create'].invoke
       end
-    end # test namesapce
+      task :migrate_tables do
+        LT::testing!
+        LT::logger.info("Migrating testing DB")
+        Rake::Task[:'db:migrate'].invoke
+      end
+    end
+  end # test namesapce
 
-    # holds all our bootup tasks
-    namespace :boot do
-      
-      desc "Setup janitor logger"
-      task :setup_logger do
-        LT::Janitor.init_logger
-      end
+  # holds all our bootup tasks
+  namespace :boot do
+    
+    desc "Setup core-app logger"
+    task :setup_logger do
+      LT::init_logger
+    end
 
-      desc "Define the environment we are running in (prod, test, dev)"
-      task :set_env do
-        LT::setup_environment(File::dirname(__FILE__))
-      end
-      
-      desc "Load all AR models from ./lib/model"
-      task :load_all_models do
-        LT::load_all_models
-      end
+    desc "Define the environment we are running in (prod, test, dev)"
+    task :set_env do
+      LT::setup_environment(File::dirname(__FILE__))
+    end
+    
+    desc "Load all AR models from ./lib/model"
+    task :load_all_models do
+      LT::load_all_models
+    end
 
-      desc "Establish connection to janitor database"
-      task :boot_janitor_db do
-        LT::boot_db(File::expand_path('./db/config.yml'))
-      end # boot_janitor_db
+    desc "Establish connection to core-app database"
+    task :boot_db do
+      LT::boot_db(File::expand_path('./db/config.yml'))
+    end # boot_db
 
-      desc "Establish connection to Redis server"
-      task :boot_redis_server do
-        LT::RedisServer::boot_redis(File::expand_path('./db/redis.yml'))
-      end # boot_redis_server
-    end #boot namespace
-  end # janitor namespace
+    desc "Establish connection to Redis server"
+    task :boot_redis_server do
+      LT::RedisServer::boot_redis(File::expand_path('./db/redis.yml'))
+    end # boot_redis_server
+  end #boot namespace
 end # lt namespace
 
 

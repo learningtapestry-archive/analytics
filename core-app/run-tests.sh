@@ -1,2 +1,2 @@
 cd core-app
-rake lt:janitor:test:run_full_tests
+rake lt:test:run_full_tests

@@ -16,21 +16,20 @@ class InitSchema < ActiveRecord::Migration
       t.timestamps
     end
 
-for each site
-  get each page 
-    Show site / page activity data
-
-
-    "user id X viewed this page http://xyz (display "Understanding Fractions") at this time"
-    create_table "user_actions", :force => true do |t|
+    #"user id X viewed this page http://xyz (display "Understanding Fractions") at this time"
+    # [user x] [viewed] [site y] [page z] on [date abc]"
+    # user x = subject, verb = viewed, object = site y, object_detail = page z
+    # date abc = occured_at
+    # also store in result: "page display title" and "site display name"
+    create_table "actions", :force => true do |t|
       t.string "subject"
-      t.string "verb"
-      t.string "object" # site
-      t.string "object_detail" # page
-      t.string/json? "result"
+      t.string "verb" 
+      t.string "object" 
+      t.string "object_detail"
+      t.json "result"
         #"display title"
         #"display site"
-      t.datetime "occured_at"
+      t.datetime "occurred_at"
       t.timestamps
     end
 

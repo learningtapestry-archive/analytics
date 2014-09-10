@@ -13,6 +13,24 @@
 
 ActiveRecord::Schema.define(:version => 20140902210605) do
 
+  create_table "actions", :force => true do |t|
+    t.string   "subject"
+    t.string   "verb"
+    t.string   "object"
+    t.string   "object_detail"
+    t.json     "result"
+    t.datetime "occurred_at"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+  end
+
+  create_table "api_keys", :force => true do |t|
+    t.integer  "user_id",    :null => false
+    t.string   "key",        :null => false
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
   create_table "approved_sites", :force => true do |t|
     t.string   "hash_id",      :null => false
     t.string   "url_pattern",  :null => false
@@ -62,6 +80,17 @@ ActiveRecord::Schema.define(:version => 20140902210605) do
   create_table "emails", :force => true do |t|
     t.integer "user_id", :null => false
     t.string  "email"
+    t.boolean "primary"
+  end
+
+  create_table "janitor_jobs", :force => true do |t|
+    t.string   "job_status"
+    t.string   "janitor_type"
+    t.string   "job_id"
+    t.string   "table_name"
+    t.integer  "table_id"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
   end
 
   create_table "raw_messages", :force => true do |t|
@@ -113,12 +142,6 @@ ActiveRecord::Schema.define(:version => 20140902210605) do
     t.datetime "updated_at",        :null => false
   end
 
-  create_table "status", :force => true do |t|
-    t.string "status_type"
-    t.string "worker_type"
-    t.string "job_id"
-  end
-
   create_table "students", :force => true do |t|
     t.string   "state_id"
     t.string   "sis_id"
@@ -140,5 +163,7 @@ ActiveRecord::Schema.define(:version => 20140902210605) do
     t.datetime "created_at",    :null => false
     t.datetime "updated_at",    :null => false
   end
+
+  add_index "users", ["username"], :name => "index_users_on_username", :unique => true
 
 end

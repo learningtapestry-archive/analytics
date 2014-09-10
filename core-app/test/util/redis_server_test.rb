@@ -6,7 +6,7 @@ require 'debugger'
 #require 'database_cleaner'
 # some likely testing gems we'll want
 # TimeCop, chronic, tempfile, uri
-require File::join(LT::Janitor::lib_path, 'util/redis_server.rb')
+require File::join(LT::lib_path, 'util/redis_server.rb')
 
 class RedisConfigurationTest < Minitest::Test
   def setup

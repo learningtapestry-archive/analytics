@@ -22,9 +22,11 @@ module LT
           @redis = Redis.new(:url => @redis_url)
           @redis.ping # connect to Redis server
         rescue Exception => e
-          # TODO: Refactor logger to another module outside of Janitor namespace
-          LT::Janitor::init_logger
-          LT::Janitor::logger.error("Cannot connect to Redis, connect url: #{@redis_url}, error: #{e.message}")
+          # TODO: We shouldn't have to init logger here. This should be handled
+          # by Rake bootup code of some kind or another. 
+          # (In fact it may not be necessary - this might be redundant already.)
+          LT::init_logger
+          LT::logger.error("Cannot connect to Redis, connect url: #{@redis_url}, error: #{e.message}")
           raise e
         end
       end

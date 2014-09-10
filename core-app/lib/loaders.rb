@@ -16,15 +16,13 @@ require 'active_record'
 require 'yaml'
 require 'htmlentities'
 require 'nokogiri'
-# This file must be loaded after LT::Janitor::boot has been called
+# This file must be loaded after rake's LT::Janitor::boot has been called
 # require './lib/model/raw_message.rb'
 # require './lib/model/statement.rb'
 # require './lib/model/approved_site.rb'
 # require './lib/model/extraction_map.rb'
 
 module LT
-	# TODO
-	# add module Janitor here and refactor
 	module Loaders 
 		ROW_LIMIT = 10000
 		module CodeAcademy

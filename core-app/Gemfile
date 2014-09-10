@@ -13,6 +13,7 @@ gem 'logger'
 gem 'rake'
 gem 'pg', '>= 0.17.1'
 gem 'standalone_migrations', '>= 2.1.4'
+gem 'activerecord-postgres-json'
 # gem 'activerecord' is included by standalone_migrations
 gem 'htmlentities', '>= 4.3.2'
 gem 'nokogiri', '>= 1.6.3.1'

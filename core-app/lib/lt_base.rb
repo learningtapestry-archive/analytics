@@ -1,6 +1,13 @@
 require 'yaml'
 require 'active_record'
+require 'standalone_migrations'
+require 'activerecord-postgres-json'
 require 'active_support/inflector' # required by module Seedlib
+require 'bcrypt' # required by various models/modules
+require 'active_record'
+require 'logger'
+require 'pg'
+require 'yaml'
 
 module LT
   # TODO:  Namespace this Exceptions

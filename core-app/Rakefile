@@ -1,11 +1,5 @@
-require 'active_record'
-require 'logger'
-require 'pg'
-require 'yaml'
 require './lib/lt_base.rb'
 require './lib/util/redis_server.rb'
-require 'standalone_migrations'
-require 'activerecord-postgres-json'
 require 'irb'
 StandaloneMigrations::Tasks.load_tasks
 
@@ -38,7 +32,7 @@ namespace :lt do
     end
     desc "Boot WebApp environment"
     task :boot do
-      LT::setup_environment(File::dirname(__FILE__))
+      Rake::Task[:'lt:boot'].invoke
     end
     desc "Run WebApp server - this starts the webserver"
     task :start_webapp => [:boot] do 

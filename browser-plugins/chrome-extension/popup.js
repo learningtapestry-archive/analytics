@@ -18,8 +18,8 @@ var LoginManager = {
     
     msg_to: null,
     
-    login_url: 'http://lt-dev01.betaspaces.com/test/api/v1/login',
-    create_url: 'http://lt-dev01.betaspaces.com:4567/api/v1/signup',
+    login_url: 'http://localhost:4567/api/v1/login',
+    create_url: 'http://localhost:4567/api/v1/signup',
     
     init: function() {
         this.bg = chrome.extension.getBackgroundPage();

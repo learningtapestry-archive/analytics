@@ -40,6 +40,7 @@ module LT
       LT::setup_environment(app_root_dir)
       LT::boot_db(File::join(LT::db_path, 'config.yml'))
       LT::load_all_models
+      LT::boot_redis(File::join(LT::db_path, 'redis.yml'))
     end
 
     # app_root_dir is the path to the root of the application being booted
@@ -78,6 +79,9 @@ module LT
         LT::logger.error("Cannot connect to Postgres, connect string: #{dbconfig[LT::run_env]}, error: #{e.message}")
         raise e
       end
+    end
+    def boot_redis(config_file)
+      LT::RedisServer::boot_redis(config_file)
     end
     def get_db_name(config_file)
       # TODO:  Refactor to utilize current AR connection

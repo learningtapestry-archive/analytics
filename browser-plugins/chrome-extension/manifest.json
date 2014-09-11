@@ -14,7 +14,8 @@
     
     "browser_action": {
         "default_title": "Learntaculous Aggregator",
-        "default_icon": "icon-off-48.png"
+        "default_icon": "icon-off-48.png",
+        "default_popup": "popup.html"
     },
     
     "background": {

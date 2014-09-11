@@ -4,8 +4,6 @@
   * The main script which is always running, it manages data extraction and sending data.
   */
 
-var _apiKey = "00000000-aaaa-bbbb-cccc-000000000000";
-
 var _callback = function(fn, ctx) {
     return function() {
         fn.apply(ctx, arguments);
@@ -55,18 +53,20 @@ var _timestamp = function() {
   */
 
 var ExtractorManager = {
+    api: null,
     user: null,
     sites: null,
     watching: null,
     
     user_tab: null,
-    user_url: 'login.html',
+    user_url: 'user.html',
     
     sites_url: 'http://lt-dev01.betaspaces.com/api/v1/user/approved-sites',
     event_url: 'http://lt-dev01.betaspaces.com/api/v1/assert',
     
     storage_keys: {
         user: 'store_user_data',
+        api: 'store_api_data',
         sites: 'store_sites_data'
     },
     
@@ -78,22 +78,25 @@ var ExtractorManager = {
       * they are not there.
       */
     init: function() {
-        chrome.browserAction.onClicked.addListener(_callback(this.getUser, this));
-        
-        chrome.storage.local.get([this.storage_keys.user, this.storage_keys.sites], _callback(function(o) {
-            var u = this.storage_keys.user,
+        chrome.storage.local.get([this.storage_keys.user, this.storage_keys.api, this.storage_keys.sites], _callback(function(o) {
+            var a = this.storage_keys.api,
+                u = this.storage_keys.user,
                 s = this.storage_keys.sites;
                 
-            if(Object.prototype.hasOwnProperty.call(o, u) && typeof o[u] === 'string' && o[u]) {
-                this.user = o[u];
+            if(Object.prototype.hasOwnProperty.call(o, a) && typeof o[a] === 'string' && o[a]) {
+                this.api = o[a];
+                
+                if(Object.prototype.hasOwnProperty.call(o, u) && typeof o[u] === 'string' && o[u]) {
+                    this.user = o[u];
+                }
             }
             else {
                 this.getUser();
             }
-            
+
             if(Object.prototype.hasOwnProperty.call(o, s) && typeof o[s] === 'string' && o[s]) {
                 this.sites = new RegExp(o[s]);
-                if(this.user && !this.watching) {
+                if(this.api && !this.watching) {
                     this.watch();
                 }
             }
@@ -133,23 +136,22 @@ var ExtractorManager = {
     },
     
     /**
-      * setUser
+      * setApi
       *
-      * Called by the script in user_tab. Stores the email, and starts watching
+      * Called by the script in popup. Stores the api-key, and starts watching
       * pages if not already watching.
       *
-      * It also closes the user_tab since it is no longer needed.
       */
-    setUser: function(u) {
-        if(typeof u !== 'string' || !u) {
+    setApi: function(a, u) {
+        if(typeof a !== 'string' || !a) {
             return;
         }
         
-        this.user = u;
+        this.api = a;
+        chrome.storage.local.set(_map(this.storage_keys.api, this.api));
+
+        this.user = typeof u !== 'string' || !u ? null : u;
         chrome.storage.local.set(_map(this.storage_keys.user, this.user));
-        
-        chrome.tabs.remove(this.user_tab);
-        this.user_tab = null;
         
         if(this.sites && !this.watching) {
             this.watch();
@@ -160,7 +162,7 @@ var ExtractorManager = {
       * getSites
       *
       * Fetches approved sites' list and stores them as a RegExp.
-      * Starts watching pages if user email available and not already watching.
+      * Starts watching pages if api-key available and not already watching.
       */
     getSites: function() {
         var r = new XMLHttpRequest, x;
@@ -177,7 +179,7 @@ var ExtractorManager = {
                     
                     chrome.storage.local.set(_map(this.storage_keys.sites, this.sites.source));
                     
-                    if(this.user && !this.watching) {
+                    if(this.api && !this.watching) {
                         this.watch();
                     }
                 }
@@ -201,10 +203,9 @@ var ExtractorManager = {
         r.open('POST', this.event_url, true);
         
         r.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        // TODO:  Process Oauth2 to obtain token, static for dev
-        r.setRequestHeader('X-LT-API-Key', _apiKey);
-        //r.setRequestHeader('Content-length', ujson.length);  ----- Chrome Extension mgr throws unsafe error
-        //r.setRequestHeader('Connection', 'close');  ----- Chrome Extension mgr throws unsafe error
+        r.setRequestHeader('X-LT-API-Key', this.api);
+        //r.setRequestHeader('Content-length', ujson.length);
+        //r.setRequestHeader('Connection', 'close');
         
         r.onreadystatechange = _callback(function() {
             if(r.readyState === 4) {
@@ -228,7 +229,7 @@ var ExtractorManager = {
       * tab. Listeners populate correct JSON based on event and send it to server.
       */
     watch: function() {
-        if(!this.user || !this.sites || this.watching) {
+        if(!this.api || !this.sites || this.watching) {
             return;
         }
         
@@ -240,7 +241,7 @@ var ExtractorManager = {
             if(e.t === 'pageview') {
                 u.user = {
                     email: this.user,
-                    apiKey: _apiKey,
+                    apiKey: this.api,
                     action: {
                         id: 'verbs/viewed',
                         display: {
@@ -261,7 +262,7 @@ var ExtractorManager = {
             else if(e.t === 'linkevent') {
                 u.user = {
                     email: this.user,
-                    apiKey: _apiKey,
+                    apiKey: this.api,
                     action: {
                         id: 'verbs/clicked',
                         display: {
@@ -280,7 +281,7 @@ var ExtractorManager = {
             else if(e.t === 'viewquote') {
                 u.user = {
                     email: this.user,
-                    apiKey: _apiKey,
+                    apiKey: this.api,
                     action: {
                         id: 'verbs/quoted',
                         display: {

@@ -10,7 +10,7 @@ require 'rack/test'
 #require 'uri'
 require 'database_cleaner'
 
-require File.expand_path('./lib/webapp.rb')
+require File::join(LT::lib_path, 'webapp.rb')
 
 class WebAppTest < Minitest::Test
   include Rack::Test::Methods

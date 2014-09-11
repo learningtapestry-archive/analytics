@@ -1,6 +1,13 @@
 require 'yaml'
 require 'active_record'
+require 'standalone_migrations'
+require 'activerecord-postgres-json'
 require 'active_support/inflector' # required by module Seedlib
+require 'bcrypt' # required by various models/modules
+require 'active_record'
+require 'logger'
+require 'pg'
+require 'yaml'
 
 module LT
   # TODO:  Namespace this Exceptions
@@ -33,7 +40,15 @@ module LT
     # root_dir holds application root (where this Rake file is located)
     # model_path holds the folder where our models are stored
     # test_path holds folder where the tests are stored
-    attr_accessor :run_env,:logger, :root_dir, :model_path, :test_path, :seed_path, :lib_path
+    attr_accessor :run_env,:logger, :root_dir, :model_path, :test_path, :seed_path, :lib_path, :db_path
+
+    def boot_all(app_root_dir = File::join(File::dirname(__FILE__),'..'))
+      LT::init_logger
+      LT::setup_environment(app_root_dir)
+      LT::boot_db(File::join(LT::db_path, 'config.yml'))
+      LT::load_all_models
+      LT::boot_redis(File::join(LT::db_path, 'redis.yml'))
+    end
 
     # app_root_dir is the path to the root of the application being booted
     def setup_environment(app_root_dir)
@@ -51,7 +66,8 @@ module LT
       LT::model_path = File::expand_path(File::join(LT::root_dir, '/lib/model'))
       LT::lib_path = File::expand_path(File::join(LT::root_dir, '/lib'))
       LT::test_path = File::expand_path(File::join(LT::root_dir, '/test'))
-      LT::seed_path = File::expand_path(File::join(LT::root_dir, '/db/seeds'))    
+      LT::db_path = File::expand_path(File::join(LT::root_dir, '/db'))      
+      LT::seed_path = File::expand_path(File::join(LT::root_dir, '/db/seeds'))
     end
     def load_all_models
       models = Dir::glob(File::join(LT::model_path, '*.rb'))
@@ -67,9 +83,12 @@ module LT
         # TODO:  Need better error message of LT::run_env is not defined; occurred multiple times in testing
         ActiveRecord::Base.establish_connection(dbconfig[LT::run_env])
       rescue Exception => e
-        LT::logger.error("Cannot connect to Postgres, connect string: #{dbconfig['development']}, error: #{e.message}")
+        LT::logger.error("Cannot connect to Postgres, connect string: #{dbconfig[LT::run_env]}, error: #{e.message}")
         raise e
       end
+    end
+    def boot_redis(config_file)
+      LT::RedisServer::boot_redis(config_file)
     end
     def get_db_name(config_file)
       # TODO:  Refactor to utilize current AR connection

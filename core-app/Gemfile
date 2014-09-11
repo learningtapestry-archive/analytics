@@ -22,6 +22,7 @@ gem 'sinatra', '>= 1.4.5'
 gem 'sinatra-contrib', '>= 1.4.2'
 gem 'thin', '>= 1.6.2' # development, maybe production
 gem 'rerun' # process reload agent, helpful for sinatra development
+gem 'bcrypt'
 # squasher - used in development to compress migration files
 group :test do
   gem 'minitest', '>= 5.4.0'

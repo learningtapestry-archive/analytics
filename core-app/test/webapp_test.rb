@@ -4,6 +4,7 @@ require 'rack/test'
 require 'fileutils'
 require 'tempfile'
 require 'debugger'
+require 'nokogiri'
 #require 'chronic'
 #require 'timecop'
 require 'uri'
@@ -13,15 +14,20 @@ require File.expand_path('./lib/webapp.rb')
 
 class WebAppTest < Minitest::Test
   include Rack::Test::Methods
-  def test_webapp_root
+  def test_homepage
     get "/"
     assert_equal 200, last_response.status, last_response.body
-    assert last_response.body.match(/Hello world/)
+    html = Nokogiri.parse(last_response.body)
+    result = html.css('body>h1').text
+    assert_equal "Hello world", result
   end
   def test_dashboard
     get "/dashboard"
     assert_equal 200, last_response.status, last_response.body
-    assert last_response.body.match(/Your Dashboard/)
+    html = Nokogiri.parse(last_response.body)
+    result = html.css('head>title').text
+    assert_equal "Learntaculous - Your Dashboard", result
+
   end
 
 

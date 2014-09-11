@@ -1,16 +1,20 @@
 require 'sinatra/base'
 module LT
-  class WebApp < Sinatra::Base 
+  module WebAppHelper
     def set_title(title)
-      @layout[:title] = title
+      @layout[:title] = "Learntaculous - #{title}"
     end
-    # set up UI options container
-    # we need this to set dynamic content in the layout template
+  end # WebAppHelper
+  class WebApp < Sinatra::Base 
+    include WebAppHelper
+    # set up UI layout container
+    # we need this container to set dynamic content in the layout template
+    # we can set things like CSS templates, Javascript includes, etc.
     before do
       @layout = {}
     end
     get "/" do
-      set_title("Learntaculous - Knowledge for Learning")
+      set_title("Knowledge for Learning")
       erb :home, :locals => {:hello_world => "Hello world"}
     end
 
@@ -21,8 +25,3 @@ module LT
   end
 end
 
-# Direct app example
-# require 'sinatra'
-# get "/" do
-#   "Hello world"
-# end

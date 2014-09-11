@@ -1,11 +1,9 @@
 gem "minitest"
 require 'minitest/autorun'
-require 'debugger'
-require 'fileutils'
-require 'tempfile'
 require 'database_cleaner'
-# some likely testing gems we'll want
-# TimeCop, chronic, tempfile, uri
+
+# TODO - we shouldn't have to require this file here?
+# Shouldn't it boot automatically from rake?
 require File::join(LT::lib_path, 'loaders.rb')
 
 class HTMLExtractTest < Minitest::Test

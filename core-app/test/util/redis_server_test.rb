@@ -1,12 +1,8 @@
 gem "minitest"
 require 'minitest/autorun'
 require 'debugger'
-#require 'fileutils'
-#require 'tempfile'
-#require 'database_cleaner'
-# some likely testing gems we'll want
-# TimeCop, chronic, tempfile, uri
-require File::join(LT::lib_path, 'util/redis_server.rb')
+require 'database_cleaner'
+require File::join(LT::lib_path, 'util', 'redis_server.rb')
 
 class RedisConfigurationTest < Minitest::Test
   def setup

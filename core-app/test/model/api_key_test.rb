@@ -1,11 +1,6 @@
 gem "minitest"
 require 'minitest/autorun'
-require 'debugger'
-require 'fileutils'
-require 'tempfile'
 require 'database_cleaner'
-require './lib/lt_base.rb'
-require './lib/model/api_key.rb'
 
 class ApiKeyModelTest < Minitest::Test
 

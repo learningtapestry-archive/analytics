@@ -1,13 +1,7 @@
 gem "minitest"
 require 'minitest/autorun'
-require 'debugger'
-require 'fileutils'
-require 'tempfile'
 require 'database_cleaner'
-require './lib/lt_base.rb'
-require './lib/util/session_manager.rb'
-require './lib/model/user.rb'
-require './lib/model/api_key.rb'
+require File::join(LT::lib_path, 'util', 'session_manager.rb')
 
 class SessionManagerTest < Minitest::Test
 

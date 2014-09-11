@@ -158,7 +158,8 @@ ActiveRecord::Schema.define(:version => 20140902210605) do
     t.string   "last_name",     :null => false
     t.string   "gender"
     t.string   "username"
-    t.string   "password"
+    t.string   "password_hash"
+    t.string   "password_salt"
     t.date     "date_of_birth"
     t.datetime "created_at",    :null => false
     t.datetime "updated_at",    :null => false

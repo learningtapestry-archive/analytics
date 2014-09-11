@@ -3,7 +3,7 @@ require './lib/lt_base.rb'
 
 class ApiKey < ActiveRecord::Base
 
-  def self.CreateApiKey(user_id)
+  def self.create_api_key(user_id)
     if user_id.nil? then
       raise LT::ParameterMissing
     elsif !user_id.is_a? Integer
@@ -17,7 +17,7 @@ class ApiKey < ActiveRecord::Base
     end
   end
 
-  def self.GetByApiKey(api_key)
+  def self.get_by_api_key(api_key)
     if api_key.nil? || api_key.empty? then
       raise LT::ParameterMissing
     else

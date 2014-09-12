@@ -77,3 +77,83 @@ approved_site.approved_site_actions.create(
   :action_type=>'PAGEVIEW',
   :url_pattern=>'http(s)?://(.*\.)?nytimes\.com(/\S*)?'
 )
+
+# Ars Technica
+approved_site = ApprovedSite.create(
+  :site_name=>'Ars Technica',
+  :url=>'http://arstechnica.com/'
+)
+
+approved_site.approved_site_actions.create(
+  :action_type=>'CLICK',
+  :url_pattern=>'http(s)?://(.*\.)?arstechnica\.com(/\S*)?'
+)
+
+approved_site.approved_site_actions.create(
+  :action_type=>'PAGEVIEW',
+  :url_pattern=>'http(s)?://(.*\.)?arstechnica\.com(/\S*)?'
+)
+
+# The Verge
+approved_site = ApprovedSite.create(
+  :site_name=>'The Verge',
+  :url=>'http://theverge.com'
+)
+
+approved_site.approved_site_actions.create(
+  :action_type=>'CLICK',
+  :url_pattern=>'http(s)?://(.*\.)?theverge\.com(/\S*)?'
+)
+
+approved_site.approved_site_actions.create(
+  :action_type=>'PAGEVIEW',
+  :url_pattern=>'http(s)?://(.*\.)?theverge\.com(/\S*)?'
+)
+
+# Gigaom
+approved_site = ApprovedSite.create(
+  :site_name=>'Gigaom',
+  :url=>'http://gigaom.com'
+)
+
+approved_site.approved_site_actions.create(
+  :action_type=>'CLICK',
+  :url_pattern=>'http(s)?://(.*\.)?gigaom\.com(/\S*)?'
+)
+
+approved_site.approved_site_actions.create(
+  :action_type=>'PAGEVIEW',
+  :url_pattern=>'http(s)?://(.*\.)?gigaom\.com(/\S*)?'
+)
+
+# Boing Boing
+approved_site = ApprovedSite.create(
+  :site_name=>'Boing Boing',
+  :url=>'http://boingboing.net'
+)
+
+approved_site.approved_site_actions.create(
+  :action_type=>'CLICK',
+  :url_pattern=>'http(s)?://(.*\.)?boingboing\.net(/\S*)?'
+)
+
+approved_site.approved_site_actions.create(
+  :action_type=>'PAGEVIEW',
+  :url_pattern=>'http(s)?://(.*\.)?boingboing\.net(/\S*)?'
+)
+
+# Washington Post
+approved_site = ApprovedSite.create(
+  :site_name=>'Washington Post',
+  :url=>'http://washingtonpost.com'
+)
+
+approved_site.approved_site_actions.create(
+  :action_type=>'CLICK',
+  :url_pattern=>'http(s)?://(.*\.)?washingtonpost\.com(/\S*)?'
+)
+
+approved_site.approved_site_actions.create(
+  :action_type=>'PAGEVIEW',
+  :url_pattern=>'http(s)?://(.*\.)?washingtonpost\.com(/\S*)?'
+)

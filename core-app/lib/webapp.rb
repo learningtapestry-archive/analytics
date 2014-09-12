@@ -1,6 +1,7 @@
 require 'sinatra/base'
 require 'json'
 require File::join(LT::lib_path, 'util', 'session_manager.rb')
+require File::join(LT::lib_path, 'util', 'redis_server.rb')
 
 module LT
   module WebAppHelper
@@ -83,6 +84,21 @@ module LT
       content_type :json
       ApprovedSiteAction.get_actions_with_sites.to_json
     end # '/api/v1/approved_sites'
+
+    post '/api/v1/assert' do
+      begin
+        api_key = request.env["HTTP_X_LT_API_KEY"] 
+        if !api_key.nil? && !LT::RedisServer.api_key_get(api_key).nil?
+          LT::RedisServer.raw_message_push(request.body.read)
+          status 200
+        else
+          status 401
+        end
+      rescue Exception => e
+        status 500
+        e.message
+      end
+    end
 
     ### END API
   end

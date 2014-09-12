@@ -53,7 +53,7 @@ var _timestamp = function() {
   */
 
 var ExtractorManager = {
-    api: null,
+    api_key: null,
     user: null,
     sites: null,
     watching: null,
@@ -61,12 +61,12 @@ var ExtractorManager = {
     user_tab: null,
     user_url: 'user.html',
     
-    sites_url: 'http://lt-dev01.betaspaces.com/api/v1/user/approved-sites',
-    event_url: 'http://lt-dev01.betaspaces.com/api/v1/assert',
+    sites_url: 'http://localhost:8080/api/v1/approved_sites',
+    event_url: 'http://localhost:8080/api/v1/assert',
     
     storage_keys: {
         user: 'store_user_data',
-        api: 'store_api_data',
+        api_key: 'store_api_data',
         sites: 'store_sites_data'
     },
     
@@ -78,13 +78,13 @@ var ExtractorManager = {
       * they are not there.
       */
     init: function() {
-        chrome.storage.local.get([this.storage_keys.user, this.storage_keys.api, this.storage_keys.sites], _callback(function(o) {
-            var a = this.storage_keys.api,
+        chrome.storage.local.get([this.storage_keys.user, this.storage_keys.api_key, this.storage_keys.sites], _callback(function(o) {
+            var a = this.storage_keys.api_key,
                 u = this.storage_keys.user,
                 s = this.storage_keys.sites;
-                
+
             if(Object.prototype.hasOwnProperty.call(o, a) && typeof o[a] === 'string' && o[a]) {
-                this.api = o[a];
+                this.api_key = o[a];
                 
                 if(Object.prototype.hasOwnProperty.call(o, u) && typeof o[u] === 'string' && o[u]) {
                     this.user = o[u];
@@ -95,8 +95,8 @@ var ExtractorManager = {
             }
 
             if(Object.prototype.hasOwnProperty.call(o, s) && typeof o[s] === 'string' && o[s]) {
-                this.sites = new RegExp(o[s]);
-                if(this.api && !this.watching) {
+                this.sites = JSON.parse(o[s]);
+                if(this.api_key && !this.watching) {
                     this.watch();
                 }
             }
@@ -147,8 +147,8 @@ var ExtractorManager = {
             return;
         }
         
-        this.api = a;
-        chrome.storage.local.set(_map(this.storage_keys.api, this.api));
+        this.api_key = a;
+        chrome.storage.local.set(_map(this.storage_keys.api_key, this.api_key));
 
         this.user = typeof u !== 'string' || !u ? null : u;
         chrome.storage.local.set(_map(this.storage_keys.user, this.user));
@@ -172,14 +172,11 @@ var ExtractorManager = {
         r.onreadystatechange = _callback(function() {
             if(r.readyState === 4) {
                 if(r.status === 200) {
-                    x = JSON.parse(r.response)[0]['approved-sites'].join('|');
-                    x = x.replace(/\//g, '\\/').replace(/\./g, '\\.').replace(/\?/g, '\\?');
+                    x = JSON.parse(r.response);
+                    this.sites = x;
+                    chrome.storage.local.set(_map(this.storage_keys.sites, JSON.stringify(x)));
                     
-                    this.sites = new RegExp('^https?:\\/\\/(?:www\.)?(?:' + x + ')');
-                    
-                    chrome.storage.local.set(_map(this.storage_keys.sites, this.sites.source));
-                    
-                    if(this.api && !this.watching) {
+                    if(this.api_key && !this.watching) {
                         this.watch();
                     }
                 }
@@ -201,12 +198,8 @@ var ExtractorManager = {
         var r = new XMLHttpRequest();
         
         r.open('POST', this.event_url, true);
-        
-        r.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        r.setRequestHeader('X-LT-API-Key', this.api);
-        //r.setRequestHeader('Content-length', ujson.length);
-        //r.setRequestHeader('Connection', 'close');
-        
+        r.setRequestHeader('X-LT-API-Key', this.api_key);
+
         r.onreadystatechange = _callback(function() {
             if(r.readyState === 4) {
                 if(r.status === 200) {
@@ -229,19 +222,19 @@ var ExtractorManager = {
       * tab. Listeners populate correct JSON based on event and send it to server.
       */
     watch: function() {
-        if(!this.api || !this.sites || this.watching) {
+        if(!this.api_key || !this.sites || this.watching) {
             return;
         }
-        
+
         this.watching = true;
-        
+
         chrome.runtime.onMessage.addListener(_callback(function(e) {
             var u = {user: null};
 
             if(e.t === 'pageview') {
                 u.user = {
                     email: this.user,
-                    apiKey: this.api,
+                    apiKey: this.api_key,
                     action: {
                         id: 'verbs/viewed',
                         display: {
@@ -262,7 +255,7 @@ var ExtractorManager = {
             else if(e.t === 'linkevent') {
                 u.user = {
                     email: this.user,
-                    apiKey: this.api,
+                    apiKey: this.api_key,
                     action: {
                         id: 'verbs/clicked',
                         display: {
@@ -281,7 +274,7 @@ var ExtractorManager = {
             else if(e.t === 'viewquote') {
                 u.user = {
                     email: this.user,
-                    apiKey: this.api,
+                    apiKey: this.api_key,
                     action: {
                         id: 'verbs/quoted',
                         display: {
@@ -310,8 +303,11 @@ var ExtractorManager = {
                 return;
             }
             
-            if(this.sites.test(t.url)) {
-                this.attachExtractor(id);
+            for (index = 0; index < this.sites.length; index++) {
+                var regEx = new RegExp(this.sites[index]['url_pattern']);
+                if (regEx.test(t.url)) {
+                    this.attachExtractor(id);
+                }
             }
         }, this));
     },
@@ -322,6 +318,8 @@ var ExtractorManager = {
       * Attaches the Extractor script to the tab with given id.
       */
     attachExtractor: function(id) {
+        //chrome.tabs.executeScript(id, {code: 'var _event = "hello";'}, 
+        //    function() { chrome.tabs.executeScript(id, {file: 'extractor.js', runAt: 'document_end'}); });
         chrome.tabs.executeScript(id, {file: 'extractor.js', runAt: 'document_end'}, function() {});
     }
 };

@@ -7,7 +7,7 @@ require 'bcrypt' # required by various models/modules
 require 'active_record'
 require 'logger'
 require 'pg'
-require 'yaml'
+require './lib/util/redis_server.rb'
 
 module LT
   # TODO:  Namespace this Exceptions
@@ -18,7 +18,6 @@ module LT
   class LoginError < BaseException;end;
   class UserNotFound < LoginError;end;
   class PasswordInvalid < LoginError;end;
-
 
   class << self
     def testing?
@@ -90,10 +89,8 @@ module LT
     def boot_redis(config_file)
       LT::RedisServer::boot_redis(config_file)
     end
-    def get_db_name(config_file)
-      # TODO:  Refactor to utilize current AR connection
-      dbconfig = YAML::load(File.open(config_file))
-      return dbconfig[LT::run_env]["database"]
+    def get_db_name
+      return ActiveRecord::Base.connection_config[:database]
     end
     def run_tests(test_path = LT::test_path)
     	test_file_glob = File::expand_path(File::join(test_path, '**/*_test.rb'))

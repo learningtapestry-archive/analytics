@@ -157,7 +157,7 @@ ActiveRecord::Schema.define(:version => 20140902210605) do
     t.string   "middle_name"
     t.string   "last_name",     :null => false
     t.string   "gender"
-    t.string   "username"
+    t.string   "username",      :null => false
     t.string   "password_hash"
     t.string   "password_salt"
     t.date     "date_of_birth"

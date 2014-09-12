@@ -7,7 +7,7 @@ require 'bcrypt' # required by various models/modules
 require 'active_record'
 require 'logger'
 require 'pg'
-require 'yaml'
+require './lib/util/redis_server.rb'
 
 module LT
   # TODO:  Namespace this Exceptions
@@ -18,7 +18,6 @@ module LT
   class LoginError < BaseException;end;
   class UserNotFound < LoginError;end;
   class PasswordInvalid < LoginError;end;
-
 
   class << self
     def testing?
@@ -90,10 +89,8 @@ module LT
     def boot_redis(config_file)
       LT::RedisServer::boot_redis(config_file)
     end
-    def get_db_name(config_file)
-      # TODO:  Refactor to utilize current AR connection
-      dbconfig = YAML::load(File.open(config_file))
-      return dbconfig[LT::run_env]["database"]
+    def get_db_name
+      return ActiveRecord::Base.connection_config[:database]
     end
     def run_tests(test_path = LT::test_path)
     	test_file_glob = File::expand_path(File::join(test_path, '**/*_test.rb'))
@@ -124,20 +121,11 @@ module LT
   module Seeds
     SEED_FILES = '.seeds.rb'
     class << self
-      # execute all the seeds loaded to date
-      def seed_all!
-        LT::Seedlib::seed_all!
-      end
-      # execute only seed specified
-      # Nb. id will generally be the "classify" name of the seed file
-      # e.g., raw_messages.seeds.rb will have id="RawMessage"
-      def seed!(id)
-        LT::Seedlib::seed!(id)
-      end
       def seed!
         run_env = LT::run_env
+        # this loads all the seeds in the root (common seeds)
         LT::Seeds::load_seeds
-        # This will run all seeds for environment, eg "test"
+        # This runs all seeds for environment, eg "test"
         env_seeds = File::join('./',run_env)
         LT::Seeds::load_seeds(env_seeds)
       end

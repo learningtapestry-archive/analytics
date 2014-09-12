@@ -46,9 +46,8 @@ class SessionManagerTest < Minitest::Test
     refute_nil match
 
     # Test in Redis that API key gives us a database name
-    db_name = LT.get_db_name(File::expand_path('./db/config.yml'))
     db_name_redis = LT::RedisServer.api_key_get(api_key)
-    assert_equal db_name, db_name_redis
+    assert_equal LT.get_db_name, db_name_redis
 
     # Test that API key from Redis matches user in Postgres
     api_key_postgres = ApiKey.get_by_api_key(api_key)

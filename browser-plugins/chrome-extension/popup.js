@@ -18,8 +18,8 @@ var LoginManager = {
     
     msg_to: null,
     
-    login_url: 'http://localhost:4567/api/v1/login',
-    create_url: 'http://localhost:4567/api/v1/signup',
+    login_url: 'http://localhost:8080/api/v1/login',
+    create_url: 'http://localhost:8080/api/v1/signup',
     
     init: function() {
         this.bg = chrome.extension.getBackgroundPage();
@@ -67,30 +67,16 @@ var LoginManager = {
             }),
             r = new XMLHttpRequest(), x, y;
         
-        console.log(d);
-        
         r.open('POST', this.login_url, true);
-        
         r.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        r.setRequestHeader('Content-length', d.length);
-        r.setRequestHeader('Connection', 'close');
         
         r.onreadystatechange = _callback(function() {
             if(r.readyState === 4) {
-                x = r.response.trim().replace(/^\s*\{\s*/, '').replace(/\s*\}\s*$/, '');
-                x = x.split(',');
-                y = {};
-                
-                for(var i=0; i<x.length; ++i) {
-                    y[x[i].split(':')[0].trim()] = x[i].split(':')[1].trim();
-                }
-                
                 if(r.status === 200) {
-                    if(y['status'] === 'login success' && y['api-key']) {
-                        console.log('api-key: ' + y['api-key']);
+                    y = JSON.parse(r.response);
+                    if(y['status'] === 'login success' && y['api_key']) {
                         d = JSON.parse(d);
-                        console.log(d);
-                        this.bg.ExtractorManager.setApi(y['api-key'], d.username, d.password);
+                        this.bg.ExtractorManager.setApi(y['api_key'], d.username, d.password);
                         window.close();
                     }
                     else {
@@ -123,21 +109,15 @@ var LoginManager = {
             }),
             r = new XMLHttpRequest(), x;
         
-        console.log(d);
-        
         r.open('POST', this.create_url, true);
         
         r.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        r.setRequestHeader('Content-length', d.length);
-        r.setRequestHeader('Connection', 'close');
         
         r.onreadystatechange = _callback(function() {
-            if(r.readyState === 4) {
-                x = r.response.trim().replace(/^\s*\{\s*/, '').replace(/\s*\}\s*$/, '');
-                console.log(x);
-                
+            if(r.readyState === 4) {                
                 if(r.status === 200) {
-                    if(x === 'status: user created') {
+                    y = JSON.parse(r.response);
+                    if(y['status'] && y['status'] === 'user created') {
                         this.showLogin();
                         this.showMessage(1, 'Created account!');
                     }

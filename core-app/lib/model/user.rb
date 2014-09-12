@@ -1,6 +1,11 @@
 require 'json'
 class User < ActiveRecord::Base
+  has_one :student
+  has_one :staff_member
+  has_many :emails
+  has_many :sections, through: :section_user
 
+  # Instance methods
   def password=(password)
     self.password_salt = BCrypt::Engine.generate_salt
     self.password_hash = BCrypt::Engine.hash_secret(password, password_salt)
@@ -14,6 +19,13 @@ class User < ActiveRecord::Base
     retval
   end
 
+  def email
+    # TODO return the primary email here
+    self.emails.first.email
+  end
+
+  # Class methods
+
   def self.create_user_from_json(json_str)
     json = JSON.parse(json_str)
     fields = {}
@@ -24,10 +36,24 @@ class User < ActiveRecord::Base
     self.create_user(fields)
   end
 
-  def self.create_user(fields)
-    fields.fetch(:password)
+  # This method is used for creating users, students and staff_members
+  # along with their associated relationship fields (emails and sections)
+
+  def self.create_user(passed_fields)
+    fields = passed_fields.dup
+    student_fields = fields.delete(:student)
+    primary_email = fields.delete(:email)
+    fields.fetch(:password) # raise error if no password field
     user = User.new(fields)
-    user.save!
+    if student_fields
+      student = Student.new(student_fields)
+      user.student=student
+    end
+    if primary_email
+      email = Email.new(:email => primary_email, :primary => true)
+      user.emails<<email
+    end
+    user.save
     # we return a hash so we can in the future return error messages or other supplemental
     # info back with the new user record
     {:user =>user}

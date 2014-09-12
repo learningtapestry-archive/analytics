@@ -1,59 +1,60 @@
 require 'sinatra/base'
 require 'json'
-require './lib/util/session_manager.rb'
-#require File::join(LT::lib_path, 'util', 'session_manager.rb')
-
-#LT::run_env = ENV['RACK_ENV']
-#LT::boot_db(File::expand_path('./db/config.yml'))
-#LT::RedisServer.boot_redis(File::expand_path('./db/redis.yml'))
+require File::join(LT::lib_path, 'util', 'session_manager.rb')
 
 module LT
   class WebApp < Sinatra::Base 
 
     before do
-      #content_type 'application/json'
+      content_type :json
     end
 
     post '/api/v1/login' do
       begin
         begin
           parsed_json = JSON.parse(request.body.read)
-          api_key = LT::SessionManager.ValidateUser(parsed_json["username"], parsed_json["password"])
+          api_key = LT::SessionManager.validate_user(parsed_json["username"], parsed_json["password"])
           status 200
-          "{ ""status"": ""login success"", ""api-key"": ""#{api_key}"" }"
+          { :status => "login success", :api_key => api_key }.to_json
         rescue Exception => e
           if e.is_a?(LT::UserNotFound) || e.is_a?(LT::PasswordInvalid) then
             status 401 # 403 = unauthorized
-            "{ ""status"": ""username or password invalid"" }"
+            { :status => 'username or password invalid' }.to_json
           elsif
             status 500
             # TODO:  Remove this after development
-            e.message
+            { :status => e.message }.to_json
           end
         end
       end
-    end
+    end # '/api/v1/login'
 
     get '/api/v1/logout' do
-      status 200
-      '{"status": "logged out"}'
-    end
+      status 501
+      { :status => "logged out not yet implemented" }.to_json
+    end # '/api/v1/logout'
 
     post '/api/v1/signup' do
       begin
-        user = User.CreateUserFromJson(request.body.read)
+        user = User.create_user_from_json(request.body.read)
         if user
           status 200
           # TODO: Return back API key as well
-          "{ ""status"": ""user created"" }"
+          { :status => "user created" }.to_json
         else
           status 500
-          '{"status": "error"}'
+          { :status => "error" }.to_json
         end
       rescue Exception => e
         status 500
-        "{""status"": ""#{e.message}""}"
+        # TODO:  Remove this after development
+        { :status => e.message }.to_json
       end
+    end # '/api/v1/signup'
+
+    get '/api/v1/approved_sites' do
+      ApprovedSiteAction.get_actions_with_sites.to_json
     end
+
   end
 end

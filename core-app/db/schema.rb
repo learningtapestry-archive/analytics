@@ -31,12 +31,22 @@ ActiveRecord::Schema.define(:version => 20140902210605) do
     t.datetime "updated_at", :null => false
   end
 
+  create_table "approved_site_actions", :force => true do |t|
+    t.integer  "approved_site_id", :null => false
+    t.string   "action_type",      :null => false
+    t.string   "url_pattern",      :null => false
+    t.string   "css_selector"
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
+  end
+
   create_table "approved_sites", :force => true do |t|
-    t.string   "hash_id",      :null => false
-    t.string   "url_pattern",  :null => false
-    t.string   "css_selector", :null => false
-    t.datetime "created_at",   :null => false
-    t.datetime "updated_at",   :null => false
+    t.string   "site_name",      :null => false
+    t.string   "url",            :null => false
+    t.string   "logo_url_small"
+    t.string   "logo_url_large"
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
   end
 
   create_table "course_offerings", :force => true do |t|

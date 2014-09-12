@@ -3,9 +3,11 @@
 #   rackup -p 8080 webapp.ru
 require 'rubygems'
 require 'bundler'
+require './lib/lt_base.rb'
 
 Bundler.require
 
+LT::boot_all
 path = File::expand_path(File::dirname(__FILE__))
 require File::join(path,'webapp.rb')
 run LT::WebApp

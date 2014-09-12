@@ -35,11 +35,20 @@ namespace :lt do
       Rake::Task[:'lt:boot'].invoke
     end
     desc "Run WebApp server - this starts the webserver"
-    task :start_webapp => [:boot] do 
+    task :start_webapp do 
       path = File::expand_path(File::dirname(__FILE__))
       rackup_file = File::join(path, 'lib', 'webapp.ru')
       # TODO - set port/server from environment var
       run_cmd = "rackup -p 8080 -o localhost #{rackup_file}"
+      $stdout.sync = true
+      Kernel.system(run_cmd)
+    end
+    desc "Run WebApp server - this starts the webserver in dev mode with rerun"
+    task :start_webapp_dev do 
+      path = File::expand_path(File::dirname(__FILE__))
+      rackup_file = File::join(path, 'lib', 'webapp.ru')
+      # TODO - set port/server from environment var
+      run_cmd = "rerun -- rackup -p 8080 -o localhost #{rackup_file}"
       $stdout.sync = true
       Kernel.system(run_cmd)
     end
@@ -54,7 +63,8 @@ namespace :lt do
   end
 
   desc "Boot Core-app system"
-  task :boot => [:'boot:set_env', :'boot:setup_logger', :'boot:boot_db', :'boot:load_all_models'] do
+  task :boot do
+    LT::boot_all(File::dirname(__FILE__))
     LT::logger.info("Core-app booted")
   end
 
@@ -120,35 +130,6 @@ namespace :lt do
       end
     end
   end # test namesapce
-
-  # holds all our bootup tasks
-  namespace :boot do
-    
-    desc "Setup core-app logger"
-    task :setup_logger do
-      LT::init_logger
-    end
-
-    desc "Define the environment we are running in (prod, test, dev)"
-    task :set_env do
-      LT::setup_environment(File::dirname(__FILE__))
-    end
-    
-    desc "Load all AR models from ./lib/model"
-    task :load_all_models do
-      LT::load_all_models
-    end
-
-    desc "Establish connection to core-app database"
-    task :boot_db do
-      LT::boot_db(File::expand_path('./db/config.yml'))
-    end # boot_db
-
-    desc "Establish connection to Redis server"
-    task :boot_redis_server do
-      LT::RedisServer::boot_redis(File::expand_path('./db/redis.yml'))
-    end # boot_redis_server
-  end #boot namespace
 end # lt namespace
 
 

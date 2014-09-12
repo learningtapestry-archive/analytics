@@ -1,7 +1,4 @@
-require 'yaml'
 require 'redis'
-require './lib/lt_base.rb'
-require 'logger'
 
 module LT
   module RedisServer

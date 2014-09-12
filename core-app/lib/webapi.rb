@@ -27,12 +27,12 @@ module LT
           end
         end
       end
-    end
+    end # '/api/v1/login'
 
     get '/api/v1/logout' do
       status 501
       { :status => "logged out not yet implemented" }.to_json
-    end
+    end # '/api/v1/logout'
 
     post '/api/v1/signup' do
       begin
@@ -50,6 +50,11 @@ module LT
         # TODO:  Remove this after development
         { :status => e.message }.to_json
       end
+    end # '/api/v1/signup'
+
+    get '/api/v1/approved_sites' do
+      ApprovedSiteAction.get_actions_with_sites.to_json
     end
+
   end
 end

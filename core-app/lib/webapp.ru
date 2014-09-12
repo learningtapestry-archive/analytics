@@ -10,5 +10,4 @@ Bundler.require
 LT::boot_all
 path = File::expand_path(File::dirname(__FILE__))
 require File::join(path,'webapp.rb')
-require File::join(path,'webapi.rb')
 run LT::WebApp

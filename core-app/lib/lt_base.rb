@@ -112,20 +112,11 @@ module LT
   module Seeds
     SEED_FILES = '.seeds.rb'
     class << self
-      # execute all the seeds loaded to date
-      def seed_all!
-        LT::Seedlib::seed_all!
-      end
-      # execute only seed specified
-      # Nb. id will generally be the "classify" name of the seed file
-      # e.g., raw_messages.seeds.rb will have id="RawMessage"
-      def seed!(id)
-        LT::Seedlib::seed!(id)
-      end
       def seed!
         run_env = LT::run_env
+        # this loads all the seeds in the root (common seeds)
         LT::Seeds::load_seeds
-        # This will run all seeds for environment, eg "test"
+        # This runs all seeds for environment, eg "test"
         env_seeds = File::join('./',run_env)
         LT::Seeds::load_seeds(env_seeds)
       end

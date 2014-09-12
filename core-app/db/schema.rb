@@ -78,9 +78,9 @@ ActiveRecord::Schema.define(:version => 20140902210605) do
   end
 
   create_table "emails", :force => true do |t|
-    t.integer "user_id", :null => false
     t.string  "email"
     t.boolean "primary"
+    t.integer "user_id"
   end
 
   create_table "janitor_jobs", :force => true do |t|
@@ -132,12 +132,18 @@ ActiveRecord::Schema.define(:version => 20140902210605) do
     t.datetime "updated_at",         :null => false
   end
 
+  create_table "sections_users", :force => true do |t|
+    t.string  "relationship"
+    t.integer "section_id"
+    t.integer "user_id"
+  end
+
   create_table "staff_members", :force => true do |t|
     t.string   "state_id"
     t.string   "sis_id"
     t.string   "other_id"
     t.string   "staff_member_type", :null => false
-    t.integer  "user_id",           :null => false
+    t.integer  "user_id"
     t.datetime "created_at",        :null => false
     t.datetime "updated_at",        :null => false
   end
@@ -147,7 +153,7 @@ ActiveRecord::Schema.define(:version => 20140902210605) do
     t.string   "sis_id"
     t.string   "other_id"
     t.string   "grade_level"
-    t.integer  "user_id",     :null => false
+    t.integer  "user_id"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
   end
@@ -157,7 +163,7 @@ ActiveRecord::Schema.define(:version => 20140902210605) do
     t.string   "middle_name"
     t.string   "last_name",     :null => false
     t.string   "gender"
-    t.string   "username"
+    t.string   "username",      :null => false
     t.string   "password_hash"
     t.string   "password_salt"
     t.date     "date_of_birth"

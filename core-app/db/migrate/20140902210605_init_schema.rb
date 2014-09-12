@@ -104,6 +104,13 @@ class InitSchema < ActiveRecord::Migration
       t.timestamps
     end
 
+    create_table "sections_users", :force => true do |t|
+      t.string "relationship" # defines the type of relationship user has to section
+        # e.g.: "teacher" "student" "TA" "auditing"
+      t.belongs_to :section
+      t.belongs_to :user
+    end
+
     create_table "users", :force => true do |t|
       t.string   "first_name",    :null => false
       t.string   "middle_name"
@@ -119,9 +126,9 @@ class InitSchema < ActiveRecord::Migration
     add_index :users, :username, :unique => true
 
     create_table "emails", :force => true do |t|
-      t.integer  "user_id",     :null => false
       t.string   "email"
       t.boolean  "primary"
+      t.belongs_to :user
     end
 
     create_table "api_keys", :force => true do |t|
@@ -135,7 +142,7 @@ class InitSchema < ActiveRecord::Migration
       t.string   "sis_id"
       t.string   "other_id"
       t.string   "grade_level"
-      t.integer  "user_id", :null => false
+      t.belongs_to :user
       t.timestamps
     end
 
@@ -144,7 +151,7 @@ class InitSchema < ActiveRecord::Migration
       t.string   "sis_id"
       t.string   "other_id"
       t.string   "staff_member_type", :null => false
-      t.integer  "user_id", :null => false
+      t.belongs_to :user
       t.timestamps
     end 
   end #def change

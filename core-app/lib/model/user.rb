@@ -3,6 +3,7 @@ class User < ActiveRecord::Base
   has_one :student
   has_one :staff_member
   has_many :emails
+  has_many :section_user
   has_many :sections, through: :section_user
 
   # Instance methods
@@ -42,12 +43,17 @@ class User < ActiveRecord::Base
   def self.create_user(passed_fields)
     fields = passed_fields.dup
     student_fields = fields.delete(:student)
+    staff_member_fields = fields.delete(:staff_member)
     primary_email = fields.delete(:email)
     fields.fetch(:password) # raise error if no password field
     user = User.new(fields)
     if student_fields
       student = Student.new(student_fields)
       user.student=student
+    end
+    if staff_member_fields
+      staff_member = StaffMember.new(staff_member_fields)
+      user.staff_member=staff_member
     end
     if primary_email
       email = Email.new(:email => primary_email, :primary => true)

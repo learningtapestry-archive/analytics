@@ -132,20 +132,20 @@ ActiveRecord::Schema.define(:version => 20140902210605) do
     t.datetime "updated_at", :null => false
   end
 
+  create_table "section_users", :force => true do |t|
+    t.string  "user_type"
+    t.integer "section_id"
+    t.integer "user_id"
+  end
+
   create_table "sections", :force => true do |t|
     t.string   "section_code"
-    t.integer  "course_offering_id", :null => false
+    t.integer  "course_offering_id"
     t.string   "sis_id"
     t.string   "other_id"
     t.string   "name",               :null => false
     t.datetime "created_at",         :null => false
     t.datetime "updated_at",         :null => false
-  end
-
-  create_table "sections_users", :force => true do |t|
-    t.string  "relationship"
-    t.integer "section_id"
-    t.integer "user_id"
   end
 
   create_table "staff_members", :force => true do |t|

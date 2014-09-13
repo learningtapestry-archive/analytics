@@ -7,12 +7,10 @@ module LT
         # Connect to Redis
         begin
           redis_config = YAML::load(File.open(config_file))
-          # QUESTION:  Ask SM what is the right way to startup w/ environment path
-          LT::setup_environment(".")
           redis_url = redis_config[LT::run_env]["url"]
           
           # Store static queue / hashlist names
-          @queue_raw_message = redis_config[LT::run_env]["queue_raw_message"]
+          @queue_raw_message = redis_config[LT::run_env]["queue_raw_messages"]
           @hashlist_api_keys = redis_config[LT::run_env]["hashlist_api_keys"]
           
           # Define and connect to server

@@ -106,15 +106,15 @@ class InitSchema < ActiveRecord::Migration
 
     create_table "sections", :force => true do |t|
       t.string   "section_code"
-      t.integer  "course_offering_id", :null => false
+      t.integer  "course_offering_id"
       t.string   "sis_id"
       t.string   "other_id"
       t.string   "name",               :null => false
       t.timestamps
     end
 
-    create_table "sections_users", :force => true do |t|
-      t.string "relationship" # defines the type of relationship user has to section
+    create_table "section_users", :force => true do |t|
+      t.string "user_type" # defines the type of relationship user has to section
         # e.g.: "teacher" "student" "TA" "auditing"
       t.belongs_to :section
       t.belongs_to :user

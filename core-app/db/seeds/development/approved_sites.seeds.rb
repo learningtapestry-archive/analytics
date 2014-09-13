@@ -157,3 +157,19 @@ approved_site.approved_site_actions.create(
   :action_type=>'PAGEVIEW',
   :url_pattern=>'http(s)?://(.*\.)?washingtonpost\.com(/\S*)?'
 )
+
+# Stack Overflow
+approved_site = ApprovedSite.create(
+  :site_name=>'Stack Overflow',
+  :url=>'http://stackoverflow.com'
+)
+
+approved_site.approved_site_actions.create(
+  :action_type=>'CLICK',
+  :url_pattern=>'http(s)?://(.*\.)?stackoverflow\.com(/\S*)?'
+)
+
+approved_site.approved_site_actions.create(
+  :action_type=>'PAGEVIEW',
+  :url_pattern=>'http(s)?://(.*\.)?stackoverflow\.com(/\S*)?'
+)

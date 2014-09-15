@@ -21,9 +21,7 @@ function htmlspecialchars(str) {
   * The main object of the script; handles all events and data extraction.
   */
 var Extractor = {
-    time: null,
-    google_quote: /^https?:\/\/(?:www\.)?(?:google\.com\/finance\?q=.+)/,
-    
+    time: null,    
     H: 3600,
     M: 60,
     
@@ -34,59 +32,69 @@ var Extractor = {
       * when page is closedm listens for clicks on all links of the page, and 
       * if the page is a Google Finance Quote, extracts quote data.
       */
-    init: function() {
-        var o;
-        
-        this.time = +Date.now();
-        
-        window.addEventListener('unload', _callback(this.pageView, this));
-        
-        Array.prototype.forEach.call(document.getElementsByTagName('a'), _callback(this.processAnchor, this));
-        
-        /*
-         * Uses MutationObserver to look for anchor tags added/changed AFTER the script has ran.
-         */
-        o = new MutationObserver(_callback(function(ms) {
-            ms.forEach(_callback(function(m) {
-                var ns = m.addedNodes, nn;
-                
-                if(!ns || !ns.length) {
-                    if(m.target.nodeType === 1 && m.target.tagName.toLowerCase() === 'a') {
-                        this.processAnchor(m.target);
-                    }
-                    return;
-                }
-                
-                for(var i=0; i<ns.length; ++i) {
-                    nn = ns[i];
-                    if(nn.nodeType === 1 && nn.tagName.toLowerCase() === 'a') {
-                        this.processAnchor(nn);
-                    }
-                    else {
-                      // HACK:  Figure out why exception is being thrown on extension initial load
-                      try {
-                        nn = nn.getElementsByTagName('a');
-                        for(var j=0; j<nn.length; ++j) {
-                            this.processAnchor(nn[j]);
+    init: function(_actionType) {
+      var o;
+
+      actionArray = JSON.parse(decodeURIComponent(_actionType));
+
+      for (index=0; index < actionArray.length; index++) {
+        console.log(index);
+        console.log(actionArray[index]['action_type']);
+        switch (actionArray[index]['action_type']) {
+          case "CLICK":
+            console.log("click registering");
+            Array.prototype.forEach.call(document.getElementsByTagName('a'), _callback(this.processAnchor, this));
+            
+            /*
+             * Uses MutationObserver to look for anchor tags added/changed AFTER the script has ran.
+             */
+            o = new MutationObserver(_callback(function(ms) {
+                ms.forEach(_callback(function(m) {
+                    var ns = m.addedNodes, nn;
+                    
+                    if(!ns || !ns.length) {
+                        if(m.target.nodeType === 1 && m.target.tagName.toLowerCase() === 'a') {
+                            this.processAnchor(m.target);
                         }
-                      } catch(err) {
-                        console.log("Extractor.js error: " + err.toString());
-                      }
+                        return;
                     }
-                }
+                    
+                    for(var i=0; i<ns.length; ++i) {
+                        nn = ns[i];
+                        if(nn.nodeType === 1 && nn.tagName.toLowerCase() === 'a') {
+                            this.processAnchor(nn);
+                        }
+                        else {
+                          // HACK:  Figure out why exception is being thrown on extension initial load
+                          try {
+                            nn = nn.getElementsByTagName('a');
+                            for(var j=0; j<nn.length; ++j) {
+                                this.processAnchor(nn[j]);
+                            }
+                          } catch(err) {
+                            console.log("Fix this: Extractor.js error: " + err.toString());
+                          }
+                        }
+                    }
+                }, this));
             }, this));
-        }, this));
-        
-        o.observe(document.body, {
-            childList: true,
-            subtree: true,
-            attributes: true,
-            characterData: false
-        });
-        
-        if(this.google_quote.test(document.location.href)) {
-            this.viewQuote();
+            
+            o.observe(document.body, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                characterData: false
+            });
+            break;
+          case "PAGEVIEW":
+            this.time = +Date.now();
+            window.addEventListener('unload', _callback(this.pageView, this));
+            break;
+          case "EXTRACT":
+            this.extractEvent('body');
+            break;
         }
+      }
     },
     
     /**
@@ -100,7 +108,7 @@ var Extractor = {
         }
             
         a.addEventListener('click', _callback(function(e) {
-            this.linkEvent(a.href);
+            this.clickEvent(a.href);
         }, this));
     },
         
@@ -129,56 +137,42 @@ var Extractor = {
         s += Math.floor(this.time) + 'S';
         
         chrome.runtime.sendMessage({
-            t: 'pageview', 
+            t: 'page_view', 
             d: {
                 t: s, 
-                id: document.location.href,
-                html: htmlspecialchars(document.querySelector('body').innerHTML)
+                id: document.location.href
             }
         });
+        console.log("pageView");
     },
     
     /**
-      * linkEvent
+      * clickEvent
       *
       * Called when link on page is clicked. Sends message to ExtractorManager
-      * with proper link for event 'linkevent'.
+      * with proper link for event 'click_event'.
       */
-    linkEvent: function(href) {
+    clickEvent: function(href) {
         chrome.runtime.sendMessage({
-            t: 'linkevent', 
+            t: 'click_event', 
             d: {
                 u: href, 
                 id: document.location.href
             }
         });
+        console.log("clickEvent");
     },
     
-    /**
-      * viewQuote
-      *
-      * Called when page is Google Finance Quote. Extracts quote data and sends
-      * it to ExtractorManager for event 'viewquote'.
-      */
-    viewQuote: function() {
-        var q = document.location.href.match(/\?q=([^&]+)/)[1],
-            p = document.querySelector('div#price-panel .pr > span'),
-            v = document.querySelector('table.snap-data td.key[data-snapfield="vol_and_avg"] + td.val');
-            
-        if(!p || !v) {
-            return;
-        }
-        
+    extractEvent: function(cssSelector) {        
         chrome.runtime.sendMessage({
-            t: 'viewquote', 
+            t: 'extract_event', 
             d: {
-                q: q, 
-                p: p.textContent, 
-                v: v.textContent.replace(/\s|\n|\r\n|\n\r|\r/g, ''), 
-                id: document.location.href
+                id: document.location.href,
+                html: htmlspecialchars(document.querySelector(cssSelector).innerHTML)
             }
         });
+        console.log("extractEvent");
     }
 };
 
-Extractor.init();
+Extractor.init(_actionType);

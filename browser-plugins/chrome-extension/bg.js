@@ -231,9 +231,9 @@ var ExtractorManager = {
         chrome.runtime.onMessage.addListener(_callback(function(e) {
             var u = {user: null};
 
-            if(e.t === 'pageview') {
+            if(e.t === 'page_view') {
                 u.user = {
-                    email: this.user,
+                    username: this.user,
                     apiKey: this.api_key,
                     action: {
                         id: 'verbs/viewed',
@@ -247,14 +247,12 @@ var ExtractorManager = {
                     url: {
                         id: e.d.id
                     },
-                    html: e.d.html,
                     timestamp: _timestamp()
                 };
-                // console.log(JSON.stringify(u.user));
             }
-            else if(e.t === 'linkevent') {
+            else if(e.t === 'click_event') {
                 u.user = {
-                    email: this.user,
+                    username: this.user,
                     apiKey: this.api_key,
                     action: {
                         id: 'verbs/clicked',
@@ -271,20 +269,16 @@ var ExtractorManager = {
                     timestamp: _timestamp()
                 };
             }
-            else if(e.t === 'viewquote') {
+            else if(e.t === 'extract_event') {
                 u.user = {
-                    email: this.user,
+                    username: this.user,
                     apiKey: this.api_key,
                     action: {
-                        id: 'verbs/quoted',
+                        id: 'verbs/extracted',
                         display: {
-                            'en-US': 'quoted'
+                            'en-US': 'extracted'
                         },
-                        value: {
-                            quote: e.d.q,
-                            price: e.d.p,
-                            volavg: e.d.v
-                        }
+                        html: e.d.html
                     },
                     url: {
                         id: e.d.id
@@ -303,11 +297,15 @@ var ExtractorManager = {
                 return;
             }
             
+            var listeners = [];
             for (index = 0; index < this.sites.length; index++) {
                 var regEx = new RegExp(this.sites[index]['url_pattern']);
                 if (regEx.test(t.url)) {
-                    this.attachExtractor(id);
+                    listeners.push(this.sites[index]);
                 }
+            }
+            if (listeners.length) {
+                this.attachExtractor(id, listeners);
             }
         }, this));
     },
@@ -317,10 +315,17 @@ var ExtractorManager = {
       *
       * Attaches the Extractor script to the tab with given id.
       */
-    attachExtractor: function(id) {
-        //chrome.tabs.executeScript(id, {code: 'var _event = "hello";'}, 
-        //    function() { chrome.tabs.executeScript(id, {file: 'extractor.js', runAt: 'document_end'}); });
-        chrome.tabs.executeScript(id, {file: 'extractor.js', runAt: 'document_end'}, function() {});
+    attachExtractor: function(id, actionType) {
+        console.log("attach: " + actionType);
+        chrome.tabs.executeScript(id, {code: 'var _actionType = "' + encodeURIComponent(JSON.stringify(actionType)) + '";'},
+            function() { 
+                chrome.tabs.executeScript(id, {file: 'extractor.js', runAt: 'document_end'}); 
+            });
+        /** chrome.tabs.executeScript(id, {file: 'extractor.js', runAt: 'document_end'},
+            function() { 
+                chrome.tabs.executeScript(id, {code: 'var _event = "hello";'}); 
+            }); */
+        //chrome.tabs.executeScript(id, {file: 'extractor.js', runAt: 'document_end'}, function() {});
     }
 };
 

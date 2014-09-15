@@ -72,8 +72,8 @@ var LoginManager = {
         
         r.onreadystatechange = _callback(function() {
             if(r.readyState === 4) {
+                y = JSON.parse(r.response);
                 if(r.status === 200) {
-                    y = JSON.parse(r.response);
                     if(y['status'] === 'login success' && y['api_key']) {
                         d = JSON.parse(d);
                         this.bg.ExtractorManager.setApi(y['api_key'], d.username, d.password);

@@ -33,3 +33,9 @@ Server Configuration
 * Improvement:  figure out how to properly handle bundle install updates for learntac wo/ sudo access if can be avoided.
 
 * Improvement:  Start CCrb in a process monitor for better durability.
+
+### Thin References
+
+* http://jordanhollinger.com/2011/04/22/how-to-use-thin-effectivly/
+
+* http://code.macournoyer.com/thin/usage/

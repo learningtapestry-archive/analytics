@@ -38,11 +38,8 @@ var Extractor = {
       actionArray = JSON.parse(decodeURIComponent(_actionType));
 
       for (index=0; index < actionArray.length; index++) {
-        console.log(index);
-        console.log(actionArray[index]['action_type']);
         switch (actionArray[index]['action_type']) {
           case "CLICK":
-            console.log("click registering");
             Array.prototype.forEach.call(document.getElementsByTagName('a'), _callback(this.processAnchor, this));
             
             /*
@@ -143,7 +140,6 @@ var Extractor = {
                 id: document.location.href
             }
         });
-        console.log("pageView");
     },
     
     /**
@@ -160,7 +156,6 @@ var Extractor = {
                 id: document.location.href
             }
         });
-        console.log("clickEvent");
     },
     
     extractEvent: function(cssSelector) {        
@@ -171,7 +166,6 @@ var Extractor = {
                 html: htmlspecialchars(document.querySelector(cssSelector).innerHTML)
             }
         });
-        console.log("extractEvent");
     }
 };
 

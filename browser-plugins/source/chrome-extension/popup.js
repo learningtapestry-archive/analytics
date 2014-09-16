@@ -68,7 +68,7 @@ var LoginManager = {
             r = new XMLHttpRequest(), x, y;
         
         r.open('POST', this.login_url, true);
-        r.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        r.setRequestHeader('Content-type', 'application/json');
         
         r.onreadystatechange = _callback(function() {
             if(r.readyState === 4) {
@@ -110,8 +110,7 @@ var LoginManager = {
             r = new XMLHttpRequest(), x;
         
         r.open('POST', this.create_url, true);
-        
-        r.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        r.setRequestHeader('Content-type', 'application/json');
         
         r.onreadystatechange = _callback(function() {
             if(r.readyState === 4) {                

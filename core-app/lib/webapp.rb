@@ -9,8 +9,11 @@ module LT
       @layout[:title] = "Learntaculous - #{title}"
     end
   end # WebAppHelper
-  class WebApp < Sinatra::Base 
+  class WebApp < Sinatra::Base
     include WebAppHelper
+
+    API_ERROR_MESSAGE = { :status => "unknown error" }.to_json
+
     # set up UI layout container
     # we need this container to set dynamic content in the layout template
     # we can set things like CSS templates, Javascript includes, etc.
@@ -43,13 +46,16 @@ module LT
           status 200
           { :status => "login success", :api_key => api_key }.to_json
         rescue Exception => e
-          if e.is_a?(LT::UserNotFound) || e.is_a?(LT::PasswordInvalid) then
-            status 401 # 403 = unauthorized
-            { :status => 'username or password invalid' }.to_json
+          if e.is_a?(LT::UserNotFound) then
+            status 401 # = HTTP unauthorized
+            { :status => 'username invalid' }.to_json          
+          elsif e.is_a?(LT::PasswordInvalid) then
+            status 401 # = HTTP unauthorized
+            { :status => 'password invalid' }.to_json
           elsif
             status 500
-            # TODO:  Remove this after development
-            { :status => e.message }.to_json
+            LT::logger.error "Unknown error in /api/v1/login: #{e.message}"
+            API_ERROR_MESSAGE
           end
         end
       end
@@ -71,12 +77,13 @@ module LT
           { :status => "user created" }.to_json
         else
           status 500
-          { :status => "error" }.to_json
+          LT::logger.error "User not returned in /api/v1/signup"
+          API_ERROR_MESSAGE
         end
       rescue Exception => e
         status 500
-        # TODO:  Remove this after development
-        { :status => e.message }.to_json
+        LT::logger.error "Unknown error in /api/v1/signup: #{e.message}"
+        API_ERROR_MESSAGE
       end
     end # '/api/v1/signup'
 
@@ -92,11 +99,12 @@ module LT
           LT::RedisServer.raw_message_push(request.body.read)
           status 200
         else
-          status 401
+          status 401 # = HTTP unauthorized
         end
       rescue Exception => e
         status 500
-        e.message
+        LT::logger.error "Unknown error in /api/v1/assert: #{e.message}"
+        API_ERROR_MESSAGE
       end
     end
 

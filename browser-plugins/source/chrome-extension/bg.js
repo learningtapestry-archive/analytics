@@ -198,6 +198,7 @@ var ExtractorManager = {
         var r = new XMLHttpRequest();
         
         r.open('POST', this.event_url, true);
+        r.setRequestHeader('Content-type', 'application/json');
         r.setRequestHeader('X-LT-API-Key', this.api_key);
 
         r.onreadystatechange = _callback(function() {
@@ -316,7 +317,6 @@ var ExtractorManager = {
       * Attaches the Extractor script to the tab with given id.
       */
     attachExtractor: function(id, actionType) {
-        console.log("attach: " + actionType);
         chrome.tabs.executeScript(id, {code: 'var _actionType = "' + encodeURIComponent(JSON.stringify(actionType)) + '";'},
             function() { 
                 chrome.tabs.executeScript(id, {file: 'extractor.js', runAt: 'document_end'}); 

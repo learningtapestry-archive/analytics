@@ -1,7 +1,16 @@
 class StaffMember < ActiveRecord::Base
   belongs_to :user
   has_many :emails, through: :user
-  attr_accessor :user_type
+  delegate :pages_visited, :to => :user
+  delegate :sites_visited, :to => :user
+  delegate :sections, :to => :user
+  delegate :first_name, :to => :user
+  delegate :last_name, :to => :user
+  delegate :username, :to => :user
+  delegate :email, :to => :user
+  delegate :each_site_visited, :to => :user
+  delegate :each_page_visited, :to => :user
+
   def add_to_section(section, user_type=self.staff_member_type)
     #self.user.sections << section
     # this creates a section user entry, attaches section to it,
@@ -10,21 +19,8 @@ class StaffMember < ActiveRecord::Base
     self.save
   end
 
-  def sections
-    retval = self.user.sections
-    retval
-  end
-  def first_name
-    self.user.first_name
-  end
-  def last_name
-    self.user.last_name
-  end
-  def username
-    self.user.username
-  end
-  def email
-    self.user.email
+  def user_type
+    self.staff_member_type
   end
 
   ### Class methods

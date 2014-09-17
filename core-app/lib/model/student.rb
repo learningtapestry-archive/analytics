@@ -1,6 +1,15 @@
 class Student < ActiveRecord::Base
   belongs_to :user
   has_many :emails, through: :user
+  delegate :pages_visited, :to => :user
+  delegate :sites_visited, :to => :user
+  delegate :sections, :to => :user
+  delegate :first_name, :to => :user
+  delegate :last_name, :to => :user
+  delegate :username, :to => :user
+  delegate :email, :to => :user
+  delegate :each_site_visited, :to => :user
+  delegate :each_page_visited, :to => :user
 
   ### Class methods
 
@@ -16,17 +25,10 @@ class Student < ActiveRecord::Base
     self.user.section_user.create(:section=>section, :user_type=>user_type)
     self.user.save
   end
-  def first_name
-    self.user.first_name
+  # TODO these can be moved into a module and loaded for staff_member and student
+  def user_type
+    "Student"
   end
-  def last_name
-    self.user.last_name
-  end
-  def username
-    self.user.username
-  end
-  def email
-    self.user.email
-  end
+
 
 end

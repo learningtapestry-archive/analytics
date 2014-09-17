@@ -5,24 +5,53 @@ class User < ActiveRecord::Base
   has_many :emails
   has_many :section_user
   has_many :sections, through: :section_user
+  has_many :sites_visited
+  has_many :sites, through: :sites_visited
+  has_many :pages, through: :sites
+  has_many :pages_visited
+  # has_many :spv, through: :pages, source: :pages_visited, 
+  #   select: 'distinct (pages_visited.id), pages_visited.*', 
+  #   conditions: proc {["pages_visited.user_id = ?",self.id]}
 
   # Instance methods
+  def email
+    # TODO return the primary email here
+    self.emails.first.email
+  end
+
+  DEFAULT_SITE_TIME_FRAME = 1.week
+
+  
+  def each_site_visited(opts={}, &block)
+    time_frame = opts[:time_frame] || DEFAULT_SITE_TIME_FRAME
+
+    # select sum(time_active), date_visited, url, display_name from sites_visited
+    # join sites on sites.id = sites_visited.site_id
+    # join user on user.id = sites_visited.user_id
+    # where date_visited between "#{Time.now}" and "#{Time.now-time_frame}"
+    # group by date_visited, url, display_name
+  end
+
+  def each_page_visited(site, opts={}, &block)
+    time_frame = opts[:time_frame] || DEFAULT_SITE_TIME_FRAME
+  end
+
+
+  # Instance security methods
+  def hash_secret(password, password_salt)
+    BCrypt::Engine.hash_secret(password, password_salt)    
+  end
   def password=(password)
     self.password_salt = BCrypt::Engine.generate_salt
-    self.password_hash = BCrypt::Engine.hash_secret(password, password_salt)
+    self.password_hash = hash_secret(password, password_salt)
   end
 
   def password_matches?(password)
     retval = false
-    if self.password_hash == BCrypt::Engine.hash_secret(password, self.password_salt) then
+    if self.password_hash == hash_secret(password, password_salt) then
       retval = true
     end
     retval
-  end
-
-  def email
-    # TODO return the primary email here
-    self.emails.first.email
   end
 
   # Class methods

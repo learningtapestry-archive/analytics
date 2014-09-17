@@ -1,18 +1,22 @@
 Filter tools
 | Change date period | View all sections/one section picker |
 
-|Students                          |
-  | Sites visited  |  Time on site |
-    [expand site]
-    | Pages visited | Time on page | 
+|Sections
+  |Students  | Total time on all sites
+   ->   [expand list]
+        | Sites visited  |  Time on site |
+     ->   [expand site]
+          | Pages visited | Time on page | 
+            |Left page to URL
 
 Nb. Time on site/page is for what time frame by default? (7 days?)
 
-teacher.students.each do |student|
-  student.full_name
+teacher.sections.each do |section|
+  Display: Section name
+  section.students.each do |student|
+    Display: student.full_name
     student.each_site_visited do |site|
-      site.display_name | site.time_spent
-        [open/close icon/js]
-          site.each_page_visited do |page|
-            page.display_name | page.time_spent
+      site.display_name | site.total_time_spent(time_frame: DEFAULT_TIME_FRAME)
+        student.each_page_visited(site) do |page|
+          page.display_name | page.total_time_spent(time_frame: DEFAULT_TIME_FRAME)
 <%=%>

@@ -53,7 +53,32 @@ class InitSchema < ActiveRecord::Migration
       t.datetime "captured_at"
       t.timestamps
     end
-    
+
+    create_table "sites", :force => true do |t|
+      t.string "display_name"
+      t.string "url"
+    end
+
+    create_table "pages", :force => true do |t|
+      t.string "display_name"
+      t.string "url"
+      t.belongs_to :site
+    end
+
+    create_table "sites_visited", :force => true do |t|
+      t.datetime "date_visited"
+      t.column "time_active", :interval
+      t.belongs_to :user
+      t.belongs_to :site
+    end
+
+    create_table "pages_visited", :force => true do |t|
+      t.datetime "date_visited"
+      t.column "time_active", :interval
+      t.belongs_to :user
+      t.belongs_to :page
+    end
+
     create_table "schools", :force => true do |t|
       t.string   "state_id"
       t.string   "nces_id"

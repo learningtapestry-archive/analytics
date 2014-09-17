@@ -2,7 +2,7 @@ require 'yaml'
 require 'active_record'
 require 'standalone_migrations'
 require 'activerecord-postgres-json'
-require 'active_support/inflector' # required by module Seedlib
+require 'active_support/inflector'
 require 'bcrypt' # required by various models/modules
 require 'active_record'
 require 'logger'
@@ -78,12 +78,22 @@ module LT
     def boot_db(config_file)
       # Connect to DB
       begin
+        boot_ar_config
         dbconfig = YAML::load(File.open(config_file))
         # TODO:  Need better error message of LT::run_env is not defined; occurred multiple times in testing
         ActiveRecord::Base.establish_connection(dbconfig[LT::run_env])
       rescue Exception => e
         LT::logger.error("Cannot connect to Postgres, connect string: #{dbconfig[LT::run_env]}, error: #{e.message}")
         raise e
+      end
+    end
+    def boot_ar_config
+      # http://stackoverflow.com/questions/20361428/rails-i18n-validation-deprecation-warning
+      # SM: Don't really know what this means - hopefully doesn't matter
+      I18n.config.enforce_available_locales = true
+      ActiveSupport::Inflector.inflections do |inflect|
+        inflect.irregular 'sites_visited', 'sites_visited'
+        inflect.irregular 'pages_visited', 'pages_visited'
       end
     end
     def boot_redis(config_file)
@@ -143,6 +153,136 @@ module LT
         load File::expand_path(seedfile)
       end
     end #class << self
+    # create a user in a section
+    module Students class << self
+      def create_joe_smith_scenario
+        scenario = {
+          :student=>{
+            :username=>"joesmith@foo.com",
+            :password=>"pass",
+            :first_name=>"Joe",
+            :last_name=>"Smith",
+            :email=> "joesmith@foo.com",
+            :student=>{}
+          },
+          :student2=>{
+            :username=>"bob@foo.com",
+            :password=>"pass2",
+            :first_name=>"Bob",
+            :last_name=>"Newhart",
+            :email=> "bobnewhard@foo.com",
+            :student=>{}
+          },
+          :section=>{
+            :name=>"CompSci Period 2",
+            :section_code=>"Comp Sci Room 2"
+          },
+          :teacher=>{
+            :username=>"janedoe@bar.com",
+            :password=>"pass",
+            :first_name=>"Jane",
+            :last_name=>"Doe",
+            :email=> "janedoe@bar.com",
+            :staff_member=>{
+              :staff_member_type=>'Teacher'
+            }
+          },
+          :sites=>[{
+            :display_name=>"Khan Academy",
+            :url=>'http://www.khanacademy.com'
+            }
+          ],
+          :pages=>[{
+            :display_name=>"Converting Decimals to Fractions 2 (ex 1)",
+            :url=>'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-decimals-to-fractions-2-ex-1',
+            # this field is not part of the model - used to help seed below
+            :site_url=>'http://www.khanacademy.com'
+            },
+            {
+            :display_name=>"Converting a fraction to a repeating decimal",
+            :url=>'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-a-fraction-to-a-repeating-decimal',
+            :site_url=>'http://www.khanacademy.com'
+            }
+          ],
+          :sites_visited=>[{
+            # this field is not part of the model - used to help seed below
+            :url=>'http://www.khanacademy.com', 
+            :date_visited=>Time.now-1.day,
+            :time_active=>42.minutes.to_i
+            },
+            {
+            :url=>'http://www.khanacademy.com',
+            :date_visited=>Time.now-2.days,
+            :time_active=>33.minutes.to_i
+            }
+          ],
+          :pages_visited=>[{
+            # this field is not part of the model - used to help seed below
+            :url=>'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-decimals-to-fractions-2-ex-1',
+            :date_visited=>Time.now-1.day,
+            :time_active=>15.minutes.to_i
+            },
+            {
+            :url=>'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-decimals-to-fractions-2-ex-1',
+            :date_visited=>Time.now-2.days,
+            :time_active=>12.minutes.to_i
+            },
+            {
+            :url=>'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-a-fraction-to-a-repeating-decimal',
+            :date_visited=>Time.now-2.days,
+            :time_active=>7.minutes.to_i
+            }
+          ]
+        }
+        student = User.create_user(scenario[:student])[:user].student
+        student2 = User.create_user(scenario[:student2])[:user].student
+        teacher = User.create_user(scenario[:teacher])[:user].staff_member
+        section = Section.create(scenario[:section])
+        student.add_to_section(section)
+        student2.add_to_section(section)
+        teacher.add_to_section(section)
+        # we add all user activity data to two students
+        # this is to make sure that we can find data associated with only student at a time
+        [student, student2].each do |student|
+          # create site records, and associated site_visited records
+          # we have to tie sites_visited to sites
+          # we have to tie sites_visited to users
+          scenario[:sites].each do |site|
+            site = site.dup
+            s = Site.create(site)
+            scenario[:sites_visited].each do |site_visited|
+              site_visited = site_visited.dup
+              if s.url == site_visited[:url] then
+                site_visited.delete(:url)
+                sv = SitesVisited.create(site_visited)
+                s.sites_visited << sv
+                student.sites_visited << sv
+              end
+            end
+          end
+          # create page records, and associated page_visited records
+          # we have to tie pages to sites as well as pages_visited
+          # we have to tie pages_visited to users
+          scenario[:pages].each do |page|
+            page = page.dup
+            s = Site.find_by_url(page[:site_url])
+            page.delete(:site_url)
+            p = Page.create(page)
+            s.pages << p
+            scenario[:pages_visited].each do |page_visited|
+              page_visited = page_visited.dup
+              if p.url == page_visited[:url] then
+                page_visited.delete(:url)
+                pv = PagesVisited.create(page_visited)
+                p.pages_visited << pv
+                student.pages_visited << pv
+              end
+            end
+          end
+        end #[student, student2].each do |student|
+        scenario
+      end # create_joe_smith_seed
+    end; end
   end # Seeds module
 
   module Janitor

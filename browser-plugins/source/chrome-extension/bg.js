@@ -64,6 +64,9 @@ var ExtractorManager = {
     sites_url: 'https://lt-dev01.learntaculo.us/api/v1/approved_sites',
     event_url: 'https://lt-dev01.learntaculo.us/api/v1/assert',
     
+    //sites_url: 'http://localhost:8080/api/v1/approved_sites',
+    //event_url: 'http://localhost:8080/api/v1/assert',
+
     storage_keys: {
         user: 'store_user_data',
         api_key: 'store_api_data',
@@ -236,6 +239,7 @@ var ExtractorManager = {
                 u.user = {
                     username: this.user,
                     apiKey: this.api_key,
+                    site_hash: e.d.site_hash,
                     action: {
                         id: 'verbs/viewed',
                         display: {
@@ -255,6 +259,7 @@ var ExtractorManager = {
                 u.user = {
                     username: this.user,
                     apiKey: this.api_key,
+                    site_hash: e.d.site_hash,
                     action: {
                         id: 'verbs/clicked',
                         display: {
@@ -274,6 +279,7 @@ var ExtractorManager = {
                 u.user = {
                     username: this.user,
                     apiKey: this.api_key,
+                    site_hash: e.d.site_hash,
                     action: {
                         id: 'verbs/extracted',
                         display: {
@@ -321,11 +327,6 @@ var ExtractorManager = {
             function() { 
                 chrome.tabs.executeScript(id, {file: 'extractor.js', runAt: 'document_end'}); 
             });
-        /** chrome.tabs.executeScript(id, {file: 'extractor.js', runAt: 'document_end'},
-            function() { 
-                chrome.tabs.executeScript(id, {code: 'var _event = "hello";'}); 
-            }); */
-        //chrome.tabs.executeScript(id, {file: 'extractor.js', runAt: 'document_end'}, function() {});
     }
 };
 

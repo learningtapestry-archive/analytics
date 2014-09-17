@@ -42,6 +42,7 @@ ActiveRecord::Schema.define(:version => 20140902210605) do
 
   create_table "approved_sites", :force => true do |t|
     t.string   "site_name",      :null => false
+    t.string   "site_hash",      :null => false
     t.string   "url",            :null => false
     t.string   "logo_url_small"
     t.string   "logo_url_large"
@@ -106,9 +107,10 @@ ActiveRecord::Schema.define(:version => 20140902210605) do
   create_table "raw_messages", :force => true do |t|
     t.integer  "status_id"
     t.string   "api_key",     :null => false
-    t.string   "email",       :null => false
+    t.string   "username",    :null => false
     t.string   "action"
     t.string   "event"
+    t.string   "result"
     t.string   "url"
     t.text     "html"
     t.datetime "captured_at"

@@ -1,15 +1,21 @@
-#!/usr/bin/env ruby
+require './lib/lt_base.rb'
+require 'json'
+require File::join(LT::lib_path, 'util', 'redis_server.rb')
 
-# Copyright 2014 Learntaculous (Hoekstra/Midgley) - All Rights Reserved
+module LT
+	module Janitors
+		module RedisPostgresSitesMover
+			class << self
+				def extract
 
-# Unauthorized copying of this file, via any medium is strictly prohibited
-# Proprietary and confidential
 
-# This script is designed to move user events, in the form of HTML blocks, from
-# Redis temporary queue into a Postgres database-backed queue.  Redis will have
-# one queue per customer and move it into the Postgres database that 
-# corresponds with that customer.  This script is intended to be called by a 
-# cron job.
+				end # extract
+			end # class << self
+		end # RedisPostgresMover
+	end # Janitors
+end
+
+=begin
 
 CONFIG_FILE = "./config/config.json"
 
@@ -21,7 +27,6 @@ require 'rubygems'
 require 'active_record'
 require 'yaml'
 require 'htmlentities'
-require './lib/util/configuration.rb'
 require './lib/model/raw_message.rb'
 
 logger = Logger.new($stdout)
@@ -100,3 +105,4 @@ if (redis.llen config.redis_queue_name) > 0 then
 		counter += 1
 	end
 end
+=end

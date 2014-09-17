@@ -20,6 +20,9 @@ var LoginManager = {
     
     login_url: 'https://lt-dev01.learntaculo.us/api/v1/login',
     create_url: 'https://lt-dev01.learntaculo.us/api/v1/signup',
+
+    //login_url: 'http://localhost:8080/api/v1/login',
+    //create_url: 'http://localhost:8080/api/v1/signup',
     
     init: function() {
         this.bg = chrome.extension.getBackgroundPage();

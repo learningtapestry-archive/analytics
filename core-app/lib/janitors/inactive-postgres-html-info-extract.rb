@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+###### NOT IMPLEMENTED, DO NOT USE
+
 # Copyright 2014 Learntaculous (Hoekstra/Midgley) - All Rights Reserved
 
 # Unauthorized copying of this file, via any medium is strictly prohibited

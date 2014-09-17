@@ -54,8 +54,8 @@ class StudentModelTest < Minitest::Test
     first_page_visit_count = 0
     second_page_visit_count = 0
     students_in_section_count = 0
-
     # test data browsing that we expect to need for dashboard view
+    skip("Test development in progress..")
     teacher.sections.each do |section|
       if section.section_code == @section[:section_code] then
         section_found += 1

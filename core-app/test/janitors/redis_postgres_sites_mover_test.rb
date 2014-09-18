@@ -18,7 +18,7 @@ class RedisPostgresSitesMoverTest < Minitest::Test
   def setup
     # set database transaction, so we can revert seeds
     DatabaseCleaner.start
-    LT::boot_all
+    LT::Seeds::seed!
   end
 
   def test_RedisPostgresViewedMessageMove
@@ -29,8 +29,6 @@ class RedisPostgresSitesMoverTest < Minitest::Test
     LT::RedisServer::raw_messages_queue_clear
     count = LT::RedisServer::raw_message_queue_length
     assert_equal 0, count
-
-    User.delete_all
 
     # Create new user as target for new API key
     username = 'test-user'
@@ -60,7 +58,7 @@ class RedisPostgresSitesMoverTest < Minitest::Test
     assert_equal api_key_postgres.user_id, user.id
 
     site_hash = "4f5978b72bf7f778629886a575375ba6"
-    url = "http://stackoverflow.com/search?q=redis+ruby"
+    page_url = "http://stackoverflow.com/search?q=redis+ruby"
     visit_value = "1M32S"
     timestamp = "2014-09-16T13:15:59-04:00"
 
@@ -73,7 +71,7 @@ class RedisPostgresSitesMoverTest < Minitest::Test
                                 :display => { :en_us => "viewed" }, 
                                 :value => { :time => visit_value }
                                 }, 
-                            :url => { :id => url }, 
+                            :url => { :id => page_url }, 
                             :timestamp => timestamp
                         }
                     }
@@ -87,7 +85,7 @@ class RedisPostgresSitesMoverTest < Minitest::Test
     site = Site.where(:url => approved_site.url).first
     refute_nil site
     
-    page = Page.where(:site_id => site.id, :url => url).first
+    page = Page.where(:site_id => site.id, :url => page_url).first
     refute_nil page
 
     page_visit = PagesVisited.where(:page_id => page.id, :user_id => user.id, :date_visited => timestamp).first

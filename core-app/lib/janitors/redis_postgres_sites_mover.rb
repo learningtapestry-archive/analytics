@@ -31,20 +31,20 @@ module LT
 					      
 					      site = Site.where(:url=>approved_site.url).first
 					      if !site then
-					      	new_site = Site.create
-					      	new_site.url = approved_site.url
-					      	new_site.display_name = approved_site.site_name
-					      	new_site.save
-					      	site = new_site.dup
+					      	site = Site.create
+					      	site.url = approved_site.url
+					      	site.display_name = approved_site.site_name
+					      	site.save
 					      end # site
+
+					      debugger
 
 					      page = Page.where(:url=> url).first
 					      if !page then
-					      	new_page = Page.create
-					      	new_page.url = url
-					      	new_page.site_id = site.id
-					      	new_page.save
-					      	page = new_page.dup
+					      	page = Page.create
+					      	page.url = url
+					      	page.site_id = site.id
+					      	page.save
 					      end # page
 
 					      begin 

@@ -4,7 +4,6 @@ require 'standalone_migrations'
 require 'activerecord-postgres-json'
 require 'active_support/inflector'
 require 'bcrypt' # required by various models/modules
-require 'active_record'
 require 'logger'
 require 'pg'
 require './lib/util/redis_server.rb'
@@ -249,7 +248,8 @@ module LT
           # we have to tie sites_visited to users
           scenario[:sites].each do |site|
             site = site.dup
-            s = Site.create(site)
+            site_url = site[:url]
+            s = Site.find_by_url(site_url) || Site.create(site)
             scenario[:sites_visited].each do |site_visited|
               site_visited = site_visited.dup
               if s.url == site_visited[:url] then
@@ -267,7 +267,8 @@ module LT
             page = page.dup
             s = Site.find_by_url(page[:site_url])
             page.delete(:site_url)
-            p = Page.create(page)
+            page_url = page[:url]
+            p = Page.find_by_url(page_url) || Page.create(page)
             s.pages << p
             scenario[:pages_visited].each do |page_visited|
               page_visited = page_visited.dup

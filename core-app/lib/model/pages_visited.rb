@@ -5,4 +5,6 @@ class PagesVisited < ActiveRecord::Base
   has_one :staff_member, through: :user
   has_one :site, through: :page
   has_one :site_visited, through: :site
+
+  delegate :url, :to => :site
 end

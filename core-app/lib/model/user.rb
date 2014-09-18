@@ -22,9 +22,16 @@ class User < ActiveRecord::Base
   DEFAULT_SITE_TIME_FRAME = 1.week
 
   
-  def each_site_visited(opts={}, &block)
+  def each_site_visited(opts={})
     time_frame = opts[:time_frame] || DEFAULT_SITE_TIME_FRAME
-
+    retval = self.sites_visited
+      .select("sum(time_active) as time_active, sites_visited.*")
+      .joins(:site,:user)
+      .where(["date_visited between ? and ?", Time::now-7.days, Time::now])
+      .group("sites_visited.id")
+    retval.each do |site_visited|
+      yield site_visited
+    end
     # select sum(time_active), date_visited, url, display_name from sites_visited
     # join sites on sites.id = sites_visited.site_id
     # join user on user.id = sites_visited.user_id
@@ -32,8 +39,16 @@ class User < ActiveRecord::Base
     # group by date_visited, url, display_name
   end
 
-  def each_page_visited(site, opts={}, &block)
+  def each_page_visited(site, opts={})
     time_frame = opts[:time_frame] || DEFAULT_SITE_TIME_FRAME
+    retval = self.pages_visited
+      .select("sum(time_active) as time_active, pages_visited.*")
+      .joins(:page,:user)
+      .where(["date_visited between ? and ?", Time::now-7.days, Time::now])
+      .group("pages_visited.id")
+    retval.each do |page_visited|
+      yield page_visited
+    end
   end
 
 

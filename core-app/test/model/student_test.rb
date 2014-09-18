@@ -54,8 +54,8 @@ class StudentModelTest < Minitest::Test
     first_page_visit_count = 0
     second_page_visit_count = 0
     students_in_section_count = 0
+    each_page_visited_count = 0
     # test data browsing that we expect to need for dashboard view
-    skip("Test development in progress..")
     teacher.sections.each do |section|
       if section.section_code == @section[:section_code] then
         section_found += 1
@@ -65,13 +65,15 @@ class StudentModelTest < Minitest::Test
         if student.username == @joe_smith[:username] then
           student_found += 1
           student.each_site_visited do |site_visited|
+debugger
             if site_visited.url == @sites.first[:url] then
               site_visit_count += 1
             end
             student.each_page_visited(site_visited) do |page_visited|
-              puts page_visited.inspect
+              each_page_visited_count +=1
             end
           end
+
           # student.pages_visited.each do |page_visited|
           #   if page_visited.page.url == @pages.first[:url]
           #     first_page_visit_count += 1
@@ -87,6 +89,7 @@ class StudentModelTest < Minitest::Test
     assert_equal 1, student_found
     assert_equal 2, students_in_section_count
     assert_equal @sites_visited.size, site_visit_count
+    assert_equal @pages_visited.size, each_page_visited_count
     assert_equal 2, first_page_visit_count
     assert_equal 1, second_page_visit_count
   end

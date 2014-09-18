@@ -40,7 +40,7 @@ module LT
     # root_dir holds application root (where this Rake file is located)
     # model_path holds the folder where our models are stored
     # test_path holds folder where the tests are stored
-    attr_accessor :run_env,:logger, :root_dir, :model_path, :test_path, :seed_path, :lib_path, :db_path, :tmp_path
+    attr_accessor :run_env,:logger, :root_dir, :model_path, :test_path, :seed_path, :lib_path, :db_path, :tmp_path, :message_path
 
     def boot_all(app_root_dir = File::join(File::dirname(__FILE__),'..'))
       LT::setup_environment(app_root_dir)
@@ -69,6 +69,11 @@ module LT
       LT::db_path = File::expand_path(File::join(LT::root_dir, '/db'))      
       LT::seed_path = File::expand_path(File::join(LT::root_dir, '/db/seeds'))
       LT::tmp_path = Dir::tmpdir
+
+      LT::message_path = File::expand_path(File::join(LT::root_dir, '/log/messages'))
+      unless File.directory?(LT::message_path)
+        FileUtils.mkdir_p(LT::message_path)
+      end
     end
     def load_all_models
       models = Dir::glob(File::join(LT::model_path, '*.rb'))

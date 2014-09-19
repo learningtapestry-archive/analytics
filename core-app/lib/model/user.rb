@@ -9,9 +9,6 @@ class User < ActiveRecord::Base
   has_many :page_visits
   has_many :sites, through: :site_visits
   has_many :pages, through: :sites
-  # has_many :spv, through: :pages, source: :pages_visited, 
-  #   select: 'distinct (pages_visited.id), pages_visited.*', 
-  #   conditions: proc {["pages_visited.user_id = ?",self.id]}
 
   # Instance methods
   def email

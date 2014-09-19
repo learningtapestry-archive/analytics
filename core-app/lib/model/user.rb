@@ -63,13 +63,13 @@ class User < ActiveRecord::Base
 
   # This method is used for creating users, students and staff_members
   # along with their associated relationship fields (emails and sections)
-
   def self.create_user(passed_fields)
     fields = passed_fields.dup
     student_fields = fields.delete(:student)
     staff_member_fields = fields.delete(:staff_member)
     primary_email = fields.delete(:email)
     fields.fetch(:password) # raise error if no password field
+    retval = {}
     user = User.new(fields)
     if student_fields
       student = Student.new(student_fields)
@@ -83,10 +83,19 @@ class User < ActiveRecord::Base
       email = Email.new(:email => primary_email, :primary => true)
       user.emails<<email
     end
-    user.save
+    begin
+      user.save
+    rescue ActiveRecord::StatementInvalid, ActiveRecord::RecordNotUnique => e
+      error_msg="A required field is missing." if e.class == ActiveRecord::StatementInvalid
+      error_msg="Username #{fields[:username]} already exists." if e.class == ActiveRecord::RecordNotUnique
+      retval[:exception] = e
+      retval[:error_msg] = error_msg
+    end
+
     # we return a hash so we can in the future return error messages or other supplemental
     # info back with the new user record
-    {:user =>user}
+    retval[:user] =user
+    retval
   end
 
   def self.get_validated_user(username, password)
@@ -95,10 +104,10 @@ class User < ActiveRecord::Base
     end
     user = User.find_by_username(username)
     if user.nil?
-      return {:error_msg=>"User not found: #{username}", :exception => LT::UserNotFound}
+      return {:error_msg=>"User not found: #{username}", :exception => LT::UserNotFound.new}
     else 
       if !user.authenticate(password) then
-        return {:error_msg=>"Password invalid for user: #{username}", :exception => LT::PasswordInvalid}
+        return {:error_msg=>"Password invalid for user: #{username}", :exception => LT::PasswordInvalid.new}
       else
         return {:user=>user}
       end

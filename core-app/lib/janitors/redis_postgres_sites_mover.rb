@@ -49,7 +49,7 @@ module LT
 						      	page.save
 						      end # page
 
-						      page_visit = PagesVisited.create
+						      page_visit = PageVisit.create
 						      page_visit.user_id = api_key_postgres.user_id
 						      page_visit.page_id = page.id
 						      page_visit.date_visited = timestamp

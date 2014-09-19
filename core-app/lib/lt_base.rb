@@ -1,8 +1,6 @@
 require 'yaml'
 require 'tmpdir'
 require 'active_record'
-require 'standalone_migrations'
-require 'activerecord-postgres-json'
 require 'active_support/inflector'
 require 'bcrypt' # required by various models/modules
 require 'logger'
@@ -47,6 +45,7 @@ module LT
       LT::boot_db(File::join(LT::db_path, 'config.yml'))
       LT::load_all_models
       LT::boot_redis(File::join(LT::db_path, 'redis.yml'))
+      LT::logger.info("Core-app booted")
     end
 
     # app_root_dir is the path to the root of the application being booted
@@ -84,7 +83,7 @@ module LT
     def boot_db(config_file)
       # Connect to DB
       begin
-        boot_ar_config
+        boot_ar_config(config_file)
         dbconfig = YAML::load(File.open(config_file))
         # TODO:  Need better error message of LT::run_env is not defined; occurred multiple times in testing
         ActiveRecord::Base.establish_connection(dbconfig[LT::run_env])
@@ -93,13 +92,16 @@ module LT
         raise e
       end
     end
-    def boot_ar_config
+    def boot_ar_config(config_file)
       # http://stackoverflow.com/questions/20361428/rails-i18n-validation-deprecation-warning
       # SM: Don't really know what this means - hopefully doesn't matter
       I18n.config.enforce_available_locales = true
+      ActiveRecord::Base.configurations = ActiveRecord::Tasks::DatabaseTasks.database_configuration = YAML::load_file(config_file)
+      ActiveRecord::Tasks::DatabaseTasks.db_dir = LT::db_path
+      ActiveRecord::Tasks::DatabaseTasks.env    = LT::run_env
+      #If you need to customize AR model pluralization do it here
       ActiveSupport::Inflector.inflections do |inflect|
-        inflect.irregular 'sites_visited', 'sites_visited'
-        inflect.irregular 'pages_visited', 'pages_visited'
+        #inflect.irregular 'weird_singular_model_thingy', 'wierd_plural_model_thingies'
       end
     end
     def boot_redis(config_file)

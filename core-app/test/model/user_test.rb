@@ -101,6 +101,12 @@ class UserModelTest < Minitest::Test
     user2 = retval[:user]
     assert !user2
     assert_equal LT::PasswordInvalid, retval[:exception]
+
+    retval = User.get_validated_user("bs username no worky", "pw doesn't matter")
+    user2 = retval[:user]
+    assert !user2
+    assert_equal LT::UserNotFound, retval[:exception]
+
   end
 
   def self.before_suite

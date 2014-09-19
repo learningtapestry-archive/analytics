@@ -93,9 +93,9 @@ class User < ActiveRecord::Base
     if username.nil? || username.empty? || password.nil? || password.empty? then
       raise LT::ParameterMissing, "Either username or password is missing"
     end
-    user = User.where(username: username).first
+    user = User.find_by_username(username)
     if user.nil?
-      raise LT::UserNotFound, "Username not found: " + username
+      return {:error_msg=>"User not found: #{username}", :exception => LT::UserNotFound}
     else 
       if !user.authenticate(password) then
         return {:error_msg=>"Password invalid for user: #{username}", :exception => LT::PasswordInvalid}

@@ -9,7 +9,10 @@ module LT
           raise LT::ParameterMissing, "Username or password is not provided"
         else
           # TODO: Think about logic to re-use api key if session is already active
-          user = User.get_validated_user(username, password).fetch(:user)
+          retval = User.get_validated_user(username, password)
+          exception = retval[:exception]
+          raise exception unless exception.blank?
+          user = retval[:user]
           api_key = ApiKey.create_api_key(user.id)
           LT::RedisServer.api_key_set(api_key, LT::get_db_name)
           return api_key

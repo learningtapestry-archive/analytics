@@ -5,7 +5,6 @@ require 'standalone_migrations'
 require 'activerecord-postgres-json'
 require 'active_support/inflector'
 require 'bcrypt' # required by various models/modules
-require 'active_record'
 require 'logger'
 require 'pg'
 require './lib/util/redis_server.rb'
@@ -213,7 +212,7 @@ module LT
             :site_url=>'http://www.khanacademy.com'
             }
           ],
-          :sites_visited=>[{
+          :site_visits=>[{
             # this field is not part of the model - used to help seed below
             :url=>'http://www.khanacademy.com', 
             :date_visited=>Time.now-1.day,
@@ -225,7 +224,7 @@ module LT
             :time_active=>33.minutes.to_i
             }
           ],
-          :pages_visited=>[{
+          :page_visits=>[{
             # this field is not part of the model - used to help seed below
             :url=>'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-decimals-to-fractions-2-ex-1',
             :date_visited=>Time.now-1.day,
@@ -258,14 +257,15 @@ module LT
           # we have to tie sites_visited to users
           scenario[:sites].each do |site|
             site = site.dup
-            s = Site.create(site)
-            scenario[:sites_visited].each do |site_visited|
-              site_visited = site_visited.dup
-              if s.url == site_visited[:url] then
-                site_visited.delete(:url)
-                sv = SitesVisited.create(site_visited)
-                s.sites_visited << sv
-                student.sites_visited << sv
+            site_url = site[:url]
+            s = Site.find_by_url(site_url) || Site.create(site)
+            scenario[:site_visits].each do |site_visit|
+              site_visit = site_visit.dup
+              if s.url == site_visit[:url] then
+                site_visit.delete(:url)
+                sv = SiteVisit.create(site_visit)
+                s.site_visits << sv
+                student.site_visits << sv
               end
             end
           end
@@ -276,15 +276,16 @@ module LT
             page = page.dup
             s = Site.find_by_url(page[:site_url])
             page.delete(:site_url)
-            p = Page.create(page)
+            page_url = page[:url]
+            p = Page.find_by_url(page_url) || Page.create(page)
             s.pages << p
-            scenario[:pages_visited].each do |page_visited|
-              page_visited = page_visited.dup
-              if p.url == page_visited[:url] then
-                page_visited.delete(:url)
-                pv = PagesVisited.create(page_visited)
-                p.pages_visited << pv
-                student.pages_visited << pv
+            scenario[:page_visits].each do |page_visit|
+              page_visit = page_visit.dup
+              if p.url == page_visit[:url] then
+                page_visit.delete(:url)
+                pv = PageVisit.create(page_visit)
+                p.page_visits << pv
+                student.page_visits << pv
               end
             end
           end

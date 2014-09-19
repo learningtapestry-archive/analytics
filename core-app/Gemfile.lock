@@ -121,6 +121,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activerecord
   activerecord-postgres-json
   bcrypt
   database_cleaner (>= 1.3.0)

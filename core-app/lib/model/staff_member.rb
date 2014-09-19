@@ -1,15 +1,15 @@
 class StaffMember < ActiveRecord::Base
   belongs_to :user
   has_many :emails, through: :user
-  delegate :pages_visited, :to => :user
-  delegate :sites_visited, :to => :user
+  delegate :page_visits, :to => :user
+  delegate :site_visits, :to => :user
   delegate :sections, :to => :user
   delegate :first_name, :to => :user
   delegate :last_name, :to => :user
   delegate :username, :to => :user
   delegate :email, :to => :user
-  delegate :each_site_visited, :to => :user
-  delegate :each_page_visited, :to => :user
+  delegate :each_site_visit, :to => :user
+  delegate :each_page_visit, :to => :user
 
   def add_to_section(section, user_type=self.staff_member_type)
     #self.user.sections << section

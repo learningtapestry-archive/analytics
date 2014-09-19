@@ -90,12 +90,19 @@ namespace :lt do
     LT::boot_all(File::dirname(__FILE__))
   end
 
+  desc "Install all gems via bundle"
+  task :bundle_install => [:'lt:boot'] do
+    output = `bundle install`
+    LT::logger.info(output)
+  end
+
   desc "Seed environment db with data (generally speaking, don't do this in testing env)"
   task :seed => [:'lt:boot', :'db:seed']
 
   namespace :test do
     desc "Run complete test suite include DB teardown/rebuild/reseed"
     task :run_full_tests => [:'lt:test:boot', :'db:full_reset'] do
+      Rake::Task[:'lt:bundle_install'].invoke
       LT::logger.info("Test setup complete. Running all tests.")
       LT::run_tests
     end

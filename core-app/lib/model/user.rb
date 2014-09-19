@@ -1,5 +1,6 @@
 require 'json'
 class User < ActiveRecord::Base
+  has_secure_password
   has_one :student
   has_one :staff_member
   has_many :emails
@@ -46,24 +47,6 @@ class User < ActiveRecord::Base
     retval.each do |page_visit|
       yield page_visit
     end
-  end
-
-
-  # Instance security methods
-  def hash_secret(password, password_salt)
-    BCrypt::Engine.hash_secret(password, password_salt)    
-  end
-  def password=(password)
-    self.password_salt = BCrypt::Engine.generate_salt
-    self.password_hash = hash_secret(password, password_salt)
-  end
-
-  def password_matches?(password)
-    retval = false
-    if self.password_hash == hash_secret(password, password_salt) then
-      retval = true
-    end
-    retval
   end
 
   # Class methods
@@ -114,7 +97,7 @@ class User < ActiveRecord::Base
     if user.nil?
       raise LT::UserNotFound, "Username not found: " + username
     else 
-      if !user.password_matches?(password) then
+      if !user.authenticate(password) then
         return {:error_msg=>"Password invalid for user: #{username}", :exception => LT::PasswordInvalid}
       else
         return {:user=>user}

@@ -259,8 +259,7 @@ module LT
           # we have to tie sites_visited to users
           scenario[:sites].each do |site|
             site = site.dup
-            site_url = site[:url]
-            s = Site.find_by_url(site_url) || Site.create(site)
+            s = Site.find_or_create_by(site)
             scenario[:site_visits].each do |site_visit|
               site_visit = site_visit.dup
               if s.url == site_visit[:url] then
@@ -278,8 +277,7 @@ module LT
             page = page.dup
             s = Site.find_by_url(page[:site_url])
             page.delete(:site_url)
-            page_url = page[:url]
-            p = Page.find_by_url(page_url) || Page.create(page)
+            p = Page.find_or_create_by(page)
             s.pages << p
             scenario[:page_visits].each do |page_visit|
               page_visit = page_visit.dup

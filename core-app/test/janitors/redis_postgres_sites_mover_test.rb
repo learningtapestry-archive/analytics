@@ -41,7 +41,7 @@ class RedisPostgresSitesMoverTest < Minitest::Test
 
     # Ensure new user was created
     assert_equal username, user.username
-    assert user.password_matches?(password)
+    assert user.authenticate(password)
 
     # Use SessionManager to validate user and create new API key
     api_key = LT::SessionManager.validate_user(username, password)

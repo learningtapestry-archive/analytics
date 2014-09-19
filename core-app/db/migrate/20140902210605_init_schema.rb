@@ -153,8 +153,7 @@ class InitSchema < ActiveRecord::Migration
       t.string   "last_name",     :null => false
       t.string   "gender"
       t.string   "username",     :null => false
-      t.string   "password_hash"
-      t.string   "password_salt"
+      t.string   "password_digest"
       t.date     "date_of_birth"
       t.timestamps
     end

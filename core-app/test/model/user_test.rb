@@ -46,14 +46,20 @@ class UserModelTest < Minitest::Test
   end
 
   def test_create_user
-    retval = User.create_user({:username=>@username,
-     :password=> @password, :first_name => @first_name, :last_name =>@last_name})
+    user_data = {:username=>@username,:password=> @password, 
+      :first_name => @first_name, :last_name =>@last_name}
+    retval = User.create_user(user_data)
     user = retval[:user]
     assert_equal User, user.class
     assert_equal @username, user.username
     assert user.authenticate(@password)
     assert_equal @first_name, user.first_name
     assert_equal @last_name, user.last_name
+
+    # test that duplicate usernames will fail without raising an exception
+    retval = User.create_user(user_data)
+    assert_equal ActiveRecord::RecordNotUnique, retval[:exception].class
+    assert_match /exists/, retval[:error_msg]
   end
 
   def test_create_user_from_invalid_json
@@ -69,10 +75,10 @@ class UserModelTest < Minitest::Test
     end
 
     # Missing username
-    assert_raises ActiveRecord::StatementInvalid do
-      json_string = '{ "password": "testpassword" }'
-      User.create_user_from_json(json_string)
-    end
+    json_string = '{ "password": "testpassword" }'
+    retval = User.create_user_from_json(json_string)
+    assert_equal ActiveRecord::StatementInvalid, retval[:exception].class
+    assert_match /required/, retval[:error_msg]
   end
 
   def test_create_user_from_valid_json
@@ -100,7 +106,13 @@ class UserModelTest < Minitest::Test
     retval = User.get_validated_user(@username, "bs password no worky")
     user2 = retval[:user]
     assert !user2
-    assert_equal LT::PasswordInvalid, retval[:exception]
+    assert_equal LT::PasswordInvalid, retval[:exception].class
+
+    retval = User.get_validated_user("bs username no worky", "pw doesn't matter")
+    user2 = retval[:user]
+    assert !user2
+    assert_equal LT::UserNotFound, retval[:exception].class
+
   end
 
   def self.before_suite

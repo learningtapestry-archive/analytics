@@ -16,7 +16,7 @@ module LT
   class LoginError < BaseException;end;
   class UserNotFound < LoginError;end;
   class PasswordInvalid < LoginError;end;
-
+  
   class << self
     def testing?
       # we are only in a testing environment if RAILS_ENV and run_env agree on it

@@ -199,13 +199,12 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   end
 
   create_table "users", force: true do |t|
-    t.string   "first_name",    null: false
+    t.string   "first_name",      null: false
     t.string   "middle_name"
-    t.string   "last_name",     null: false
+    t.string   "last_name",       null: false
     t.string   "gender"
-    t.string   "username",      null: false
-    t.string   "password_hash"
-    t.string   "password_salt"
+    t.string   "username",        null: false
+    t.string   "password_digest"
     t.date     "date_of_birth"
     t.datetime "created_at"
     t.datetime "updated_at"

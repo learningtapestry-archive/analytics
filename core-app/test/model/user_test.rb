@@ -10,9 +10,9 @@ class UserSecurityTest < Minitest::Test
     last_name = 'last'
     user = User.create_user(:username=>username, :password=>password, :first_name => first_name,
       :last_name=>last_name)[:user]
-    assert user.password_matches?(password)
+    assert user.authenticate(password)
     user = User.where(:username => username).first
-    assert user.password_matches?(password)
+    assert user.authenticate(password)
   end
 
   def self.before_suite
@@ -51,7 +51,7 @@ class UserModelTest < Minitest::Test
     user = retval[:user]
     assert_equal User, user.class
     assert_equal @username, user.username
-    assert user.password_matches?(@password)
+    assert user.authenticate(@password)
     assert_equal @first_name, user.first_name
     assert_equal @last_name, user.last_name
   end
@@ -80,7 +80,7 @@ class UserModelTest < Minitest::Test
     user = retval[:user]
     assert_equal User, user.class
     assert_equal @username, user.username
-    assert user.password_matches?(@password)
+    assert user.authenticate(@password)
     assert_equal @first_name, user.first_name
     assert_equal @last_name, user.last_name
   end
@@ -94,7 +94,7 @@ class UserModelTest < Minitest::Test
     user1 = retval[:user]
     assert_equal User, user.class
     assert_equal @username, user.username
-    assert user.password_matches?(@password)
+    assert user.authenticate(@password)
     assert !retval[:exception]
 
     retval = User.get_validated_user(@username, "bs password no worky")

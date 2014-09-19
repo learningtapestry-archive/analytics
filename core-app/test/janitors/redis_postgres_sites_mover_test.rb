@@ -2,6 +2,7 @@ gem "minitest"
 require 'minitest/autorun'
 require 'debugger'
 require 'database_cleaner'
+require 'date'
 require File::join(LT::lib_path, 'util', 'redis_server.rb')
 require File::join(LT::lib_path, 'util', 'session_manager.rb')
 require File::join(LT::lib_path, 'janitors', 'redis_postgres_sites_mover.rb')
@@ -60,8 +61,7 @@ class RedisPostgresSitesMoverTest < Minitest::Test
     site_hash = "4f5978b72bf7f778629886a575375ba6"
     page_url = "http://stackoverflow.com/search?q=redis+ruby"
     visit_value = "1M32S"
-    timestamp = "2014-09-16T13:15:59-04:00"
-
+    timestamp = DateTime.parse("2014-09-16T13:15:59-04:00")
     raw_message =   { :user => {
                             :username => username, 
                             :apiKey => api_key,

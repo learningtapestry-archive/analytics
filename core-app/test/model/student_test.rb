@@ -12,8 +12,8 @@ class StudentModelTest < Minitest::Test
     @joe_smith = @scenario[:student]
     @jane_doe = @scenario[:teacher]
     @section = @scenario[:section]
-    @pages_visited = @scenario[:pages_visited]
-    @sites_visited = @scenario[:sites_visited]
+    @page_visits = @scenario[:page_visits]
+    @site_visits = @scenario[:site_visits]
     @sites = @scenario[:sites]
     @pages = @scenario[:pages]
   end
@@ -44,17 +44,17 @@ class StudentModelTest < Minitest::Test
     # Joe Smith has visited some Khan Academy sites recently
     student = Student.find_by_username(@joe_smith[:username])
     teacher = StaffMember.find_by_username(@jane_doe[:username])
-    assert_equal @sites_visited.size, student.sites_visited.size
-    assert student.sites_visited.size >= 2
-    assert_equal @pages_visited.size, student.pages_visited.size
-    assert student.pages_visited.size >= 2
+    assert_equal @site_visits.size, student.site_visits.size
+    assert student.site_visits.size >= 2
+    assert_equal @page_visits.size, student.page_visits.size
+    assert student.page_visits.size >= 2
     section_found = 0
     student_found = 0
-    site_visit_count = 0
+    khan_visit_count = 0
     first_page_visit_count = 0
     second_page_visit_count = 0
     students_in_section_count = 0
-    each_page_visited_count = 0
+    each_page_visited_list = []
     # test data browsing that we expect to need for dashboard view
     teacher.sections.each do |section|
       if section.section_code == @section[:section_code] then
@@ -64,32 +64,30 @@ class StudentModelTest < Minitest::Test
         students_in_section_count += 1
         if student.username == @joe_smith[:username] then
           student_found += 1
-          student.each_site_visited do |site_visited|
-debugger
-            if site_visited.url == @sites.first[:url] then
-              site_visit_count += 1
+          student.each_site_visit do |site_visit|
+            if site_visit.url == @sites.first[:url] then
+              khan_visit_count += 1
             end
-            student.each_page_visited(site_visited) do |page_visited|
-              each_page_visited_count +=1
+            student.each_page_visit do |page_visit|
+              each_page_visited_list << page_visit
             end
           end
-
-          # student.pages_visited.each do |page_visited|
-          #   if page_visited.page.url == @pages.first[:url]
-          #     first_page_visit_count += 1
-          #   end
-          #   if page_visited.page.url == @pages[1][:url]
-          #     second_page_visit_count += 1
-          #   end
-          # end
+          student.page_visits.each do |page_visit|
+            if page_visit.page.url == @pages.first[:url]
+              first_page_visit_count += 1
+            end
+            if page_visit.page.url == @pages[1][:url]
+              second_page_visit_count += 1
+            end
+          end
         end # if student.username 
       end
     end
     assert_equal 1, section_found
     assert_equal 1, student_found
     assert_equal 2, students_in_section_count
-    assert_equal @sites_visited.size, site_visit_count
-    assert_equal @pages_visited.size, each_page_visited_count
+    assert_equal @site_visits.size, khan_visit_count
+    assert_equal @page_visits.size, each_page_visited_list.uniq.size
     assert_equal 2, first_page_visit_count
     assert_equal 1, second_page_visit_count
   end

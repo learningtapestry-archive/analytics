@@ -1,4 +1,4 @@
 class Page < ActiveRecord::Base
-  has_many :pages_visited
+  has_many :page_visits
   belongs_to :site
 end

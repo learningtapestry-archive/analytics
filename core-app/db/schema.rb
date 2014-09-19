@@ -103,17 +103,17 @@ ActiveRecord::Schema.define(:version => 20140902210605) do
     t.datetime "updated_at",   :null => false
   end
 
-  create_table "pages", :force => true do |t|
-    t.string  "display_name"
-    t.string  "url"
-    t.integer "site_id"
-  end
-
-  create_table "pages_visited", :force => true do |t|
+  create_table "page_visits", :force => true do |t|
     t.datetime "date_visited"
     t.string   "time_active",  :limit => nil
     t.integer  "user_id"
     t.integer  "page_id"
+  end
+
+  create_table "pages", :force => true do |t|
+    t.string  "display_name"
+    t.string  "url"
+    t.integer "site_id"
   end
 
   create_table "raw_messages", :force => true do |t|
@@ -161,16 +161,16 @@ ActiveRecord::Schema.define(:version => 20140902210605) do
     t.datetime "updated_at",         :null => false
   end
 
-  create_table "sites", :force => true do |t|
-    t.string "display_name"
-    t.string "url"
-  end
-
-  create_table "sites_visited", :force => true do |t|
+  create_table "site_visits", :force => true do |t|
     t.datetime "date_visited"
     t.string   "time_active",  :limit => nil
     t.integer  "user_id"
     t.integer  "site_id"
+  end
+
+  create_table "sites", :force => true do |t|
+    t.string "display_name"
+    t.string "url"
   end
 
   create_table "staff_members", :force => true do |t|

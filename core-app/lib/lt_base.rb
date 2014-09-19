@@ -1,4 +1,5 @@
 require 'yaml'
+require 'tmpdir'
 require 'active_record'
 require 'standalone_migrations'
 require 'activerecord-postgres-json'
@@ -38,11 +39,11 @@ module LT
     # root_dir holds application root (where this Rake file is located)
     # model_path holds the folder where our models are stored
     # test_path holds folder where the tests are stored
-    attr_accessor :run_env,:logger, :root_dir, :model_path, :test_path, :seed_path, :lib_path, :db_path
+    attr_accessor :run_env,:logger, :root_dir, :model_path, :test_path, :seed_path, :lib_path, :db_path, :tmp_path, :message_path
 
     def boot_all(app_root_dir = File::join(File::dirname(__FILE__),'..'))
-      LT::init_logger
       LT::setup_environment(app_root_dir)
+      LT::init_logger
       LT::boot_db(File::join(LT::db_path, 'config.yml'))
       LT::load_all_models
       LT::boot_redis(File::join(LT::db_path, 'redis.yml'))
@@ -66,6 +67,12 @@ module LT
       LT::test_path = File::expand_path(File::join(LT::root_dir, '/test'))
       LT::db_path = File::expand_path(File::join(LT::root_dir, '/db'))      
       LT::seed_path = File::expand_path(File::join(LT::root_dir, '/db/seeds'))
+      LT::tmp_path = Dir::tmpdir
+
+      LT::message_path = File::expand_path(File::join(LT::root_dir, '/log/messages'))
+      unless File.directory?(LT::message_path)
+        FileUtils.mkdir_p(LT::message_path)
+      end
     end
     def load_all_models
       models = Dir::glob(File::join(LT::model_path, '*.rb'))
@@ -121,9 +128,11 @@ module LT
       require testfile
     end # run_test
 
-    # will test all files in test folder: *_test.rb
+    # will initialize the logger
     def init_logger
-      self.logger = Logger.new($stdout)
+      self.logger = Logger.new(File::join(LT::tmp_path,'lt_application.log'), 'daily')
+      self.logger.formatter = Logger::Formatter.new
+      self.logger.info("LT::logger initialized")
     end
   end # class << self (LT)
 

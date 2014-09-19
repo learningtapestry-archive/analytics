@@ -18,8 +18,11 @@ var LoginManager = {
     
     msg_to: null,
     
-    login_url: 'http://localhost:8080/api/v1/login',
-    create_url: 'http://localhost:8080/api/v1/signup',
+    login_url: 'https://lt-dev01.learntaculo.us/api/v1/login',
+    create_url: 'https://lt-dev01.learntaculo.us/api/v1/signup',
+
+    //login_url: 'http://localhost:8080/api/v1/login',
+    //create_url: 'http://localhost:8080/api/v1/signup',
     
     init: function() {
         this.bg = chrome.extension.getBackgroundPage();
@@ -68,7 +71,7 @@ var LoginManager = {
             r = new XMLHttpRequest(), x, y;
         
         r.open('POST', this.login_url, true);
-        r.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        r.setRequestHeader('Content-type', 'application/json');
         
         r.onreadystatechange = _callback(function() {
             if(r.readyState === 4) {
@@ -110,8 +113,7 @@ var LoginManager = {
             r = new XMLHttpRequest(), x;
         
         r.open('POST', this.create_url, true);
-        
-        r.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        r.setRequestHeader('Content-type', 'application/json');
         
         r.onreadystatechange = _callback(function() {
             if(r.readyState === 4) {                

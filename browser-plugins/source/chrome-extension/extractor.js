@@ -11,6 +11,8 @@ var _callback = function(fn, ctx) {
     };
 };
 
+var _site_hash = '';
+
 function htmlspecialchars(str) {
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 }
@@ -38,11 +40,12 @@ var Extractor = {
       actionArray = JSON.parse(decodeURIComponent(_actionType));
 
       for (index=0; index < actionArray.length; index++) {
-        console.log(index);
-        console.log(actionArray[index]['action_type']);
+        if (_site_hash == '') {
+          _site_hash = actionArray[index]['site_hash'];
+        }
+
         switch (actionArray[index]['action_type']) {
           case "CLICK":
-            console.log("click registering");
             Array.prototype.forEach.call(document.getElementsByTagName('a'), _callback(this.processAnchor, this));
             
             /*
@@ -72,6 +75,7 @@ var Extractor = {
                                 this.processAnchor(nn[j]);
                             }
                           } catch(err) {
+                            // # TODO: Fix this
                             console.log("Fix this: Extractor.js error: " + err.toString());
                           }
                         }
@@ -102,11 +106,11 @@ var Extractor = {
       *
       * Listens to click events on the anchor tag passed as argument.
       */
-    processAnchor: function(a) {
+    processAnchor: function(a, args) {
         if(/#.+$/.test(a.href)) {
             return;
         }
-            
+
         a.addEventListener('click', _callback(function(e) {
             this.clickEvent(a.href);
         }, this));
@@ -139,11 +143,11 @@ var Extractor = {
         chrome.runtime.sendMessage({
             t: 'page_view', 
             d: {
+                site_hash: _site_hash,
                 t: s, 
                 id: document.location.href
             }
         });
-        console.log("pageView");
     },
     
     /**
@@ -156,22 +160,22 @@ var Extractor = {
         chrome.runtime.sendMessage({
             t: 'click_event', 
             d: {
+                site_hash: _site_hash,
                 u: href, 
                 id: document.location.href
             }
         });
-        console.log("clickEvent");
     },
     
     extractEvent: function(cssSelector) {        
         chrome.runtime.sendMessage({
             t: 'extract_event', 
             d: {
+                site_hash: _site_hash,
                 id: document.location.href,
                 html: htmlspecialchars(document.querySelector(cssSelector).innerHTML)
             }
         });
-        console.log("extractEvent");
     }
 };
 

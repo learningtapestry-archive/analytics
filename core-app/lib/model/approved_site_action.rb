@@ -5,7 +5,7 @@ class ApprovedSiteAction < ActiveRecord::Base
     connection = ActiveRecord::Base.connection
 
     sql = <<END 
-                SELECT sites.site_name,sites.url,actions.action_type,actions.url_pattern,actions.css_selector 
+                SELECT sites.site_name,sites.url,sites.site_hash,actions.action_type,actions.url_pattern,actions.css_selector 
                 FROM approved_site_actions actions
                 LEFT JOIN approved_sites sites 
                 ON sites.id = actions.approved_site_id

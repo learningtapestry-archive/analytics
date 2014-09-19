@@ -1,7 +1,7 @@
-#id,status,api_key,email,action,url,html,date_captured,date_created,date_updated
+#id,status,api_key,username,action,url,html,date_captured,date_created,date_updated
 RawMessage.create(
   :api_key=>'api_key_1_invalid',
-  :email=>'foo@bar.com',
+  :username=>'foo@bar.com',
   :action=>'GET',
   :url => 'http://foo.bar',
   :html=>'<html><body><a href="foo">link</a></body></html>',
@@ -9,7 +9,7 @@ RawMessage.create(
 )
 RawMessage.create(
   :api_key=>'00000000-aaaa-bbbb-cccc-000000000000',
-  :email=>'bar@bar.com',
+  :username=>'bar@bar.com',
   :action=>'GET',
   :url => 'http://foo.bar',
   :html=>'<html><body><a href="bar">link</a></body></html>',
@@ -17,7 +17,7 @@ RawMessage.create(
 )
 RawMessage.create({
   :api_key=>'00000000-aaaa-bbbb-dddd-000000000000',
-  :email=>'foo@bar.com',
+  :username=>'foo@bar.com',
   :action=>'GET',
   :captured_at=>Time::now,
   :url => 'http://www.codeacademy.com/learn/pageFoo',

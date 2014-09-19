@@ -67,14 +67,14 @@ class InitSchema < ActiveRecord::Migration
       t.belongs_to :site
     end
 
-    create_table "sites_visited", :force => true do |t|
+    create_table "site_visits", :force => true do |t|
       t.datetime "date_visited"
       t.column "time_active", :interval
       t.belongs_to :user
       t.belongs_to :site
     end
 
-    create_table "pages_visited", :force => true do |t|
+    create_table "page_visits", :force => true do |t|
       t.datetime "date_visited"
       t.column "time_active", :interval
       t.belongs_to :user

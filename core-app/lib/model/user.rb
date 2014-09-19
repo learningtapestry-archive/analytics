@@ -5,10 +5,10 @@ class User < ActiveRecord::Base
   has_many :emails
   has_many :section_user
   has_many :sections, through: :section_user
-  has_many :sites_visited
-  has_many :sites, through: :sites_visited
+  has_many :site_visits
+  has_many :page_visits
+  has_many :sites, through: :site_visits
   has_many :pages, through: :sites
-  has_many :pages_visited
   # has_many :spv, through: :pages, source: :pages_visited, 
   #   select: 'distinct (pages_visited.id), pages_visited.*', 
   #   conditions: proc {["pages_visited.user_id = ?",self.id]}
@@ -22,9 +22,16 @@ class User < ActiveRecord::Base
   DEFAULT_SITE_TIME_FRAME = 1.week
 
   
-  def each_site_visited(opts={}, &block)
+  def each_site_visit(opts={})
     time_frame = opts[:time_frame] || DEFAULT_SITE_TIME_FRAME
-
+    retval = self.site_visits
+      .select("sum(time_active) as time_active, site_visits.*")
+      .joins(:site,:user)
+      .where(["date_visited between ? and ?", Time::now-7.days, Time::now])
+      .group("site_visits.id")
+    retval.each do |site_visit|
+      yield site_visit
+    end
     # select sum(time_active), date_visited, url, display_name from sites_visited
     # join sites on sites.id = sites_visited.site_id
     # join user on user.id = sites_visited.user_id
@@ -32,8 +39,16 @@ class User < ActiveRecord::Base
     # group by date_visited, url, display_name
   end
 
-  def each_page_visited(site, opts={}, &block)
+  def each_page_visit(opts={})
     time_frame = opts[:time_frame] || DEFAULT_SITE_TIME_FRAME
+    retval = self.page_visits
+      .select("sum(time_active) as time_active, page_visits.*")
+      .joins(:page,:user)
+      .where(["date_visited between ? and ?", Time::now-7.days, Time::now])
+      .group("page_visits.id")
+    retval.each do |page_visit|
+      yield page_visit
+    end
   end
 
 

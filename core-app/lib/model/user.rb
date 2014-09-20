@@ -1,5 +1,6 @@
 require 'json'
 class User < ActiveRecord::Base
+  has_secure_password
   has_one :student
   has_one :staff_member
   has_many :emails
@@ -9,9 +10,6 @@ class User < ActiveRecord::Base
   has_many :page_visits
   has_many :sites, through: :site_visits
   has_many :pages, through: :sites
-  # has_many :spv, through: :pages, source: :pages_visited, 
-  #   select: 'distinct (pages_visited.id), pages_visited.*', 
-  #   conditions: proc {["pages_visited.user_id = ?",self.id]}
 
   # Instance methods
   def email
@@ -51,24 +49,6 @@ class User < ActiveRecord::Base
     end
   end
 
-
-  # Instance security methods
-  def hash_secret(password, password_salt)
-    BCrypt::Engine.hash_secret(password, password_salt)    
-  end
-  def password=(password)
-    self.password_salt = BCrypt::Engine.generate_salt
-    self.password_hash = hash_secret(password, password_salt)
-  end
-
-  def password_matches?(password)
-    retval = false
-    if self.password_hash == hash_secret(password, password_salt) then
-      retval = true
-    end
-    retval
-  end
-
   # Class methods
 
   def self.create_user_from_json(json_str)
@@ -83,13 +63,13 @@ class User < ActiveRecord::Base
 
   # This method is used for creating users, students and staff_members
   # along with their associated relationship fields (emails and sections)
-
   def self.create_user(passed_fields)
     fields = passed_fields.dup
     student_fields = fields.delete(:student)
     staff_member_fields = fields.delete(:staff_member)
     primary_email = fields.delete(:email)
     fields.fetch(:password) # raise error if no password field
+    retval = {}
     user = User.new(fields)
     if student_fields
       student = Student.new(student_fields)
@@ -103,22 +83,31 @@ class User < ActiveRecord::Base
       email = Email.new(:email => primary_email, :primary => true)
       user.emails<<email
     end
-    user.save
+    begin
+      user.save
+    rescue ActiveRecord::StatementInvalid, ActiveRecord::RecordNotUnique => e
+      error_msg="A required field is missing." if e.class == ActiveRecord::StatementInvalid
+      error_msg="Username #{fields[:username]} already exists." if e.class == ActiveRecord::RecordNotUnique
+      retval[:exception] = e
+      retval[:error_msg] = error_msg
+    end
+
     # we return a hash so we can in the future return error messages or other supplemental
     # info back with the new user record
-    {:user =>user}
+    retval[:user] =user
+    retval
   end
 
   def self.get_validated_user(username, password)
     if username.nil? || username.empty? || password.nil? || password.empty? then
       raise LT::ParameterMissing, "Either username or password is missing"
     end
-    user = User.where(username: username).first
+    user = User.find_by_username(username)
     if user.nil?
-      raise LT::UserNotFound, "Username not found: " + username
+      return {:error_msg=>"User not found: #{username}", :exception => LT::UserNotFound.new}
     else 
-      if !user.password_matches?(password) then
-        return {:error_msg=>"Password invalid for user: #{username}", :exception => LT::PasswordInvalid}
+      if !user.authenticate(password) then
+        return {:error_msg=>"Password invalid for user: #{username}", :exception => LT::PasswordInvalid.new}
       else
         return {:user=>user}
       end

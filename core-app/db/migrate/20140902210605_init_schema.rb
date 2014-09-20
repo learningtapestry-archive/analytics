@@ -87,7 +87,6 @@ class InitSchema < ActiveRecord::Migration
 
     create_table "page_clicks", :force => true do |t|
       t.datetime "date_visited"
-      t.string "url"
       t.string "url_visited"
       t.belongs_to :user
       t.belongs_to :page  # In future, this will belong to page_visits once relationships figured out
@@ -165,8 +164,7 @@ class InitSchema < ActiveRecord::Migration
       t.string   "last_name",     :null => false
       t.string   "gender"
       t.string   "username",     :null => false
-      t.string   "password_hash"
-      t.string   "password_salt"
+      t.string   "password_digest"
       t.date     "date_of_birth"
       t.timestamps
     end

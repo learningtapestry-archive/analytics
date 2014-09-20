@@ -2,6 +2,7 @@ gem "minitest"
 require 'minitest/autorun'
 require 'debugger'
 require 'database_cleaner'
+require 'date'
 require File::join(LT::lib_path, 'util', 'redis_server.rb')
 require File::join(LT::lib_path, 'util', 'session_manager.rb')
 require File::join(LT::lib_path, 'janitors', 'redis_postgres_sites_mover.rb')
@@ -57,8 +58,7 @@ class RedisPostgresSitesMoverTest < Minitest::Test
     site_hash = "4f5978b72bf7f778629886a575375ba6" # this comes from seed data, # TODO: move to scenario
     page_url = "http://stackoverflow.com/search?q=redis+ruby"
     visit_value = "1M32S"
-    timestamp = "2014-09-16T13:15:59-04:00"
-
+    timestamp = DateTime.parse("2014-09-16T13:15:59-04:00")
     raw_message =   { :user => {
                             :username => @joe_smith[:username], 
                             :apiKey => @api_key,
@@ -122,7 +122,7 @@ class RedisPostgresSitesMoverTest < Minitest::Test
     page = Page.where(:site_id => site.id, :url => page_url).first
     refute_nil page
 
-    page_click = PageClick.where(:page_id => page.id, :user_id => @student.user_id, :url => page_url, :url_visited => page_clicked_url, :date_visited => timestamp).first
+    page_click = PageClick.where(:page_id => page.id, :user_id => @student.user_id, :url_visited => page_clicked_url).first
     refute_nil page_click
     assert_equal page_click.url_visited, page_clicked_url
   end

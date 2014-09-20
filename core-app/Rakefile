@@ -1,7 +1,30 @@
 require './lib/lt_base.rb'
 require './lib/util/redis_server.rb'
 require 'irb'
-StandaloneMigrations::Tasks.load_tasks
+
+## AR 4: The following section allows us to run AR w/out Rails
+# Overwrite the already existing Rake task "load_config"
+class Rake::Task
+  def overwrite(&block)
+    @actions.clear
+    enhance(&block)
+  end
+end
+
+# Load the ActiveRecord tasks
+spec = Gem::Specification.find_by_name("activerecord")
+load File.join(spec.gem_dir, "lib", "active_record", "railties", "databases.rake")
+
+# Overwrite the load config 
+Rake::Task["db:load_config"].overwrite do
+  Rake::Task[:'lt:boot'].invoke
+end
+
+# AR Migrations need an environment with an already established database connection
+task :environment => ["lt:boot", "db:load_config"] do
+end
+## End AR 4 installation
+
 
 desc 'Default does nothing at the moment - just used to check if rake compiles'
 task :default do
@@ -52,7 +75,7 @@ namespace :lt do
       $stdout.sync = true
       Kernel.system(run_cmd)
     end
-  end
+  end # namespace :webapp
 
   desc "Boot up a console with required context"
   task :console => [:boot] do
@@ -65,7 +88,12 @@ namespace :lt do
   desc "Boot Core-app system"
   task :boot do
     LT::boot_all(File::dirname(__FILE__))
-    LT::logger.info("Core-app booted")
+  end
+
+  desc "Install all gems via bundle"
+  task :bundle_install => [:'lt:boot'] do
+    output = `bundle install`
+    LT::logger.info(output)
   end
 
   desc "Seed environment db with data (generally speaking, don't do this in testing env)"
@@ -74,6 +102,7 @@ namespace :lt do
   namespace :test do
     desc "Run complete test suite include DB teardown/rebuild/reseed"
     task :run_full_tests => [:'lt:test:boot', :'db:full_reset'] do
+      Rake::Task[:'lt:bundle_install'].invoke
       LT::logger.info("Test setup complete. Running all tests.")
       LT::run_tests
     end

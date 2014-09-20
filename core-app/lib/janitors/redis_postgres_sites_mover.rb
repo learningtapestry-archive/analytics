@@ -1,5 +1,6 @@
 require './lib/lt_base.rb'
 require 'json'
+require 'debugger'
 require File::join(LT::lib_path, 'util', 'redis_server.rb')
 
 module LT
@@ -47,10 +48,9 @@ module LT
 							      	page_click = PageClick.create
 							      	page_click.user_id = api_key_postgres.user_id
 							      	page_click.page_id = page.id
-							      	page_click.url = url
 							      	page_click.url_visited = redis_message["user"]["action"]["value"]["url"]
 							      	page_click.date_visited = timestamp
-							      	page_click.save	
+							      	page_click.save
 							      end #action
 							    else
 							    	LT::logger.error("RedisPostgresSitesMover.extract - approved_site not found, message: #{file_name}")
@@ -83,13 +83,6 @@ module LT
 					now = Time.new.strftime("%H%M%S")
 					"#{now}-#{counter}.msg"
 				end
-
-				def create_site
-				end
-
-
-
-
 			end # class << self
 		end # RedisPostgresMover
 	end # Janitors

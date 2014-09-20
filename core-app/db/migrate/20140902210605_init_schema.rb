@@ -57,15 +57,19 @@ class InitSchema < ActiveRecord::Migration
     end
 
     create_table "sites", :force => true do |t|
+      t.string "url",         :null => false
       t.string "display_name"
-      t.string "url"
     end
 
+    add_index :sites, :url, :unique => true
+
     create_table "pages", :force => true do |t|
+      t.string "url",         :null => false
       t.string "display_name"
-      t.string "url"
       t.belongs_to :site
     end
+
+    add_index :pages, :url, :unique => true
 
     create_table "site_visits", :force => true do |t|
       t.datetime "date_visited"
@@ -79,6 +83,13 @@ class InitSchema < ActiveRecord::Migration
       t.column "time_active", :interval
       t.belongs_to :user
       t.belongs_to :page
+    end
+
+    create_table "page_clicks", :force => true do |t|
+      t.datetime "date_visited"
+      t.string "url_visited"
+      t.belongs_to :user
+      t.belongs_to :page  # In future, this will belong to page_visits once relationships figured out
     end
 
     create_table "schools", :force => true do |t|

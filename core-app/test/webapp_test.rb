@@ -1,13 +1,7 @@
 gem "minitest"
 require 'minitest/autorun'
 require 'rack/test'
-#require 'fileutils'
-#require 'tempfile'
-#require 'debugger'
-#require 'nokogiri'
-#require 'chronic'
-#require 'timecop'
-#require 'uri'
+require 'nokogiri'
 require 'database_cleaner'
 
 require File::join(LT::lib_path, 'webapp.rb')

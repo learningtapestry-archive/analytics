@@ -5,15 +5,11 @@ require 'database_cleaner'
 require 'date'
 require File::join(LT::lib_path, 'util', 'redis_server.rb')
 require File::join(LT::lib_path, 'util', 'session_manager.rb')
-require File::join(LT::lib_path, 'janitors', 'redis_postgres_sites_mover.rb')
+require File::join(LT::lib_path, 'janitors', 'redis_postgres_extract.rb')
 
 class RedisPostgresSitesMoverTest < Minitest::Test
   def self.before_suite
     DatabaseCleaner.strategy = :transaction
-  end
-
-  def self.test_order
-    :alpha # ideally, yes, I know...
   end
 
   def teardown
@@ -54,7 +50,7 @@ class RedisPostgresSitesMoverTest < Minitest::Test
     assert_equal api_key_postgres.user_id, @student.user_id
   end
 
-  def test_RedisPostgresViewedMessageMove
+  def test_RedisPostgresViewedMessageExtract
     site_hash = "4f5978b72bf7f778629886a575375ba6" # this comes from seed data, # TODO: move to scenario
     page_url = "http://stackoverflow.com/search?q=redis+ruby"
     visit_value = "1M32S"
@@ -75,7 +71,7 @@ class RedisPostgresSitesMoverTest < Minitest::Test
 
     LT::RedisServer::raw_message_push(raw_message.to_json)
 
-    LT::Janitors::RedisPostgresSitesMover.extract
+    LT::Janitors::RedisPostgresExtract.extract
     approved_site = ApprovedSite.get_by_site_hash(site_hash)
     refute_nil approved_site
 
@@ -90,7 +86,7 @@ class RedisPostgresSitesMoverTest < Minitest::Test
     assert_equal page_visit.time_active, "00:01:32"
   end
 
-  def test_RedisPostgresClickedMessageMove
+  def test_RedisPostgresClickedMessageExtract
     site_hash = "4f5978b72bf7f778629886a575375ba6" # this comes from seed data, # TODO: move to scenario
     page_url = "http://stackoverflow.com/questions/3046607/rails-find-or-create-by-more-than-one-attribute"
     page_clicked_url = "https://ninefold.com/?utm_source=stackoverflow&utm_medium=banner&utm_content=220x250-green-side&utm_campaign=INT%20%7C%20stackoverflow"
@@ -112,7 +108,7 @@ class RedisPostgresSitesMoverTest < Minitest::Test
 
     LT::RedisServer::raw_message_push(raw_message.to_json)
 
-    LT::Janitors::RedisPostgresSitesMover.extract
+    LT::Janitors::RedisPostgresExtract.extract
     approved_site = ApprovedSite.get_by_site_hash(site_hash)
     refute_nil approved_site
 

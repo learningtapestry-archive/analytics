@@ -77,6 +77,16 @@ namespace :lt do
     end
   end # namespace :webapp
 
+  namespace :janitors do
+    desc "Run Redis to Postgres extractor"
+    task :redis_postgres_extract do
+
+      LT::boot_all
+      require './lib/janitors/redis_postgres_extract.rb'
+      LT::Janitors::RedisPostgresExtract.extract
+    end
+  end # namespace :janitors
+
   desc "Boot up a console with required context"
   task :console => [:boot] do
     IRB.setup nil
@@ -119,13 +129,6 @@ namespace :lt do
       filename = args[:testfile]
       LT::run_test(filename, LT::test_path)
     end
-
-    # TODO:  Get this to work (covered by all tests however)
-    #desc "Run Redis Raw Message Test"
-    #task :redis_raw_messages do
-    #  #LT::run_test("redisserver_test.rb", LT::test_path)
-    #  #Rake::Task[:'lt:test:run_test[./test/redisserver_test.rb]'].invoke
-    #end
 
     task :boot do
       # Force us into testing environment, then boot core-app

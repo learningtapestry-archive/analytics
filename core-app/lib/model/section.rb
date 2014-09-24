@@ -2,6 +2,10 @@ class Section < ActiveRecord::Base
   has_many :section_user
   has_many :users, through: :section_user
 
+  def display_name
+    self.name||self.section
+  end
+
   def teachers
     retval = self.section_user.dup.map do |su|
       if su.user_type == __method__.to_s.singularize.capitalize

@@ -17,16 +17,23 @@ class User < ActiveRecord::Base
     self.emails.first.email
   end
 
-  DEFAULT_SITE_TIME_FRAME = 1.week
+  DEFAULT_VISIT_TIME_FRAME = 1.week
 
-  
+  def full_name
+    retval = "#{first_name} #{middle_name} #{last_name}"
+    # reduce double spaces to single and any spaces front/back
+    retval.gsub(/\s\s+/," ").strip
+  end
+
   def each_site_visit(opts={})
-    time_frame = opts[:time_frame] || DEFAULT_SITE_TIME_FRAME
+    time_frame = opts[:time_frame] || DEFAULT_VISIT_TIME_FRAME
     retval = self.site_visits
-      .select("sum(time_active) as time_active, site_visits.*")
+      .select("sum(site_visits.time_active) as time_active, \
+        max(site_visits.date_visited) as date_visited, \
+        site_visits.user_id, site_visits.site_id")
       .joins(:site,:user)
       .where(["date_visited between ? and ?", Time::now-7.days, Time::now])
-      .group("site_visits.id")
+      .group("site_visits.user_id, site_visits.site_id")
     retval.each do |site_visit|
       yield site_visit
     end
@@ -37,13 +44,26 @@ class User < ActiveRecord::Base
     # group by date_visited, url, display_name
   end
 
+  # required parameters: 
+  #   :site => Site or SiteVisit model instance
+  #      Serves to indicate which site we're pulling page_visits for
   def each_page_visit(opts={})
-    time_frame = opts[:time_frame] || DEFAULT_SITE_TIME_FRAME
+    site = opts.fetch(:site)
+    site_id = if site.kind_of?(Site) then
+      site.id
+    elsif site.respond_to?(:site_id)
+      site.site_id
+    else
+      raise LT::InvalidParameter.new("Bad Site parameter in each_page_visit")
+    end
+    time_frame = opts[:time_frame] || DEFAULT_VISIT_TIME_FRAME
     retval = self.page_visits
-      .select("sum(time_active) as time_active, page_visits.*")
+      .select("sum(time_active) as time_active, \
+        max(date_visited) as date_visited, user_id, page_id")
       .joins(:page,:user)
-      .where(["date_visited between ? and ?", Time::now-7.days, Time::now])
-      .group("page_visits.id")
+      .where(["date_visited between ? and ?", Time::now-time_frame, Time::now])
+      .where(["site_id = ?",site_id])
+      .group("user_id, page_id")
     retval.each do |page_visit|
       yield page_visit
     end

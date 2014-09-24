@@ -11,12 +11,23 @@ Filter tools
 
 Nb. Time on site/page is for what time frame by default? (7 days?)
 
-teacher.sections.each do |section|
-  Display: Section name
-  section.students.each do |student|
-    Display: student.full_name
-    student.each_site_visited do |site|
-      site.display_name | site.total_time_spent(time_frame: DEFAULT_TIME_FRAME)
-        student.each_page_visited(site) do |page|
-          page.display_name | page.total_time_spent(time_frame: DEFAULT_TIME_FRAME)
-<%=%>
+User: <p class="teacher_name"><%=user.full_name%></p>
+<%user.sections.each do |section|%>
+  Section: <%=section.display_name%>
+  <%section.students.each do |student|%>
+    <p class="student<%=student.id%>">Student: <p class="student_name"><%=student.full_name%></p>
+    <%student.each_site_visit do |site_visit|%>
+      Site: <p class="site_name"><%=site_visit.site.display_name%> <p/>
+      Time on Site: <%=site_visit.time_active_words%>
+        <%student.each_page_visit(site: site_visit) do |page_visit|%>
+          <%=page_visit.display_name%>
+          <%=page_visit.time_active_words%>
+
+<%
+        end #student.each_page_visited
+      end #student.each_site_visited
+%>  
+    </p><!--class student.id-->
+<%  end #section.students
+  end #user.section
+%>

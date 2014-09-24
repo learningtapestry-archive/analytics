@@ -1,7 +1,9 @@
 require 'yaml'
 require 'tmpdir'
 require 'active_record'
+require 'active_support'
 require 'active_support/inflector'
+require 'action_view'
 require 'bcrypt' # required by various models/modules
 require 'logger'
 require 'pg'
@@ -16,7 +18,7 @@ module LT
   class LoginError < BaseException;end;
   class UserNotFound < LoginError;end;
   class PasswordInvalid < LoginError;end;
-  
+
   class << self
     def testing?
       # we are only in a testing environment if RAILS_ENV and run_env agree on it
@@ -197,51 +199,79 @@ module LT
               :staff_member_type=>'Teacher'
             }
           },
-          :sites=>[{
-            :display_name=>"Khan Academy",
-            :url=>'http://www.khanacademy.com'
-            }
+          :sites=>[
+            {:display_name=>"Khan Academy",
+            :url=>'http://www.khanacademy.org'},
+            {:display_name=>"Code Academy",
+            :url=>'http://www.codeacademy.com'},
+            
           ],
-          :pages=>[{
-            :display_name=>"Converting Decimals to Fractions 2 (ex 1)",
+          :pages=>[
+            {:display_name=>"Converting Decimals to Fractions 2 (ex 1)",
             :url=>'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-decimals-to-fractions-2-ex-1',
             # this field is not part of the model - used to help seed below
-            :site_url=>'http://www.khanacademy.com'
-            },
-            {
-            :display_name=>"Converting a fraction to a repeating decimal",
+            :site_url=>'http://www.khanacademy.org'},
+            {:display_name=>"Converting a fraction to a repeating decimal",
             :url=>'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-a-fraction-to-a-repeating-decimal',
-            :site_url=>'http://www.khanacademy.com'
-            }
+            :site_url=>'http://www.khanacademy.org'},
+            {:display_name=>"Access Array By Index",
+            :url=>'http://www.codecademy.com/courses/ruby-beginner-en-F3loB/0/2?curriculum_id=5059f8619189a5000201fbcb',
+            :site_url=>'http://www.codeacademy.com'}
           ],
           :site_visits=>[{
             # this field is not part of the model - used to help seed below
-            :url=>'http://www.khanacademy.com', 
-            :date_visited=>Time.now-1.day,
+            :url=>'http://www.khanacademy.org', 
+            :date_visited=>1.day.ago,
             :time_active=>42.minutes.to_i
             },
             {
-            :url=>'http://www.khanacademy.com',
-            :date_visited=>Time.now-2.days,
+            :url=>'http://www.khanacademy.org',
+            :date_visited=>2.days.ago,
             :time_active=>33.minutes.to_i
+            },
+            {
+            :url=>'http://www.codeacademy.com',
+            :date_visited=>3.days.ago,
+            :time_active=>33.minutes.to_i
+            },
+            {
+            :url=>'http://www.codeacademy.com',
+            :date_visited=>13.days.ago,
+            :time_active=>44.minutes.to_i
             }
           ],
           :page_visits=>[{
             # this field is not part of the model - used to help seed below
             :url=>'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-decimals-to-fractions-2-ex-1',
-            :date_visited=>Time.now-1.day,
+            :date_visited=>1.day.ago,
             :time_active=>15.minutes.to_i
             },
             {
             :url=>'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-decimals-to-fractions-2-ex-1',
-            :date_visited=>Time.now-2.days,
+            :date_visited=>2.days.ago,
             :time_active=>12.minutes.to_i
             },
             {
             :url=>'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-a-fraction-to-a-repeating-decimal',
-            :date_visited=>Time.now-2.days,
+            :date_visited=>2.days.ago,
             :time_active=>7.minutes.to_i
+            },
+            {
+            :url=>'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-a-fraction-to-a-repeating-decimal',
+            :date_visited=>2.weeks.ago,
+            :time_active=>7.minutes.to_i
+            },
+            {
+            :url=>'http://www.codecademy.com/courses/ruby-beginner-en-F3loB/0/2?curriculum_id=5059f8619189a5000201fbcb',
+            :date_visited=>3.days.ago,
+            :time_active=>8.minutes.to_i
+            },
+            {
+            :url=>'http://www.codecademy.com/courses/ruby-beginner-en-F3loB/0/2?curriculum_id=5059f8619189a5000201fbcb',
+            :date_visited=>13.days.ago,
+            :time_active=>22.minutes.to_i
             }
+
           ]
         }
         student = User.create_user(scenario[:student])[:user].student

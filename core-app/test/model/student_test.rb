@@ -49,8 +49,8 @@ class StudentModelTest < Minitest::Test
     assert_equal @page_visits.size, student.page_visits.size
     assert student.page_visits.size >= 2
     section_found = 0
-    student_found = 0
-    khan_visit_count = 0
+    joe_smith_found = 0
+    khan_site_visit_count = 0
     first_page_visit_count = 0
     second_page_visit_count = 0
     students_in_section_count = 0
@@ -63,33 +63,42 @@ class StudentModelTest < Minitest::Test
       section.students.each do |student|
         students_in_section_count += 1
         if student.username == @joe_smith[:username] then
-          student_found += 1
+          joe_smith_found += 1
           student.each_site_visit do |site_visit|
             if site_visit.url == @sites.first[:url] then
-              khan_visit_count += 1
+              khan_site_visit_count += 1
             end
-            student.each_page_visit do |page_visit|
-              each_page_visited_list << page_visit
-            end
-          end
-          student.page_visits.each do |page_visit|
-            if page_visit.page.url == @pages.first[:url]
-              first_page_visit_count += 1
-            end
-            if page_visit.page.url == @pages[1][:url]
-              second_page_visit_count += 1
-            end
-          end
+            student.each_page_visit(site: site_visit.site) do |page_visit|
+              if site_visit.url == @sites.first[:url] then
+                each_page_visited_list << page_visit
+              end 
+            end # student.each_page_visit
+          end # if site_visit.url ==
         end # if student.username 
-      end
+      end #section.students.each
+    end # teacher.sections.each
+    khan_site_visits_actual = @site_visits.count do |visit|
+      visit[:url].match(/khanacademy/)
     end
+    khan_page_visits_actual = @page_visits.count do |visit|
+      visit[:url].match(/khanacademy/) && (visit[:date_visited] > Time.now - User::DEFAULT_VISIT_TIME_FRAME)
+    end
+    assert_equal khan_site_visits_actual, 2
+    assert_equal khan_page_visits_actual, 3
     assert_equal 1, section_found
-    assert_equal 1, student_found
+    assert_equal 1, joe_smith_found
     assert_equal 2, students_in_section_count
-    assert_equal @site_visits.size, khan_visit_count
-    assert_equal @page_visits.size, each_page_visited_list.uniq.size
-    assert_equal 2, first_page_visit_count
-    assert_equal 1, second_page_visit_count
+    assert_equal 1, khan_site_visit_count
+    assert_equal 2, each_page_visited_list.uniq.size
+    # loop through every page visited and make sure it's
+    # in the list of @page_visits we expected
+    each_page_visited_list.delete_if do |page_visit|
+      @page_visits.find {|pv| 
+        pv[:url] == page_visit.url
+      }
+    end
+  
+    assert_equal 0, each_page_visited_list.size
   end
 
   def self.before_suite

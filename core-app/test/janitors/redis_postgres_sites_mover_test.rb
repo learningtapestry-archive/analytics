@@ -87,7 +87,7 @@ class RedisPostgresSitesMoverTest < Minitest::Test
 
     page_visit = PageVisit.where(:page_id => page.id, :user_id => @student.user_id, :date_visited => timestamp).first
     refute_nil page_visit
-    assert_equal page_visit.time_active, "00:01:32"
+    assert_equal 92, page_visit.time_active
   end
 
   def test_RedisPostgresClickedMessageMove

@@ -10,10 +10,17 @@ module LT
     end
   end # WebAppHelper
   class WebApp < Sinatra::Base
+    # TODO this is ugly - not sure how to get non-html exceptions raised in testing otherwise
+    # There should be a way to get the config object from Sinatra/WebApp and configure that with these values
+    if LT::testing? then
+      set :raise_errors, true
+      set :dump_errors, false
+      set :show_exceptions, false
+    end
+
     include WebAppHelper
 
     API_ERROR_MESSAGE = { :status => "unknown error" }.to_json
-
     # set up UI layout container
     # we need this container to set dynamic content in the layout template
     # we can set things like CSS templates, Javascript includes, etc.
@@ -28,9 +35,10 @@ module LT
       erb :home, :locals => {:hello_world => "Hello world"}
     end
 
-    get "/dashboard" do
+    get "/dashboard/:username" do
       set_title("Your Dashboard")
-      erb :dashboard, :locals => {}
+      user = User.find_by_username(params['username'])
+      erb :dashboard, :locals => {user: user}
     end
 
     ### END Dashboard

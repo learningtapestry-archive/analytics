@@ -2,6 +2,13 @@ gem "minitest"
 require 'minitest/autorun'
 require 'rack/test'
 require 'nokogiri'
+require 'debugger'
+#require 'fileutils'
+#require 'tempfile'
+#require 'nokogiri'
+#require 'chronic'
+#require 'timecop'
+#require 'uri'
 require 'database_cleaner'
 
 require File::join(LT::lib_path, 'webapp.rb')
@@ -16,11 +23,32 @@ class WebAppTest < Minitest::Test
     assert_equal "Hello world", result
   end
   def test_dashboard
-    get "/dashboard"
+    teacher_username = @jane_doe[:username]
+    teacher = User.find_by_username(teacher_username)
+    get "/dashboard/#{teacher_username}"
     assert_equal 200, last_response.status, last_response.body
     html = Nokogiri.parse(last_response.body)
-    result = html.css('head>title').text
-    assert_equal "Learntaculous - Your Dashboard", result
+    title = html.css('head>title').text
+    assert_equal "Learntaculous - Your Dashboard", title
+
+    # verify teacher's name is printed on the page
+    teacher_name = html.css('p.teacher_name').text
+    assert_equal teacher.full_name, teacher_name
+    assert teacher_name.size>5
+
+    # verify that student names are printed on the page
+    student_names = []
+    html.css('p.student_name').each do |name|
+      student_names << name.text
+    end
+    student_names.each do |student_name_actual|  
+      student_name_html = student_names.find do |name|
+        name == student_name_actual
+      end
+      assert_equal student_name_actual, student_name_html
+      assert student_name_html.size > 5
+    end
+    #u = User.find_by_username(@joe_smith[:username])
 
   end
 
@@ -29,11 +57,18 @@ class WebAppTest < Minitest::Test
     DatabaseCleaner.strategy = :transaction
   end
   def setup
+
     # set database transaction, so we can revert seeds
     DatabaseCleaner.start
-    ## TODO: Question should seed! go up into before_suite to reduce reload time?
-    # re-seed data for each test
-    #LT::WebApp::Seeds::seed!
+    LT::Seeds::seed!
+    @scenario = LT::Seeds::Students::create_joe_smith_scenario
+    @joe_smith = @scenario[:student]
+    @jane_doe = @scenario[:teacher]
+    @section = @scenario[:section]
+    @page_visits = @scenario[:page_visits]
+    @site_visits = @scenario[:site_visits]
+    @sites = @scenario[:sites]
+    @pages = @scenario[:pages]
   end
   def teardown
     DatabaseCleaner.clean # cleanup of the database

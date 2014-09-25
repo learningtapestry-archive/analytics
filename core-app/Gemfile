@@ -13,6 +13,7 @@ gem 'logger'
 gem 'rake'
 gem 'pg', '>= 0.17.1'
 gem 'activerecord', '>=4.1.6'
+gem 'actionview'
 gem 'htmlentities', '>= 4.3.2'
 gem 'nokogiri', '>= 1.6.3.1'
 gem 'redis', '>= 3.1.0'
@@ -21,6 +22,8 @@ gem 'sinatra-contrib', '>= 1.4.2'
 gem 'thin', '>= 1.6.2' # development, maybe production
 gem 'rerun' # process reload agent, helpful for sinatra development
 gem 'bcrypt', '>=3.1.7'
+gem 'chronic'
+gem 'chronic_duration'
 # squasher - used in development to compress migration files
 group :test do
   gem 'minitest', '>= 5.4.0'

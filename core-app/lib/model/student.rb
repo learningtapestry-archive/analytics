@@ -4,6 +4,7 @@ class Student < ActiveRecord::Base
   delegate :page_visits, :to => :user
   delegate :site_visits, :to => :user
   delegate :sections, :to => :user
+  delegate :full_name, :to => :user
   delegate :first_name, :to => :user
   delegate :last_name, :to => :user
   delegate :username, :to => :user

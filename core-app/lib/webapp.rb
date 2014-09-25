@@ -32,13 +32,13 @@ module LT
 
     get "/" do
       set_title("Knowledge for Learning")
-      erb :home, :locals => {:hello_world => "Hello world"}
+      erb :home, :locals => {:page_title => "Welcome"}
     end
 
     get "/dashboard/:username" do
       set_title("Your Dashboard")
       user = User.find_by_username(params['username'])
-      erb :dashboard, :locals => {user: user}
+      erb :dashboard, :locals => {:page_title => "Dashboard", user: user}
     end
 
     ### END Dashboard

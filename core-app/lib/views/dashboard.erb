@@ -1,4 +1,4 @@
-Filter tools
+<!-- Filter tools
 | Change date period | View all sections/one section picker |
 
 |Sections
@@ -10,25 +10,43 @@ Filter tools
             |Left page to URL
 
 Nb. Time on site/page is for what time frame by default? (7 days?)
+-->
 
-User: <p class="teacher_name"><%=user.full_name%></p>
 <%user.sections.each do |section|%>
-  Section: <%=section.display_name%>
-  <%section.students.each do |student|%>
-    <p class="student<%=student.id%>">Student: <p class="student_name"><%=student.full_name%></p>
-    <%student.each_site_visit do |site_visit|%>
-      Site: <p class="site_name"><%=site_visit.site.display_name%> <p/>
-      Time on Site: <%=site_visit.time_active_words%>
-        <%student.each_page_visit(site: site_visit) do |page_visit|%>
-          <%=page_visit.display_name%>
-          <%=page_visit.time_active_words%>
+<h3>  Section: <%=section.display_name%></h3>
 
-<%
-        end #student.each_page_visited
-      end #student.each_site_visited
-%>  
-    </p><!--class student.id-->
+<%section.students.each do |student|%>
+  <div class="box">
+    <div class="box-header">
+        <h3 class="box-title"><%=student.full_name%></h3>
+    </div><!-- /.box-header -->
+    <div class="box-body no-padding">
+        <table class="table table-condensed">
+            <tbody><tr>
+                <th>Site</th>
+                <th>Timed Visited</th>
+                <th style="width: 40px">Label</th>
+            </tr>
+
+  <%student.each_site_visit do |site_visit|%>
+            <tr>
+                <td><%=site_visit.site.display_name%></td>
+                <td><%=site_visit.time_active_words%></td>
+                <td><span class="badge bg-red">55%</span></td>
+            </tr>
+  <% end #student.each_site_visited %>
+
+        </tbody></table>
+    </div><!-- /.box-body -->
+  </div>
 <%  end #section.students
   end #user.section
 %>
 <br/><br/>
+
+
+<!--
+<##student.each_page_visit(site: site_visit) do |page_visit|##>
+<##=page_visit.display_name##>
+<##=page_visit.time_active_words##>
+-->

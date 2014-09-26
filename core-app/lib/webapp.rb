@@ -10,6 +10,9 @@ module LT
     end
   end # WebAppHelper
   class WebApp < Sinatra::Base
+
+    enable :sessions
+
     # TODO this is ugly - not sure how to get non-html exceptions raised in testing otherwise
     # There should be a way to get the config object from Sinatra/WebApp and configure that with these values
     if LT::testing? then
@@ -32,13 +35,28 @@ module LT
 
     get "/" do
       set_title("Knowledge for Learning")
-      erb :home, :locals => {:page_title => "Welcome"}
+      erb :home, :locals => {:page_title => "Welcome"}, :layout => false
+      # This is the only page that does not use the default layout, it is the gateway to the kingdom,
+      # once entered, enjoy the standard site template chock full of information.
     end
 
-    get "/dashboard/:username" do
+    post "/" do
+      set_title("Knowledge for Learning")
+      user_retval = User.get_validated_user(params[:username], params[:password])
+
+      if user_retval[:exception] then
+        erb :home, :locals => {:page_title => "Welcome", :exception => user[:exception]}, :layout => false 
+      else
+        session[:user_id] = user_retval[:user].id
+        redirect '/dashboard'
+      end
+    end
+
+    get "/dashboard" do
+      if !session || !session[:user_id] then redirect '/' end
       set_title("Your Dashboard")
-      user = User.find_by_username(params['username'])
-      erb :dashboard, :locals => {:page_title => "Dashboard", user: user}
+      user = User.find(session[:user_id])
+      erb :dashboard, :locals => {:page_title => "Dashboard", :user => user}
     end
 
     ### END Dashboard

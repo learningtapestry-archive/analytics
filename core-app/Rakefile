@@ -58,7 +58,7 @@ namespace :lt do
       Rake::Task[:'lt:boot'].invoke
     end
     desc "Run WebApp server - this starts the webserver"
-    task :start_webapp do 
+    task :start do 
       path = File::expand_path(File::dirname(__FILE__))
       rackup_file = File::join(path, 'lib', 'webapp.ru')
       # TODO - set port/server from environment var
@@ -67,7 +67,7 @@ namespace :lt do
       Kernel.system(run_cmd)
     end
     desc "Run WebApp server - this starts the webserver in dev mode with rerun"
-    task :start_webapp_dev do 
+    task :start_dev do 
       path = File::expand_path(File::dirname(__FILE__))
       rackup_file = File::join(path, 'lib', 'webapp.ru')
       # TODO - set port/server from environment var

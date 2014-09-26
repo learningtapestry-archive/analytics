@@ -47,7 +47,7 @@ module LT
       LT::boot_db(File::join(LT::db_path, 'config.yml'))
       LT::load_all_models
       LT::boot_redis(File::join(LT::db_path, 'redis.yml'))
-      LT::logger.info("Core-app booted")
+      LT::logger.info("Core-app booted (mode: #{LT::run_env})")
     end
 
     # app_root_dir is the path to the root of the application being booted

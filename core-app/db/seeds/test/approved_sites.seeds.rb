@@ -1,7 +1,7 @@
 # Slashdot
 approved_site = ApprovedSite.create(
   :site_name=>'Slashdot',
-  :site_hash=>'27c74d4da0789bd3557b0a82aea8c759',
+  :site_uuid=>'658d1a95-33cb-482e-a3b1-e152ddd68c9f',
   :url=>'http://slashdot.org'
 )
 
@@ -18,7 +18,7 @@ approved_site = ApprovedSite.create(
 # TechCrunch
 approved_site = ApprovedSite.create(
   :site_name=>'TechCrunch',
-  :site_hash=>'8c63e4e9beb90b0a9ca92e896be646da',
+  :site_uuid=>'d0c33b30-72a9-40fb-abef-df3cc8a8976b',
   :url=>'http://techcrunch.com'
 )
 
@@ -35,7 +35,7 @@ approved_site = ApprovedSite.create(
 # Gizmodo
 approved_site = ApprovedSite.create(
   :site_name=>'Gizmodo',
-  :site_hash=>'42e735bbfcc00757ceb03b632000a02a',
+  :site_uuid=>'f997b320-2a75-49d9-aba5-7c9d44d4483b',
   :url=>'http://gizmodo.com'
 )
 
@@ -53,7 +53,7 @@ approved_site = ApprovedSite.create(
 approved_site = ApprovedSite.create(
   :site_name=>'NPR',
   :url=>'http://npr.org',
-  :site_hash=>'9688ad746cea4c437212d0ac2754e787'
+  :site_uuid=>'4d22024f-94a0-443c-bb23-acdca1c0addd'
 )
 
   approved_site.approved_site_actions.create(
@@ -69,7 +69,7 @@ approved_site = ApprovedSite.create(
 # New York Times
 approved_site = ApprovedSite.create(
   :site_name=>'New York Times',
-  :site_hash=>'4fe2a48a3c9cca2f7aacbc429d084754',
+  :site_uuid=>'6ac95f3a-debb-4cdb-b45b-592f6f15750b',
   :url=>'http://nytimes.com'
 
 )
@@ -87,7 +87,7 @@ approved_site = ApprovedSite.create(
 # Ars Technica
 approved_site = ApprovedSite.create(
   :site_name=>'Ars Technica',
-  :site_hash=>'52a7dafb049f85c047892807e1f51a1a',
+  :site_uuid=>'fdb033cd-06bb-4448-b353-3110c388ffe1',
   :url=>'http://arstechnica.com/'
 )
 
@@ -104,7 +104,7 @@ approved_site = ApprovedSite.create(
 # The Verge
 approved_site = ApprovedSite.create(
   :site_name=>'The Verge',
-  :site_hash=>'b49cf44e0129364982a8e98a54067539',
+  :site_uuid=>'d63ea619-1a40-46eb-8ef7-f4dc00340486',
   :url=>'http://theverge.com'
 )
 
@@ -121,7 +121,7 @@ approved_site = ApprovedSite.create(
 # Gigaom
 approved_site = ApprovedSite.create(
   :site_name=>'Gigaom',
-  :site_hash=>'6656dd67a96a23bd7e2e508e30e9705b',
+  :site_uuid=>'408c5f65-5311-4be7-94ee-599885715c53',
   :url=>'http://gigaom.com'
 
 )
@@ -139,7 +139,7 @@ approved_site = ApprovedSite.create(
 # Boing Boing
 approved_site = ApprovedSite.create(
   :site_name=>'Boing Boing',
-  :site_hash=>'2c314552cef288e21cbd3f1490016b62',
+  :site_uuid=>'09935a32-6232-469b-aa0e-697d39fe6ed8',
   :url=>'http://boingboing.net'
 )
 
@@ -156,7 +156,7 @@ approved_site = ApprovedSite.create(
 # Washington Post
 approved_site = ApprovedSite.create(
   :site_name=>'Washington Post',
-  :site_hash=>'2c9f88c048870e837bc3ec1e5090419d',
+  :site_uuid=>'136ef862-689d-412e-b3b9-dc2e1297b8d2',
   :url=>'http://washingtonpost.com'
   )
 
@@ -173,7 +173,7 @@ approved_site = ApprovedSite.create(
 # Stack Overflow
 approved_site = ApprovedSite.create(
   :site_name=>'Stack Overflow',
-  :site_hash=>'4f5978b72bf7f778629886a575375ba6',
+  :site_uuid=>'2bc96317-2e9b-4288-a776-f785a2b825e0',
   :url=>'http://stackoverflow.com'
   )
 

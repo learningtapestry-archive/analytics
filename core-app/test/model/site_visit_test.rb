@@ -8,7 +8,7 @@ class SiteVisitModelTest < Minitest::Test
     # set database transaction, so we can revert seeds
     DatabaseCleaner.start
     LT::Seeds::seed!
-    @scenario = LT::Seeds::Students::create_joe_smith_scenario
+    @scenario = LT::Scenarios::Students::create_joe_smith_scenario
     @joe_smith = @scenario[:student]
     @jane_doe = @scenario[:teacher]
     @section = @scenario[:section]

@@ -44,14 +44,11 @@ class InitSchema < ActiveRecord::Migration
     end
 
     create_table "raw_messages", :force => true do |t|
-      t.integer  "status_id"
       t.string   "api_key",          :null => false
       t.string   "username",         :null => false
-      t.string   "action"
-      t.string   "event"
-      t.string   "result"
+      t.string   "site_hash"
+      t.json     "action"
       t.string   "url",              :limit => 4096
-      t.text     "html"
       t.datetime "captured_at"
       t.timestamps
     end

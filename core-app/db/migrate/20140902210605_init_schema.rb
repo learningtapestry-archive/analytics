@@ -2,7 +2,7 @@ class InitSchema < ActiveRecord::Migration
   def change
     create_table "approved_sites", :force => true do |t|
       t.string   "site_name",       :null => false
-      t.string   "site_hash",       :null => false
+      t.uuid     "site_uuid",       :null => false
       t.string   "url",             :null => false, :limit => 4096
       t.string   "logo_url_small",  :limit => 4096
       t.string   "logo_url_large",  :limit => 4096
@@ -46,7 +46,8 @@ class InitSchema < ActiveRecord::Migration
     create_table "raw_messages", :force => true do |t|
       t.string   "api_key",          :null => false
       t.string   "username",         :null => false
-      t.string   "site_hash"
+      t.uuid     "site_uuid"
+      t.string   "verb"
       t.json     "action"
       t.string   "url",              :limit => 4096
       t.datetime "captured_at"
@@ -175,8 +176,8 @@ class InitSchema < ActiveRecord::Migration
     end
 
     create_table "api_keys", :force => true do |t|
-      t.integer "user_id",      :null => false
-      t.string  "key",          :null => false
+      t.integer  "user_id",      :null => false
+      t.string   "key",          :null => false
       t.timestamps
     end
 

@@ -45,7 +45,7 @@ ActiveRecord::Schema.define(version: 20140902210605) do
 
   create_table "approved_sites", force: true do |t|
     t.string   "site_name",                   null: false
-    t.string   "site_hash",                   null: false
+    t.uuid     "site_uuid",                   null: false
     t.string   "url",            limit: 4096, null: false
     t.string   "logo_url_small", limit: 4096
     t.string   "logo_url_large", limit: 4096
@@ -130,9 +130,10 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   add_index "pages", ["url"], name: "index_pages_on_url", unique: true, using: :btree
 
   create_table "raw_messages", force: true do |t|
-    t.string   "api_key",     null: false
-    t.string   "username",    null: false
-    t.string   "site_hash"
+    t.string   "api_key",                  null: false
+    t.string   "username",                 null: false
+    t.uuid     "site_uuid"
+    t.string   "verb"
     t.json     "action"
     t.string   "url",         limit: 4096
     t.datetime "captured_at"

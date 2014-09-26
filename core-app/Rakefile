@@ -21,7 +21,7 @@ Rake::Task["db:load_config"].overwrite do
 end
 
 # AR Migrations need an environment with an already established database connection
-task :environment => ["lt:boot", "db:load_config"] do
+task :environment => ["db:load_config"] do
 end
 ## End AR 4 installation
 

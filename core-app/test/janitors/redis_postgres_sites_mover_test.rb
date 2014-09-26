@@ -33,7 +33,7 @@ class RedisPostgresSitesMoverTest < Minitest::Test
     count = LT::RedisServer::raw_message_queue_length
     assert_equal 0, count
 
-    @scenario = LT::Seeds::Students::create_joe_smith_scenario
+    @scenario = LT::Scenarios::Students::create_joe_smith_scenario
     @joe_smith = @scenario[:student]
     @student = Student.find_by_username(@joe_smith[:username])
     assert_equal @joe_smith[:username], @student.user.username

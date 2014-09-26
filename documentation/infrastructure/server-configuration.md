@@ -39,3 +39,45 @@ Server Configuration
 * http://jordanhollinger.com/2011/04/22/how-to-use-thin-effectivly/
 
 * http://code.macournoyer.com/thin/usage/
+
+# Server Management Notes
+
+* Server is located at: lt-dev01.learntaculo.us
+* byobu: multi-terminal window manager
+  * byobu-enable/disable: turn this service on/off
+  * ctrl-a: screen manager
+  * ctrl-a-c: new terminal
+  * ctrl-a-[0-9]: switch between terminals
+  * ctrl-a-d: detach from server (logout)
+* learntac CI/pg local user
+* /home/learntac: folder for system
+  * sudo -su learntac: to become this user
+  * /home/learntac/Projects
+    * ./cruisecontrol.rb: code for cruisecontrol
+      * /home/learntac/.cruise: CI build of code
+    * learntaculous: web server build of code
+  * /etc/thin/webapp.yml: config for thin
+    * sudo service thin restart: reboot thin
+    /home/learntac/core-app/log: thin logs
+  * /etc/nginx/web-sites.confg: nginx configuration file
+    * sudo service nginx restart
+    * /var/log/nginx: nginx logs
+  * VPN
+    * On lt-dev01: /etc/ppp/chap-secrets: holds user/pass credentials
+    * In local vbox: use bridged network, not NAT to connect to VPN
+    * Local config for PPTP: MSCHAPv2/128bit MPPE
+    * start/stop VPN: nmcli con [up|down] id lt-dev01
+  * PG
+    * user lt_dbo
+    * 192.168.247.1
+  * Cruisecontrol CI
+    * 192.168.247.1:3333
+
+Thin-rack-ruby 502 failure
+  Possible explanation: when ruby raises an exception, it causes thin to terminate which leaves sockets open from nginx but no handler to process requests
+
+Chrome: Advanced REST client
+
+
+
+

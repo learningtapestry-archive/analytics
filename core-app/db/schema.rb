@@ -130,14 +130,11 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   add_index "pages", ["url"], name: "index_pages_on_url", unique: true, using: :btree
 
   create_table "raw_messages", force: true do |t|
-    t.integer  "status_id"
     t.string   "api_key",     null: false
     t.string   "username",    null: false
-    t.string   "action"
-    t.string   "event"
-    t.string   "result"
+    t.string   "site_hash"
+    t.json     "action"
     t.string   "url"
-    t.text     "html"
     t.datetime "captured_at"
     t.datetime "created_at"
     t.datetime "updated_at"

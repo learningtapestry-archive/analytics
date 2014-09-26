@@ -3,16 +3,16 @@ class InitSchema < ActiveRecord::Migration
     create_table "approved_sites", :force => true do |t|
       t.string   "site_name",       :null => false
       t.string   "site_hash",       :null => false
-      t.string   "url",             :null => false
-      t.string   "logo_url_small"
-      t.string   "logo_url_large"
+      t.string   "url",             :null => false, :limit => 4096
+      t.string   "logo_url_small",  :limit => 4096
+      t.string   "logo_url_large",  :limit => 4096
       t.timestamps
     end
 
     create_table "approved_site_actions", :force => true do |t|
       t.integer  "approved_site_id", :null => false
       t.string   "action_type",     :null => false # CLICK, PAGEVIEW, EXTRACT 
-      t.string   "url_pattern",     :null => false
+      t.string   "url_pattern",     :null => false, :limit => 4096
       t.string   "css_selector"
       t.timestamps
     end
@@ -45,27 +45,27 @@ class InitSchema < ActiveRecord::Migration
 
     create_table "raw_messages", :force => true do |t|
       t.integer  "status_id"
-      t.string   "api_key",       :null => false
+      t.string   "api_key",          :null => false
       t.string   "username",         :null => false
       t.string   "action"
       t.string   "event"
       t.string   "result"
-      t.string   "url"
+      t.string   "url",              :limit => 4096
       t.text     "html"
       t.datetime "captured_at"
       t.timestamps
     end
 
     create_table "sites", :force => true do |t|
-      t.string "url",         :null => false
-      t.string "display_name"
+      t.string   "url",         :null => false, :limit => 4096
+      t.string   "display_name"
     end
 
     add_index :sites, :url, :unique => true
 
     create_table "pages", :force => true do |t|
-      t.string "url",         :null => false
-      t.string "display_name"
+      t.string   "url",         :null => false, :limit => 4096
+      t.string   "display_name"
       t.belongs_to :site
     end
 
@@ -73,21 +73,21 @@ class InitSchema < ActiveRecord::Migration
 
     create_table "site_visits", :force => true do |t|
       t.datetime "date_visited"
-      t.column "time_active", :interval
+      t.column   "time_active", :interval
       t.belongs_to :user
       t.belongs_to :site
     end
 
     create_table "page_visits", :force => true do |t|
       t.datetime "date_visited"
-      t.column "time_active", :interval
+      t.column   "time_active", :interval
       t.belongs_to :user
       t.belongs_to :page
     end
 
     create_table "page_clicks", :force => true do |t|
       t.datetime "date_visited"
-      t.string "url_visited"
+      t.string   "url_visited", :limit => 4096
       t.belongs_to :user
       t.belongs_to :page  # In future, this will belong to page_visits once relationships figured out
     end
@@ -120,7 +120,7 @@ class InitSchema < ActiveRecord::Migration
       t.string   "course_code"
       t.string   "sis_id"
       t.string   "other_id"
-      t.string   "name",                    :null => false
+      t.string   "name",         :null => false
       t.string   "description"
       t.string   "subject_area"
       t.boolean  "high_school_requirement"
@@ -147,12 +147,12 @@ class InitSchema < ActiveRecord::Migration
       t.integer  "course_offering_id"
       t.string   "sis_id"
       t.string   "other_id"
-      t.string   "name",               :null => false
+      t.string   "name",         :null => false
       t.timestamps
     end
 
     create_table "section_users", :force => true do |t|
-      t.string "user_type" # defines the type of relationship user has to section
+      t.string   "user_type" # defines the type of relationship user has to section
         # e.g.: "teacher" "student" "TA" "auditing"
       t.belongs_to :section
       t.belongs_to :user

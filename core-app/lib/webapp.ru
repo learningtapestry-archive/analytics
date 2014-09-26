@@ -10,4 +10,5 @@ Bundler.require
 LT::boot_all
 path = File::expand_path(File::dirname(__FILE__))
 require File::join(path,'webapp.rb')
+puts "Run enviroment mode: #{LT::run_env}"
 run LT::WebApp

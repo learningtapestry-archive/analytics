@@ -35,20 +35,20 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   end
 
   create_table "approved_site_actions", force: true do |t|
-    t.integer  "approved_site_id", null: false
-    t.string   "action_type",      null: false
-    t.string   "url_pattern",      null: false
+    t.integer  "approved_site_id",              null: false
+    t.string   "action_type",                   null: false
+    t.string   "url_pattern",      limit: 4096, null: false
     t.string   "css_selector"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "approved_sites", force: true do |t|
-    t.string   "site_name",      null: false
-    t.string   "site_hash",      null: false
-    t.string   "url",            null: false
-    t.string   "logo_url_small"
-    t.string   "logo_url_large"
+    t.string   "site_name",                   null: false
+    t.string   "site_hash",                   null: false
+    t.string   "url",            limit: 4096, null: false
+    t.string   "logo_url_small", limit: 4096
+    t.string   "logo_url_large", limit: 4096
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -109,7 +109,7 @@ ActiveRecord::Schema.define(version: 20140902210605) do
 
   create_table "page_clicks", force: true do |t|
     t.datetime "date_visited"
-    t.string   "url_visited"
+    t.string   "url_visited",  limit: 4096
     t.integer  "user_id"
     t.integer  "page_id"
   end
@@ -122,7 +122,7 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   end
 
   create_table "pages", force: true do |t|
-    t.string  "url",          null: false
+    t.string  "url",          limit: 4096, null: false
     t.string  "display_name"
     t.integer "site_id"
   end
@@ -134,7 +134,7 @@ ActiveRecord::Schema.define(version: 20140902210605) do
     t.string   "username",    null: false
     t.string   "site_hash"
     t.json     "action"
-    t.string   "url"
+    t.string   "url",         limit: 4096
     t.datetime "captured_at"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -180,7 +180,7 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   end
 
   create_table "sites", force: true do |t|
-    t.string "url",          null: false
+    t.string "url",          limit: 4096, null: false
     t.string "display_name"
   end
 

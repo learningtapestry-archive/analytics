@@ -237,60 +237,41 @@ var ExtractorManager = {
 
             if(e.t === 'page_view') {
                 u.user = {
+                    api_key: this.api_key,
                     username: this.user,
-                    apiKey: this.api_key,
-                    site_hash: e.d.site_hash,
+                    site_uuid: e.d.site_uuid,
+                    verb: 'viewed',
                     action: {
-                        id: 'verbs/viewed',
-                        display: {
-                            'en-US': 'viewed'
-                        },
-                        value: {
-                            time: e.d.t
-                        }
+                        time: e.d.t
                     },
-                    url: {
-                        id: e.d.id
-                    },
-                    timestamp: _timestamp()
+                    url: e.d.id,
+                    captured_at: _timestamp()
                 };
             }
             else if(e.t === 'click_event') {
                 u.user = {
+                    api_key: this.api_key,
                     username: this.user,
-                    apiKey: this.api_key,
-                    site_hash: e.d.site_hash,
+                    site_uuid: e.d.site_uuid,
+                    verb: 'clicked',
                     action: {
-                        id: 'verbs/clicked',
-                        display: {
-                            'en-US': 'clicked'
-                        },
-                        value: {
                             url: e.d.u
-                        }
                     },
-                    url: {
-                        id: e.d.id
-                    },
-                    timestamp: _timestamp()
+                    url: e.d.id,
+                    captured_at: _timestamp()
                 };
             }
             else if(e.t === 'extract_event') {
                 u.user = {
+                    api_key: this.api_key,
                     username: this.user,
-                    apiKey: this.api_key,
-                    site_hash: e.d.site_hash,
+                    site_uuid: e.d.site_uuid,
+                    verb: 'extracted',
                     action: {
-                        id: 'verbs/extracted',
-                        display: {
-                            'en-US': 'extracted'
-                        },
                         html: e.d.html
                     },
-                    url: {
-                        id: e.d.id
-                    },
-                    timestamp: _timestamp()
+                    url: e.d.id,
+                    captured_at: _timestamp()
                 };
             }
             

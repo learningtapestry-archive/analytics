@@ -61,7 +61,7 @@ var ExtractorManager = {
     user_tab: null,
     user_url: 'user.html',
     
-    sites_url: 'https://lt-dev01.learntaculo.us/api/v1/approved_sites',
+    sites_url: 'https://lt-dev01.learntaculo.us/api/v1/approved-sites',
     event_url: 'https://lt-dev01.learntaculo.us/api/v1/assert',
     
     //sites_url: 'http://localhost:8080/api/v1/approved_sites',

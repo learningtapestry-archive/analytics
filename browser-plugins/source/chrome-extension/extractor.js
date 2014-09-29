@@ -145,7 +145,8 @@ var Extractor = {
             d: {
                 site_hash: _site_hash,
                 t: s, 
-                id: document.location.href
+                id: document.location.href,
+                page_title: document.title
             }
         });
     },

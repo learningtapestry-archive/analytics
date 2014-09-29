@@ -242,7 +242,8 @@ var ExtractorManager = {
                     site_uuid: e.d.site_uuid,
                     verb: 'viewed',
                     action: {
-                        time: e.d.t
+                        time: e.d.t,
+                        page_title: e.d.pt
                     },
                     url: e.d.id,
                     captured_at: _timestamp()

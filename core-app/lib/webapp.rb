@@ -113,7 +113,7 @@ module LT
       end
     end # '/api/v1/signup'
 
-    get '/api/v1/approved_sites' do
+    get '/api/v1/approved-sites' do
       content_type :json
       ApprovedSiteAction.get_actions_with_sites.to_json
     end # '/api/v1/approved_sites'

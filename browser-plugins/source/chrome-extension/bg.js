@@ -61,7 +61,7 @@ var ExtractorManager = {
     user_tab: null,
     user_url: 'user.html',
     
-    sites_url: 'https://lt-dev01.learntaculo.us/api/v1/approved_sites',
+    sites_url: 'https://lt-dev01.learntaculo.us/api/v1/approved-sites',
     event_url: 'https://lt-dev01.learntaculo.us/api/v1/assert',
     
     //sites_url: 'http://localhost:8080/api/v1/approved_sites',
@@ -233,68 +233,51 @@ var ExtractorManager = {
         this.watching = true;
 
         chrome.runtime.onMessage.addListener(_callback(function(e) {
-            var u = {user: null};
+            var u = {};
 
             if(e.t === 'page_view') {
-                u.user = {
+                u = {
+                    api_key: this.api_key,
                     username: this.user,
-                    apiKey: this.api_key,
-                    site_hash: e.d.site_hash,
+                    site_uuid: e.d.site_uuid,
+                    verb: 'viewed',
                     action: {
-                        id: 'verbs/viewed',
-                        display: {
-                            'en-US': 'viewed'
-                        },
-                        value: {
-                            time: e.d.t
-                        }
+                        time: e.d.t,
+                        page_title: e.d.pt
                     },
-                    url: {
-                        id: e.d.id
-                    },
-                    timestamp: _timestamp()
+                    url: e.d.id,
+                    page_title: e.d.page_title,
+                    captured_at: _timestamp()
                 };
             }
             else if(e.t === 'click_event') {
-                u.user = {
+                u = {
+                    api_key: this.api_key,
                     username: this.user,
-                    apiKey: this.api_key,
-                    site_hash: e.d.site_hash,
+                    site_uuid: e.d.site_uuid,
+                    verb: 'clicked',
                     action: {
-                        id: 'verbs/clicked',
-                        display: {
-                            'en-US': 'clicked'
-                        },
-                        value: {
                             url: e.d.u
-                        }
                     },
-                    url: {
-                        id: e.d.id
-                    },
-                    timestamp: _timestamp()
+                    url: e.d.id,
+                    captured_at: _timestamp()
                 };
             }
             else if(e.t === 'extract_event') {
-                u.user = {
+                u = {
+                    api_key: this.api_key,
                     username: this.user,
-                    apiKey: this.api_key,
-                    site_hash: e.d.site_hash,
+                    site_uuid: e.d.site_uuid,
+                    verb: 'extracted',
                     action: {
-                        id: 'verbs/extracted',
-                        display: {
-                            'en-US': 'extracted'
-                        },
                         html: e.d.html
                     },
-                    url: {
-                        id: e.d.id
-                    },
-                    timestamp: _timestamp()
+                    url: e.d.id,
+                    captured_at: _timestamp()
                 };
             }
             
-            if(u.user) {
+            if(u) {
                 this.sendData(JSON.stringify(u));
             }
         }, this));

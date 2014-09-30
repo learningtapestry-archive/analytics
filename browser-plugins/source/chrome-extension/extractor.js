@@ -11,7 +11,7 @@ var _callback = function(fn, ctx) {
     };
 };
 
-var _site_hash = '';
+var _site_uuid = '';
 
 function htmlspecialchars(str) {
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
@@ -40,8 +40,8 @@ var Extractor = {
       actionArray = JSON.parse(decodeURIComponent(_actionType));
 
       for (index=0; index < actionArray.length; index++) {
-        if (_site_hash == '') {
-          _site_hash = actionArray[index]['site_hash'];
+        if (_site_uuid == '') {
+          _site_uuid = actionArray[index]['site_uuid'];
         }
 
         switch (actionArray[index]['action_type']) {
@@ -143,9 +143,10 @@ var Extractor = {
         chrome.runtime.sendMessage({
             t: 'page_view', 
             d: {
-                site_hash: _site_hash,
+                site_uuid: _site_uuid,
                 t: s, 
-                id: document.location.href
+                id: document.location.href,
+                page_title: document.title
             }
         });
     },
@@ -160,7 +161,7 @@ var Extractor = {
         chrome.runtime.sendMessage({
             t: 'click_event', 
             d: {
-                site_hash: _site_hash,
+                site_uuid: _site_uuid,
                 u: href, 
                 id: document.location.href
             }
@@ -171,7 +172,7 @@ var Extractor = {
         chrome.runtime.sendMessage({
             t: 'extract_event', 
             d: {
-                site_hash: _site_hash,
+                site_uuid: _site_uuid,
                 id: document.location.href,
                 html: htmlspecialchars(document.querySelector(cssSelector).innerHTML)
             }

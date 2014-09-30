@@ -233,10 +233,10 @@ var ExtractorManager = {
         this.watching = true;
 
         chrome.runtime.onMessage.addListener(_callback(function(e) {
-            var u = {user: null};
+            var u = {};
 
             if(e.t === 'page_view') {
-                u.user = {
+                u = {
                     api_key: this.api_key,
                     username: this.user,
                     site_uuid: e.d.site_uuid,
@@ -246,11 +246,12 @@ var ExtractorManager = {
                         page_title: e.d.pt
                     },
                     url: e.d.id,
+                    page_title: e.d.page_title,
                     captured_at: _timestamp()
                 };
             }
             else if(e.t === 'click_event') {
-                u.user = {
+                u = {
                     api_key: this.api_key,
                     username: this.user,
                     site_uuid: e.d.site_uuid,
@@ -263,7 +264,7 @@ var ExtractorManager = {
                 };
             }
             else if(e.t === 'extract_event') {
-                u.user = {
+                u = {
                     api_key: this.api_key,
                     username: this.user,
                     site_uuid: e.d.site_uuid,
@@ -276,7 +277,7 @@ var ExtractorManager = {
                 };
             }
             
-            if(u.user) {
+            if(u) {
                 this.sendData(JSON.stringify(u));
             }
         }, this));

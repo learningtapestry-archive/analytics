@@ -1,0 +1,103 @@
+[{
+    "action": {
+        "time": "21S"
+    },
+    "api_key": "5f27d6dc-ef14-4517-82b2-8ab65f3df93e",
+    "captured_at": "2014-09-29T23:12:04-04:00",
+    "page_title": "I Tried The New Oculus Rift, And It Blew Me Away All Over Again",
+    "site_uuid": "42e735bb-fcc0-0757-ceb0-3b632000a02a",
+    "url": "http://gizmodo.com/i-tried-the-new-oculus-rift-and-it-blew-me-away-all-ov-1637201830",
+    "username": "jason",
+    "verb": "viewed"
+},
+{
+    "action": {
+        "url": "http://gizmodo.com/the-best-smartphone-camera-iphone-6-edition-1637751507"
+    },
+    "api_key": "5f27d6dc-ef14-4517-82b2-8ab65f3df93e",
+    "captured_at": "2014-09-29T23:12:03-04:00",
+    "site_uuid": "42e735bb-fcc0-0757-ceb0-3b632000a02a",
+    "url": "http://gizmodo.com/i-tried-the-new-oculus-rift-and-it-blew-me-away-all-ov-1637201830",
+    "username": "jason",
+    "verb": "clicked"
+},
+{
+    "action": {
+        "url": "http://gizmodo.com/the-best-smartphone-camera-iphone-6-edition-1637751507"
+    },
+    "api_key": "5f27d6dc-ef14-4517-82b2-8ab65f3df93e",
+    "captured_at": "2014-09-29T23:12:03-04:00",
+    "site_uuid": "42e735bb-fcc0-0757-ceb0-3b632000a02a",
+    "url": "http://gizmodo.com/i-tried-the-new-oculus-rift-and-it-blew-me-away-all-ov-1637201830",
+    "username": "jason",
+    "verb": "clicked"
+},
+{
+    "action": {
+        "time": "14S"
+    },
+    "api_key": "5f27d6dc-ef14-4517-82b2-8ab65f3df93e",
+    "captured_at": "2014-09-29T23:11:40-04:00",
+    "page_title": "Consumer Reports Bend Test Pits iPhone 6 Plus Against the Competition",
+    "site_uuid": "42e735bb-fcc0-0757-ceb0-3b632000a02a",
+    "url": "http://gizmodo.com/consumer-reports-bend-test-pits-iphone-6-plus-against-t-1639756245",
+    "username": "jason",
+    "verb": "viewed"
+},
+{
+    "action": {
+        "url": "http://gizmodo.com/i-tried-the-new-oculus-rift-and-it-blew-me-away-all-ov-1637201830"
+    },
+    "api_key": "5f27d6dc-ef14-4517-82b2-8ab65f3df93e",
+    "captured_at": "2014-09-29T23:11:39-04:00",
+    "site_uuid": "42e735bb-fcc0-0757-ceb0-3b632000a02a",
+    "url": "http://gizmodo.com/consumer-reports-bend-test-pits-iphone-6-plus-against-t-1639756245",
+    "username": "jason",
+    "verb": "clicked"
+},
+{
+    "action": {
+        "url": "http://gizmodo.com/i-tried-the-new-oculus-rift-and-it-blew-me-away-all-ov-1637201830"
+    },
+    "api_key": "5f27d6dc-ef14-4517-82b2-8ab65f3df93e",
+    "captured_at": "2014-09-29T23:11:39-04:00",
+    "site_uuid": "42e735bb-fcc0-0757-ceb0-3b632000a02a",
+    "url": "http://gizmodo.com/consumer-reports-bend-test-pits-iphone-6-plus-against-t-1639756245",
+    "username": "jason",
+    "verb": "clicked"
+},
+{
+    "action": {
+        "time": "35S"
+    },
+    "api_key": "5f27d6dc-ef14-4517-82b2-8ab65f3df93e",
+    "captured_at": "2014-09-29T23:11:25-04:00",
+    "page_title": "​Drink Boxed Wine",
+    "site_uuid": "42e735bb-fcc0-0757-ceb0-3b632000a02a",
+    "url": "http://gizmodo.com/drink-boxed-wine-1639662921",
+    "username": "jason",
+    "verb": "viewed"
+},
+{
+    "action": {
+        "url": "http://gizmodo.com/consumer-reports-bend-test-pits-iphone-6-plus-against-t-1639756245"
+    },
+    "api_key": "5f27d6dc-ef14-4517-82b2-8ab65f3df93e",
+    "captured_at": "2014-09-29T23:11:24-04:00",
+    "site_uuid": "42e735bb-fcc0-0757-ceb0-3b632000a02a",
+    "url": "http://gizmodo.com/drink-boxed-wine-1639662921",
+    "username": "jason",
+    "verb": "clicked"
+},
+{
+    "action": {
+        "time": "2S"
+    },
+    "api_key": "5f27d6dc-ef14-4517-82b2-8ab65f3df93e",
+    "captured_at": "2014-09-29T23:10:44-04:00",
+    "page_title": "Skateboarder zips down mountains and flies by cars at insane speeds",
+    "site_uuid": "42e735bb-fcc0-0757-ceb0-3b632000a02a",
+    "url": "http://sploid.gizmodo.com/skateboarder-zips-down-mountains-and-flys-by-cars-at-in-1639778763",
+    "username": "jason",
+    "verb": "viewed"
+}]

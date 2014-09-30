@@ -13,6 +13,7 @@ class RedisPostgresExtractTest < Minitest::Test
     scenario = LT::Scenarios::RawMessages::create_raw_message_redis_to_pg_scenario
     joe_smith_username =scenario[:students][0][:username]
     joe_smith = User.find_by_username(joe_smith_username)
+    joe_smith_id = joe_smith.id
     assert_equal scenario[:students][0][:first_name], joe_smith.first_name
     assert LT::RedisServer::raw_message_queue_length >=4
     assert_equal scenario[:raw_messages].size, LT::RedisServer::raw_message_queue_length
@@ -22,7 +23,7 @@ class RedisPostgresExtractTest < Minitest::Test
     assert_equal 0, LT::RedisServer::raw_message_queue_length
     assert_equal scenario[:raw_messages].size, RawMessage.count
     test_msgs = RawMessage.where(:url => scenario[:raw_messages][0][:url])
-      .where(:username => joe_smith_username)
+      .where(:user_id => joe_smith_id)
       .where(['captured_at <= ?', 8.days.ago])
       .where(:verb => 'viewed')
     test_msg = test_msgs.first
@@ -34,8 +35,19 @@ class RedisPostgresExtractTest < Minitest::Test
     assert_equal RawMessageLog::Actions::FROM_REDIS, logs.first.action
     assert_equal 1, test_msg.raw_message_logs.size
 
-    # convert raw_messages to appropriate page visits
+    # prep/verify data before converting raw to pv
     assert_equal 0, PageVisit.count
+    # create a new raw message, add a "to_page_visits" log entry
+    rm = RawMessage.create_from_json(scenario[:raw_messages][0].to_json)
+    rm.raw_message_logs << RawMessageLog.new_to_page_visits
+    rm.save!
+    sql = RawMessage.find_new_page_visits.to_sql
+    # show that this new raw message doesn't show up when we query for new page visit messages
+    assert_equal scenario[:raw_messages].size, RawMessage.find_new_page_visits.size
+    assert_equal scenario[:raw_messages].size+1, RawMessage.all.size
+
+
+    # convert raw_messages to appropriate page visits
     LT::Janitors::RawMessagesExtract::raw_messages_to_page_visits
 
     # re-running RawMessagesExtract should not process any records

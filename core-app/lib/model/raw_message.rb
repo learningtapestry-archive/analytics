@@ -19,12 +19,13 @@ class RawMessage < ActiveRecord::Base
   end
 
   def self.find_new_page_visits(limit = 100)
+    # TODO verify that api_key and user_id are associated in api_key table
     self
       .select("#{table_name}.*")
       .joins(:raw_message_logs)
       .where(:verb => Verbs::VIEWED)
       .where(["#{RawMessageLog.table_name}.action = ?", RawMessageLog::Actions::FROM_REDIS])
-      .where(["#{RawMessageLog.table_name}.action <> ?", RawMessageLog::Actions::TO_PAGE_VISITS])
+      .where.not(id: RawMessageLog.select("raw_message_id").where(action: RawMessageLog::Actions::TO_PAGE_VISITS))
       .limit(limit)
   end
 

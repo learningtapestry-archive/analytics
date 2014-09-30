@@ -36,7 +36,8 @@ class InitSchema < ActiveRecord::Migration
 
     create_table "raw_messages", :force => true do |t|
       t.string   "api_key",          :null => false
-      t.string   "username",         :null => false
+      t.integer  "user_id",          :null => false
+      t.string   "page_title"
       t.uuid     "site_uuid"
       t.string   "verb"
       t.json     "action"

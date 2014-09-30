@@ -256,10 +256,17 @@ module LT
       end #raw_messages_scenario_data
       def create_raw_message_redis_to_pg_scenario
         scenario = raw_messages_scenario_data
+        # this holds username=>id associations
+        usernames_ids = {}
         scenario[:students].each do |s|
-          User.create_user(s)
+          user = User.create_user(s)[:user]
+          usernames_ids[user.username] = user.id
         end
+
         scenario[:raw_messages].each do |raw_message|
+          # delete username and swap in the user_id
+          raw_message[:user_id]=usernames_ids[raw_message.delete(:username)]
+          raise StandardError if raw_message[:user_id].nil?
           json_message = raw_message.to_json
           LT::RedisServer::raw_message_push(json_message)
         end

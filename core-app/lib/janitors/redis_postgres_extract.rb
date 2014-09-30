@@ -3,8 +3,9 @@ module LT
 	module Janitors
 		module RawMessagesExtract class << self
 			def raw_messages_to_page_visits
+
 				RawMessage.find_new_page_visits.each do |raw_page_visit|
-					puts raw_page_visit.inspect
+					#raw_page_visit
 				end
 			end
 		end; end # RawMessagesExtract

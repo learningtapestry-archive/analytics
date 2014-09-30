@@ -9,6 +9,9 @@ class RawMessageLog < ActiveRecord::Base
   def self.new_from_redis
     self.new(:action => Actions::FROM_REDIS)
   end
+  def self.new_to_page_visits
+    self.new(:action => Actions::TO_PAGE_VISITS)
+  end
 end
 
 

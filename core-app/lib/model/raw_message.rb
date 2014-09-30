@@ -1,26 +1,31 @@
 class RawMessage < ActiveRecord::Base
-  # stub method for children to override (simply here to document common method signatures for children)
-  # 
-  def each_new_row(opts ={}, &block)
-    # support opts:
-    #  :yield => Max number of rows to iterate over
+  has_many :raw_message_logs
+  module Verbs
+    VIEWED = 'viewed'
   end
-end
 
-class RawCodeAcademy < RawMessage
-  def self.each_row(opts = {}, &block)
-    # opts:
-    #   :limit => [max rows to iterate over]
-    #   :status => ["READY"] - type of rows to iterate over
-    limit = opts[:limit] || 50
-    status = opts[:status] || (raise ParameterMissing.new)
-    # lock rows that we are going to work on
-    
-    # grab ids of all locked rows
-    msg_ids = ActiveRecord::Base.connection.exec_query("select id from raw_messages limit #{limit}")
-       # TODO Make sql pull only code academy raw_messages that haven't or aren't being processed
-    # grab first locked row
-    # pass row to iterator block
-    # ensure we change status on all locked rows
+  def self.create_from_json(raw_json_msg)
+    message = JSON.parse(raw_json_msg)
+    retval = new_with_log(message, RawMessageLog.new_from_redis)
+    retval.save
+    retval
   end
+
+  # create a new record with associated log_entry
+  def self.new_with_log(message, log_entry)
+    record = new(message)
+    record.raw_message_logs << log_entry
+    record
+  end
+
+  def self.find_new_page_visits(limit = 100)
+    self
+      .select("#{table_name}.*")
+      .joins(:raw_message_logs)
+      .where(:verb => Verbs::VIEWED)
+      .where(["#{RawMessageLog.table_name}.action = ?", RawMessageLog::Actions::FROM_REDIS])
+      .where(["#{RawMessageLog.table_name}.action <> ?", RawMessageLog::Actions::TO_PAGE_VISITS])
+      .limit(limit)
+  end
+
 end

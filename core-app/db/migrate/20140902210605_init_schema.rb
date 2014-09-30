@@ -17,15 +17,6 @@ class InitSchema < ActiveRecord::Migration
       t.timestamps
     end
     
-    create_table "janitor_jobs", :force => true do |t|
-      t.string   "job_status"   # what are the status of the rows "IN PROGRESS" "FINISHED"
-      t.string   "janitor_type" # what extractor is it?
-      t.string   "job_id"       # what specific extractor 
-      t.string   "table_name"
-      t.integer  "table_id"
-      t.timestamps
-    end
-
     #"user id X viewed this page http://xyz (display "Understanding Fractions") at this time"
     # [user x] [viewed] [site y] [page z] on [date abc]"
     # user x = subject, verb = viewed, object = site y, object_detail = page z
@@ -54,9 +45,19 @@ class InitSchema < ActiveRecord::Migration
       t.timestamps
     end
 
+    create_table "raw_message_logs", :force => true do |t|
+      t.string "action"
+      t.belongs_to :raw_message
+      t.timestamps
+    end
+
     create_table "sites", :force => true do |t|
-      t.string   "url",         :null => false, :limit => 4096
-      t.string   "display_name"
+      t.string   "url",             :null => false, :limit => 4096
+      t.string   "display_name",    :null => false
+      t.uuid     "site_uuid",       :null => false
+      t.string   "url",             :null => false, :limit => 4096
+      t.string   "logo_url_small",  :limit => 4096
+      t.string   "logo_url_large",  :limit => 4096
     end
 
     add_index :sites, :url, :unique => true

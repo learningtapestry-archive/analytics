@@ -40,7 +40,7 @@ module LT
     # root_dir holds application root (where this Rake file is located)
     # model_path holds the folder where our models are stored
     # test_path holds folder where the tests are stored
-    attr_accessor :run_env,:logger, :root_dir, :model_path, :test_path, :seed_path, :lib_path, :db_path, :tmp_path, :message_path
+    attr_accessor :run_env,:logger, :root_dir, :model_path, :test_path, :seed_path, :lib_path, :db_path, :tmp_path, :message_path, :janitor_path
 
     def boot_all(app_root_dir = File::join(File::dirname(__FILE__),'..'))
       LT::setup_environment(app_root_dir)
@@ -69,6 +69,7 @@ module LT
       LT::test_path = File::expand_path(File::join(LT::root_dir, '/test'))
       LT::db_path = File::expand_path(File::join(LT::root_dir, '/db'))      
       LT::seed_path = File::expand_path(File::join(LT::root_dir, '/db/seeds'))
+      LT::janitor_path = File::expand_path(File::join(LT::lib_path,'/janitors'))
       LT::tmp_path = Dir::tmpdir
 
       LT::message_path = File::expand_path(File::join(LT::root_dir, '/log/messages'))
@@ -135,12 +136,25 @@ module LT
 
     # will initialize the logger
     def init_logger
+      # prevent us from re-initializing the logger if it's already created
+      return if self.logger.kind_of?(Logger)
       self.logger = Logger.new(File::join(LT::tmp_path,'lt_application.log'), 'daily')
       self.logger.formatter = Logger::Formatter.new
       self.logger.info("LT::logger initialized")
     end
   end # class << self (LT)
-
+  # postgres specific utilities
+  module PG class << self
+    def begin_transaction
+      ActiveRecord::Base.connection.execute("BEGIN")
+    end
+    def commit_transaction
+      ActiveRecord::Base.connection.execute("COMMIT")
+    end
+    def rollback_transaction
+      ActiveRecord::Base.connection.execute("ROLLBACK")
+    end
+  end; end #PG
   module Seeds
     SEED_FILES = '.seeds.rb'
     class << self

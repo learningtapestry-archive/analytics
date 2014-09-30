@@ -97,16 +97,6 @@ ActiveRecord::Schema.define(version: 20140902210605) do
     t.integer "user_id"
   end
 
-  create_table "janitor_jobs", force: true do |t|
-    t.string   "job_status"
-    t.string   "janitor_type"
-    t.string   "job_id"
-    t.string   "table_name"
-    t.integer  "table_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "page_clicks", force: true do |t|
     t.datetime "date_visited"
     t.string   "url_visited",  limit: 4096
@@ -128,6 +118,13 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   end
 
   add_index "pages", ["url"], name: "index_pages_on_url", unique: true, using: :btree
+
+  create_table "raw_message_logs", force: true do |t|
+    t.string   "action"
+    t.integer  "raw_message_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "raw_messages", force: true do |t|
     t.string   "api_key",                  null: false
@@ -181,8 +178,11 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   end
 
   create_table "sites", force: true do |t|
-    t.string "url",          limit: 4096, null: false
-    t.string "display_name"
+    t.string "url",            limit: 4096, null: false
+    t.string "display_name",                null: false
+    t.uuid   "site_uuid",                   null: false
+    t.string "logo_url_small", limit: 4096
+    t.string "logo_url_large", limit: 4096
   end
 
   add_index "sites", ["url"], name: "index_sites_on_url", unique: true, using: :btree

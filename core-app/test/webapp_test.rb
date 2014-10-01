@@ -53,12 +53,17 @@ class WebAppTest < Minitest::Test
 
   end
 
-
-  def self.before_suite
-    DatabaseCleaner.strategy = :transaction
+  @first_run
+  def before_suite
+    if !@first_run
+      DatabaseCleaner[:active_record].strategy = :transaction
+      DatabaseCleaner[:redis].strategy = :truncation
+    end
+    @first_run = true
   end
-  def setup
 
+  def setup
+    before_suite
     # set database transaction, so we can revert seeds
     DatabaseCleaner.start
     LT::Seeds::seed!

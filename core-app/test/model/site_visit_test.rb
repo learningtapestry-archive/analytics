@@ -5,6 +5,7 @@ require 'debugger'
 
 class SiteVisitModelTest < Minitest::Test
   def setup
+    before_suite
     # set database transaction, so we can revert seeds
     DatabaseCleaner.start
     LT::Seeds::seed!
@@ -67,9 +68,15 @@ class SiteVisitModelTest < Minitest::Test
     assert_equal 0, page_visits_expected.size
   end
 
-  def self.before_suite
-    DatabaseCleaner.strategy = :transaction
+  @first_run
+  def before_suite
+    if !@first_run
+      DatabaseCleaner[:active_record].strategy = :transaction
+      DatabaseCleaner[:redis].strategy = :truncation
+    end
+    @first_run = true
   end
+
   def teardown
     DatabaseCleaner.clean # cleanup of the database
   end

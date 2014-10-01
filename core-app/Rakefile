@@ -78,12 +78,22 @@ namespace :lt do
   end # namespace :webapp
 
   namespace :janitors do
-    desc "Run Redis to Postgres extractor"
-    task :redis_postgres_extract do
-
-      LT::boot_all
+    desc "Process full workload from Redis to data tables"
+    task :process_redis_messages => [:redis_to_raw_messages, :raw_messages_to_page_visits] do
+      LT::logger.info("process_redis_analytics completed")
+    end
+    
+    desc "Convert Redis queue to raw_messages table"
+    task :redis_to_raw_messages do
+      Rake::Task[:'lt:boot'].invoke
       require './lib/janitors/redis_postgres_extract.rb'
-      LT::Janitors::RedisPostgresExtract.extract
+      LT::Janitors::RedisPostgresExtract.redis_to_raw_messages
+    end
+    desc "Convert raw_messages to page_views"
+    task :raw_messages_to_page_visits do
+      Rake::Task[:'lt:boot'].invoke
+      require './lib/janitors/redis_postgres_extract.rb'
+      LT::Janitors::RawMessagesExtract.raw_messages_to_page_visits
     end
   end # namespace :janitors
 

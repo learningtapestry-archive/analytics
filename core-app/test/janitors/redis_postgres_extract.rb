@@ -8,15 +8,22 @@ require File::join(LT::lib_path, 'util', 'session_manager.rb')
 require File::join(LT::lib_path, 'janitors', 'redis_postgres_extract.rb')
 
 class RedisPostgresSitesMoverTest < Minitest::Test
-  def self.before_suite
-    DatabaseCleaner.strategy = :transaction
+  @first_run
+  def before_suite
+    if !@first_run
+      DatabaseCleaner[:active_record].strategy = :transaction
+      DatabaseCleaner[:redis].strategy = :truncation
+    end
+    @first_run = true
   end
+
 
   def teardown
     DatabaseCleaner.clean # cleanup of the database
   end
 
   def setup
+    before_suite
     # set database transaction, so we can revert seeds
     DatabaseCleaner.start
     LT::Seeds::seed!

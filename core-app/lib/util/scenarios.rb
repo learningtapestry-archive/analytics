@@ -1,58 +1,86 @@
 module LT
   module Scenarios
+    module Teachers class << self
+      def jane_doe_data
+        {
+          :username=>"janedoe@bar.com",
+          :password=>"pass",
+          :first_name=>"Jane",
+          :last_name=>"Doe",
+          :email=> "janedoe@bar.com",
+          :staff_member=>{
+            :staff_member_type=>'Teacher'
+          }
+        }
+      end
+    end; end # Teachers
+    module Sites class << self
+      def khanacademy_data
+        {:display_name=>"Khan Academy",
+        :url=>'http://www.khanacademy.org',
+        site_uuid: "dd584c3e-47ee-11e4-8939-164230d1df67"
+        }
+      end
+      def codeacademy_data
+        {:display_name=>"Code Academy",
+        :url=>'http://www.codeacademy.com',
+        site_uuid: "bc921bb1-c7ed-421a-8e8f-e3ece2a57e53"
+        }
+      end
+    end; end #Sites
+    module Pages class << self
+      def khanacademy_data
+        [{:display_name=>"Converting Decimals to Fractions 2 (ex 1)",
+        :url=>'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-decimals-to-fractions-2-ex-1',
+        # this field is not part of the model - used to help seed below
+        :site_url=>'http://www.khanacademy.org'},
+        {:display_name=>"Converting a fraction to a repeating decimal",
+        :url=>'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-a-fraction-to-a-repeating-decimal',
+        :site_url=>'http://www.khanacademy.org'}]
+      end
+      def codeacademy_data
+        [{:display_name=>"Access Array By Index",
+        :url=>'http://www.codecademy.com/courses/ruby-beginner-en-F3loB/0/2?curriculum_id=5059f8619189a5000201fbcb',
+        :site_url=>'http://www.codeacademy.com'}]
+      end
+    end; end # Pages
     # create a user in a section
     module Students class << self
+      def joe_smith_data
+        {
+        :username=>"joesmith@foo.com",
+        :password=>"pass",
+        :first_name=>"Joe",
+        :last_name=>"Smith",
+        :email=> "joesmith@foo.com",
+        :student=>{}
+        }
+      end
+      def bob_newhart_data
+        {
+        :username=>"bob@foo.com",
+        :password=>"pass2",
+        :first_name=>"Bob",
+        :last_name=>"Newhart",
+        :email=> "bobnewhard@foo.com",
+        :student=>{}
+        }
+      end
       def create_joe_smith_scenario
         scenario = {
-          :student=>{
-            :username=>"joesmith@foo.com",
-            :password=>"pass",
-            :first_name=>"Joe",
-            :last_name=>"Smith",
-            :email=> "joesmith@foo.com",
-            :student=>{}
-          },
-          :student2=>{
-            :username=>"bob@foo.com",
-            :password=>"pass2",
-            :first_name=>"Bob",
-            :last_name=>"Newhart",
-            :email=> "bobnewhard@foo.com",
-            :student=>{}
-          },
+          :student=>joe_smith_data,
+          :student2=>bob_newhart_data,
           :section=>{
             :name=>"CompSci Period 2",
             :section_code=>"Comp Sci Room 2"
           },
-          :teacher=>{
-            :username=>"janedoe@bar.com",
-            :password=>"pass",
-            :first_name=>"Jane",
-            :last_name=>"Doe",
-            :email=> "janedoe@bar.com",
-            :staff_member=>{
-              :staff_member_type=>'Teacher'
-            }
-          },
+          :teacher=>Teachers::jane_doe_data,
           :sites=>[
-            {:display_name=>"Khan Academy",
-            :url=>'http://www.khanacademy.org'},
-            {:display_name=>"Code Academy",
-            :url=>'http://www.codeacademy.com'},
+            Sites::khanacademy_data,
+            Sites::codeacademy_data,
             
           ],
-          :pages=>[
-            {:display_name=>"Converting Decimals to Fractions 2 (ex 1)",
-            :url=>'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-decimals-to-fractions-2-ex-1',
-            # this field is not part of the model - used to help seed below
-            :site_url=>'http://www.khanacademy.org'},
-            {:display_name=>"Converting a fraction to a repeating decimal",
-            :url=>'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-a-fraction-to-a-repeating-decimal',
-            :site_url=>'http://www.khanacademy.org'},
-            {:display_name=>"Access Array By Index",
-            :url=>'http://www.codecademy.com/courses/ruby-beginner-en-F3loB/0/2?curriculum_id=5059f8619189a5000201fbcb',
-            :site_url=>'http://www.codeacademy.com'}
-          ],
+          :pages=>(Pages::khanacademy_data+Pages::codeacademy_data),
           :site_visits=>[{
             # this field is not part of the model - used to help seed below
             :url=>'http://www.khanacademy.org', 
@@ -157,6 +185,95 @@ module LT
         end #[student, student2].each do |student|
         scenario
       end # create_joe_smith_seed
-    end; end
+    end; end #Students
+    module RawMessages class << self
+      def raw_messages_scenario_data
+        scenario = {
+          students: [
+            Students::joe_smith_data,
+            Students::bob_newhart_data
+          ],
+          raw_messages: [
+            {
+            username: Students::joe_smith_data[:username],
+            site_uuid: Sites::khanacademy_data[:site_uuid],
+            verb: "viewed",
+            action:
+              {
+              id: "verbs/viewed",
+              display: {:"en-US" => "viewed"},
+              value: {time: "8M21S"}
+              },
+            captured_at: 8.days.ago.iso8601,
+            api_key: "2866b962-a7be-44f8-9a0c-66502fba7d31",
+            url: Pages::khanacademy_data[0][:url]
+            },
+            {
+            username: Students::joe_smith_data[:username],
+            site_uuid: Sites::khanacademy_data[:site_uuid],
+            verb: "viewed",
+            page_title: Pages::khanacademy_data[0][:display_name],
+            action:
+              {
+              id: "verbs/viewed",
+              display: {:"en-US" => "viewed"},
+              value: {time: "12M1S"}
+              },
+            captured_at: 2.days.ago.iso8601,
+            api_key: "2866b962-a7be-44f8-9a0c-66502fba7d31",
+            url: Pages::khanacademy_data[0][:url]
+            },
+            {
+            username: Students::joe_smith_data[:username],
+            site_uuid: Sites::khanacademy_data[:site_uuid],
+            verb: "viewed",
+            action:
+              {
+              id: "verbs/viewed",
+              display: {:"en-US" => "viewed"}
+              # note - we don't provide value/time key for this record
+              },
+            captured_at: 1.day.ago.iso8601,
+            api_key: "2866b962-a7be-44f8-9a0c-66502fba7d31",
+            url: Pages::khanacademy_data[1][:url]
+            },
+            {
+            username: Students::bob_newhart_data[:username],
+            site_uuid: Sites::khanacademy_data[:site_uuid],
+            verb: "viewed",
+            action:
+              {
+              id: "verbs/viewed",
+              display: {:"en-US" => "viewed"},
+              value: {time: "2M1S"}
+              },
+            captured_at: 2.days.ago.iso8601,
+            api_key: "2866b962-a7be-44f8-9a0c-66502fba7d31",
+            url: Pages::khanacademy_data[0][:url]
+            },
+          ]
+        }
+        scenario
+      end #raw_messages_scenario_data
+      def create_raw_message_redis_to_pg_scenario
+        scenario = raw_messages_scenario_data
+        # this holds username=>id associations
+        usernames_ids = {}
+        scenario[:students].each do |s|
+          user = User.create_user(s)[:user]
+          usernames_ids[user.username] = user.id
+        end
+
+        scenario[:raw_messages].each do |raw_message|
+          # delete username and swap in the user_id
+          raw_message[:user_id]=usernames_ids[raw_message.delete(:username)]
+          raise StandardError if raw_message[:user_id].nil?
+          json_message = raw_message.to_json
+          LT::RedisServer::raw_message_push(json_message)
+        end
+        scenario
+      end
+    end; end # RawMessages
   end # Scenarios module
 end # LT module
+

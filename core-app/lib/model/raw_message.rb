@@ -13,13 +13,15 @@ class RawMessage < ActiveRecord::Base
 
   # create a new record with associated log_entry
   def self.new_with_log(message, log_entry)
+    # TODO SECURITY verify that api_key and user_id in raw_message
+    #   are associated with a record in api_key table
+    #   We may want an option to skip validation of user_id/api_key
     record = new(message)
     record.raw_message_logs << log_entry
     record
   end
 
   def self.find_new_page_visits(limit = 100)
-    # TODO verify that api_key and user_id are associated in api_key table
     self
       .select("#{table_name}.*")
       .joins(:raw_message_logs)

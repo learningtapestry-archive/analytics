@@ -212,6 +212,7 @@ module LT
             username: Students::joe_smith_data[:username],
             site_uuid: Sites::khanacademy_data[:site_uuid],
             verb: "viewed",
+            page_title: Pages::khanacademy_data[0][:display_name],
             action:
               {
               id: "verbs/viewed",
@@ -229,8 +230,8 @@ module LT
             action:
               {
               id: "verbs/viewed",
-              display: {:"en-US" => "viewed"},
-              value: {time: "22M4S"}
+              display: {:"en-US" => "viewed"}
+              # note - we don't provide value/time key for this record
               },
             captured_at: 1.day.ago.iso8601,
             api_key: "2866b962-a7be-44f8-9a0c-66502fba7d31",

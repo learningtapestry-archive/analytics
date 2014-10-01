@@ -180,7 +180,7 @@ ActiveRecord::Schema.define(version: 20140902210605) do
 
   create_table "sites", force: true do |t|
     t.string "url",            limit: 4096, null: false
-    t.string "display_name",                null: false
+    t.string "display_name"
     t.uuid   "site_uuid",                   null: false
     t.string "logo_url_small", limit: 4096
     t.string "logo_url_large", limit: 4096

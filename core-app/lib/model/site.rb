@@ -1,3 +1,5 @@
+require 'uri'
+
 class Site < ActiveRecord::Base
   has_many :site_visits
   has_many :pages
@@ -7,9 +9,17 @@ class Site < ActiveRecord::Base
 
   after_initialize :set_defaults
 
+  def self.url_to_canonical(url)
+    URI::parse(url).host
+  end
+
   # legacy synonym
   def site_name
     self.display_name
+  end
+
+  def display_name
+    super || url
   end
 
   def set_defaults

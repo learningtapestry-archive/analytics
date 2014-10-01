@@ -18,4 +18,20 @@ class PageVisit < ActiveRecord::Base
   def time_active_words
     distance_of_time_in_words(self.time_active) if self.time_active
   end
+
+  # creates a new page_visit
+  # will walk back to pages and sites to create all necessary underlying tables
+  # data is a hash of attributes
+  def self.create_full(data)
+    page_data = data.delete(:page)
+    pv = self.new(data)
+    # if we aren't given a page_id, we need to find/create one
+    if data[:page_id].nil? && !page_data.nil? then
+      page = Page.find_or_create_by_url(page_data)
+    end
+    pv.page = page
+    pv.save!
+    pv
+  end
+
 end

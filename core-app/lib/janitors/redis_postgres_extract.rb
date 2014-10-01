@@ -2,15 +2,38 @@
 module LT
 	module Janitors
 		module RawMessagesExtract class << self
+			# convert raw_messages table records to page_visits
+			#  finds all records in raw_messages that haven't been processed for page_visits
+			#  translates as appropriate into page_visit records
+			#  marks these records as having been processed
+			MAX_RAW_MESSAGE_TRANSACTION_LENGTH = 200
 			def raw_messages_to_page_visits
-
-				RawMessage.find_new_page_visits.each do |raw_page_visit|
-					#raw_page_visit
-				end
-			end
+				num_transactions = 0
+				RawMessage.transaction do
+					RawMessage.find_new_page_visits.each do |raw_page_visit|
+						pv_data = {}
+						if raw_page_visit["action"] && raw_page_visit["action"]["value"] then
+						  time_active = raw_page_visit["action"]["value"]["time"]
+						  pv_data[:time_active] = ChronicDuration.parse(time_active) if time_active.kind_of?(String)
+						end
+						pv_data[:date_visited] = raw_page_visit["captured_at"]
+						pv_data[:user_id] = raw_page_visit["user_id"]
+						pv_data[:page] = {display_name: raw_page_visit["page_title"]}
+						pv_data[:page][:url] = raw_page_visit["url"]
+						PageVisit.create_full(pv_data)
+						# tag RawMessage record as having been processed for page_visit
+						raw_page_visit.raw_message_logs << RawMessageLog.new_to_page_visits
+						num_transactions += 1
+						break if num_transactions > MAX_RAW_MESSAGE_TRANSACTION_LENGTH
+					end 
+				end # RawMessage.transaction
+				{number_of_records: num_transactions}
+			end # raw_messages_to_page_visits
 		end; end # RawMessagesExtract
+
 		module RedisPostgresExtract class << self
 			MAX_REDIS_RAW_MESSAGE_QUEUE = 200
+			# pulls raw_messages from redis and saves them into raw_messages table
 			def redis_to_raw_messages
 				total_msg_count = 0
 				RawMessage.transaction do
@@ -20,6 +43,7 @@ module LT
 						total_msg_count +=1
 					end # while..
 				end # transaction
+				{number_of_records: total_msg_count}
 			end # redis_to_raw_messages
 
 			def extract

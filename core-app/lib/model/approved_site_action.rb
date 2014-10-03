@@ -1,6 +1,7 @@
 class ApprovedSiteAction < ActiveRecord::Base
   belongs_to :approved_site
 
+  # TODO:  Factor out once Chrome extension uses new methods
   def self.get_actions_with_sites
     connection = ActiveRecord::Base.connection
 

@@ -1,4 +1,6 @@
 require 'sinatra/base'
+#require 'sinatra/contrib'
+require 'sinatra/cookies'
 require 'json'
 require File::join(LT::lib_path, 'util', 'session_manager.rb')
 require File::join(LT::lib_path, 'util', 'redis_server.rb')
@@ -10,7 +12,7 @@ module LT
     end
   end # WebAppHelper
   class WebApp < Sinatra::Base
-
+    helpers Sinatra::Cookies
     enable :sessions
 
     # TODO this is ugly - not sure how to get non-html exceptions raised in testing otherwise
@@ -35,9 +37,8 @@ module LT
 
     get "/" do
       set_title("Knowledge for Learning")
-      erb :home, :locals => {:page_title => "Welcome"}, :layout => false
-      # This is the only page that does not use the default layout, it is the gateway to the kingdom,
-      # once entered, enjoy the standard site template chock full of information.
+      erb :home, locals: {page_title: "Welcome", extension_login: (params[:src] == "ext")}, layout: false
+      # This is the only page that does not use the default layout
     end
 
     post "/" do
@@ -45,9 +46,15 @@ module LT
       user_retval = User.get_validated_user(params[:username], params[:password])
 
       if user_retval[:exception] then
-        erb :home, :locals => {:page_title => "Welcome", :exception => user[:exception]}, :layout => false 
+        erb :home, locals: {page_title: "Welcome", exception: user[:exception]}, layout: false 
       else
         session[:user_id] = user_retval[:user].id
+
+        # If the source is the extension, then set a cookie for the extension long-lived session  
+        if params[:src] == "ext" then
+          response.set_cookie('api_key', httponly: true, value: ApiKey.create_api_key(user_retval[:user].id).to_s + "." + user_retval[:user].id.to_s)
+        end
+
         redirect '/dashboard'
       end
     end
@@ -114,9 +121,16 @@ module LT
     end # '/api/v1/signup'
 
     get '/api/v1/approved-sites' do
+      # TODO:  Note this will be replaced with below once new extension is ready
       content_type :json
       ApprovedSiteAction.get_actions_with_sites.to_json
     end # '/api/v1/approved_sites'
+
+    get '/api/v1/approved-sites-new' do
+      # TODO:  Note this will replace above once new extension is ready
+      content_type :json
+      ApprovedSite.get_all_with_actions.to_json
+    end # '/api/v1/approved_sites
 
     post '/api/v1/assert' do
       begin

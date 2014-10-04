@@ -52,7 +52,7 @@ module LT
 
         # If the source is the extension, then set a cookie for the extension long-lived session  
         if params[:src] == "ext" then
-          response.set_cookie('api_key', httponly: true, value: ApiKey.create_api_key(user_retval[:user].id).to_s + "." + user_retval[:user].id.to_s)
+          response.set_cookie('api_key', httponly: true, value: ApiKey.create_api_key(user_retval[:user].id).to_s + "." + user_retval[:user].id.to_s + "." + user_retval[:user].first_name)
         end
 
         redirect '/dashboard'
@@ -64,6 +64,14 @@ module LT
       set_title("Your Dashboard")
       user = User.find(session[:user_id])
       erb :dashboard, :locals => {:page_title => "Dashboard", :user => user}
+    end
+
+    get "/welcome-install" do
+      erb :welcome, locals: {page_title: "Welcome!"}, layout: false
+    end
+
+    get "/privacy" do
+      erb :privacy, locals: {page_title: "Privacy"}, layout: false
     end
 
     ### END Dashboard

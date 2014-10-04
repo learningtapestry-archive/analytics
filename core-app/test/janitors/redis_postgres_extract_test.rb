@@ -88,7 +88,7 @@ class RedisPostgresExtractTest < Minitest::Test
   @first_run
   def before_suite
     if !@first_run
-      DatabaseCleaner[:active_record].strategy = :truncation
+      DatabaseCleaner[:active_record].strategy = :transaction
       DatabaseCleaner[:redis].strategy = :truncation
     end
     @first_run = true
@@ -109,17 +109,31 @@ class RedisPostgresExtractTest < Minitest::Test
     assert_equal 0, count
     count = LT::RedisServer::raw_message_queue_length
     assert_equal 0, count
+    # test raw message queue
     LT::RedisServer::raw_message_push("foobidy")
     count = LT::RedisServer::raw_message_queue_length
     assert_equal 1, count
+    # test api_key queue
+    key = "foo"
+    value = "bar"
+    LT::RedisServer::api_key_set(key, value)
+    ret_value = LT::RedisServer::api_key_get(key)
+    assert_equal value, ret_value
   end
   def test_redis_queues_are_empty_on_start
     count = LT::RedisServer::api_key_hashlist_length
     assert_equal 0, count
     count = LT::RedisServer::raw_message_queue_length
     assert_equal 0, count
+    # test raw message queue
     LT::RedisServer::raw_message_push("foobidy")
     count = LT::RedisServer::raw_message_queue_length
     assert_equal 1, count
+    # test api_key queue
+    key = "foo"
+    value = "bar"
+    LT::RedisServer::api_key_set(key, value)
+    ret_value = LT::RedisServer::api_key_get(key)
+    assert_equal value, ret_value
   end
 end

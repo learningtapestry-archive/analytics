@@ -19,8 +19,36 @@ class PageVisit < ActiveRecord::Base
     distance_of_time_in_words(self.time_active) if self.time_active
   end
 
+  # Create a page visit from a raw_message entry
+  # raw_message: AR RawMessage instance
+  # This method doesn't make sure that the raw_message hasn't already been processed as a page_visit
+  # This method does validate the raw message verb
+  def self.create_from_raw_message(raw_message)
+    retval = {}
+    if (raw_message[:verb] != RawMessage::Verbs::VIEWED) then
+      retval[:exception] = ActiveRecord::StatementInvalid
+      retval[:error_msg] = "RawMessage verb is not suitable. Was: #{raw_message[:verb]} Expected: #{RawMessage::Verbs::VIEWED}"
+      return retval
+    end
+    pv_data = {}
+    if raw_message["action"] && raw_message["action"]["value"] then
+      time_active = raw_message["action"]["value"]["time"]
+      pv_data[:time_active] = ChronicDuration.parse(time_active) if time_active.kind_of?(String)
+    end
+    pv_data[:date_visited] = raw_message["captured_at"]
+    pv_data[:user_id] = raw_message["user_id"]
+    pv_data[:page] = {
+      display_name: raw_message["page_title"],
+      url: raw_message["url"]
+    }
+    retval[:page_visit] = PageVisit.create_full(pv_data)[:page_visit]
+    # tag RawMessage record as having been processed for page_visit
+    raw_message.raw_message_logs << RawMessageLog.new_to_page_visits
+    retval
+  end
+
   # creates a new page_visit
-  # will walk back to pages and sites to create all necessary underlying tables
+  # will create underlying pages table entries as needed
   # data is a hash of attributes
   def self.create_full(data)
     page_data = data.delete(:page)
@@ -31,7 +59,7 @@ class PageVisit < ActiveRecord::Base
     end
     pv.page = page
     pv.save!
-    pv
+    {page_visit: pv}
   end
 
 end

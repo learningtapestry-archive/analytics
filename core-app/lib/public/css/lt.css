@@ -1,8 +1,17 @@
 /*! Learntaculous Custom CSS */
 
-section.footer {
-  position: absolute; 
-  bottom: 0;
-  margin-left: 15px;
-  margin-bottom: 5px;
+footer {
+  position: relative;
+  padding: 15px;
+  background: #FFF;
+  color: #000;
+}
+
+ul#bottom-nav {
+  list-style-type: none;
+  display: inline;
+}
+ul#bottom-nav li {
+  display: inline;
+  padding-right: 30px;
 }

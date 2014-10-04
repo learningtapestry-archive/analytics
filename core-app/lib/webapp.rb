@@ -37,7 +37,7 @@ module LT
 
     get "/" do
       set_title("Knowledge for Learning")
-      erb :home, locals: {page_title: "Welcome", extension_login: (params[:src] == "ext")}, layout: false
+      erb :home, locals: { page_title: "Welcome", extension_login: (params[:src] == "ext") }, layout: :layout_noauth
       # This is the only page that does not use the default layout
     end
 
@@ -46,7 +46,7 @@ module LT
       user_retval = User.get_validated_user(params[:username], params[:password])
 
       if user_retval[:exception] then
-        erb :home, locals: {page_title: "Welcome", exception: user[:exception]}, layout: false 
+        erb :home, locals: {page_title: "Welcome", exception: user[:exception]}, layout: :layout_noauth 
       else
         session[:user_id] = user_retval[:user].id
 
@@ -63,15 +63,15 @@ module LT
       if !session || !session[:user_id] then redirect '/' end
       set_title("Your Dashboard")
       user = User.find(session[:user_id])
-      erb :dashboard, :locals => {:page_title => "Dashboard", :user => user}
+      erb :dashboard, locals: { page_title: "Dashboard", user: user }
     end
 
-    get "/welcome-install" do
-      erb :welcome, locals: {page_title: "Welcome!"}, layout: false
+    get "/welcome" do
+      erb :welcome, locals: { page_title: "Welcome!" }, layout: :layout_noauth
     end
 
     get "/privacy" do
-      erb :privacy, locals: {page_title: "Privacy"}, layout: false
+      erb :privacy, locals: { page_title: "Privacy" }, layout: :layout_noauth
     end
 
     ### END Dashboard
@@ -105,7 +105,7 @@ module LT
     get '/api/v1/logout' do
       content_type :json
       status 501
-      { :status => "logged out not yet implemented" }.to_json
+      { status: "logged out not yet implemented" }.to_json
     end # '/api/v1/logout'
 
     post '/api/v1/signup' do
@@ -115,7 +115,7 @@ module LT
         if user
           status 200
           # TODO: Return back API key as well
-          { :status => "user created" }.to_json
+          { status: "user created" }.to_json
         else
           status 500
           LT::logger.error "User not returned in /api/v1/signup"

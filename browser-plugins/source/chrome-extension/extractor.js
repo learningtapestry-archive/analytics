@@ -11,8 +11,6 @@ var _callback = function(fn, ctx) {
     };
 };
 
-var _site_uuid = '';
-
 function htmlspecialchars(str) {
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 }
@@ -23,7 +21,9 @@ function htmlspecialchars(str) {
   * The main object of the script; handles all events and data extraction.
   */
 var Extractor = {
-    time: null,    
+    site_uuid: null,
+    time: null,
+    viewing: null,    
     H: 3600,
     M: 60,
     
@@ -34,18 +34,11 @@ var Extractor = {
       * when page is closedm listens for clicks on all links of the page, and 
       * if the page is a Google Finance Quote, extracts quote data.
       */
-    init: function(_actionType) {
+    init: function(i, a) {
+      this.site_uuid = i;
       var o;
-
-      actionArray = JSON.parse(decodeURIComponent(_actionType));
-
-      for (index=0; index < actionArray.length; index++) {
-        if (_site_uuid == '') {
-          _site_uuid = actionArray[index]['site_uuid'];
-        }
-
-        switch (actionArray[index]['action_type']) {
-          case "CLICK":
+      for (var i=0; i<a.length; i++) {
+        if(a[i].action_type === 'CLICK') {
             Array.prototype.forEach.call(document.getElementsByTagName('a'), _callback(this.processAnchor, this));
             
             /*
@@ -64,20 +57,19 @@ var Extractor = {
                     
                     for(var i=0; i<ns.length; ++i) {
                         nn = ns[i];
+                        
+                        if(!nn) {
+                            continue;
+                        }
+                        
                         if(nn.nodeType === 1 && nn.tagName.toLowerCase() === 'a') {
                             this.processAnchor(nn);
                         }
-                        else {
-                          // HACK:  Figure out why exception is being thrown on extension initial load
-                          try {
+                        else if(nn.getElementsByTagName && typeof nn.getElementsByTagName === 'function') {
                             nn = nn.getElementsByTagName('a');
                             for(var j=0; j<nn.length; ++j) {
                                 this.processAnchor(nn[j]);
                             }
-                          } catch(err) {
-                            // # TODO: Fix this
-                            console.log("Fix this: Extractor.js error: " + err.toString());
-                          }
                         }
                     }
                 }, this));
@@ -89,14 +81,29 @@ var Extractor = {
                 attributes: true,
                 characterData: false
             });
-            break;
-          case "PAGEVIEW":
+        }
+        else if(a[i].action_type === 'PAGEVIEW') {
             this.time = +Date.now();
+            this.viewing = true;
+            
+            chrome.runtime.onMessage.addListener(_callback(function(m) {
+                if(m.e === 'start_page_view') {
+                    if(this.viewing) {
+                        return;
+                    }
+                    
+                    this.time = +Date.now();
+                    this.viewing = true;
+                }
+                else if(m.e === 'stop_page_view') {
+                    this.pageView();
+                }
+            }, this));
+            
             window.addEventListener('unload', _callback(this.pageView, this));
-            break;
-          case "EXTRACT":
+        }
+        else if(a[i].action_type === 'EXTRACT') {
             this.extractEvent('body');
-            break;
         }
       }
     },
@@ -124,6 +131,12 @@ var Extractor = {
       * ExtractorManager for event 'pageview'.
       */
     pageView: function() {
+        if(!this.viewing) {
+            return;
+        }
+        
+        this.viewing = null;
+        
         var s = '', t;
         
         this.time = Math.floor((+Date.now() - this.time)/1000);
@@ -143,7 +156,7 @@ var Extractor = {
         chrome.runtime.sendMessage({
             t: 'page_view', 
             d: {
-                site_uuid: _site_uuid,
+                site_uuid: this.site_uuid,
                 t: s, 
                 id: document.location.href,
                 page_title: document.title
@@ -161,7 +174,7 @@ var Extractor = {
         chrome.runtime.sendMessage({
             t: 'click_event', 
             d: {
-                site_uuid: _site_uuid,
+                site_uuid: this.site_uuid,
                 u: href, 
                 id: document.location.href
             }
@@ -172,7 +185,7 @@ var Extractor = {
         chrome.runtime.sendMessage({
             t: 'extract_event', 
             d: {
-                site_uuid: _site_uuid,
+                site_uuid: this.site_uuid,
                 id: document.location.href,
                 html: htmlspecialchars(document.querySelector(cssSelector).innerHTML)
             }
@@ -180,4 +193,10 @@ var Extractor = {
     }
 };
 
-Extractor.init(_actionType);
+chrome.runtime.sendMessage({
+    t: 'extractor_init', 
+    d: document.location.href
+}, function(r) {
+    console.log(r);
+    Extractor.init(r.i, r.a);
+});

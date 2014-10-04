@@ -5,55 +5,29 @@
     </head>
     <body>
         <div class="base">
-            <div id="login" class="options">
-                <div class="fields"> 
-                    <div>
-                        <span>Username: </span>
-                        <input id="username" type="text" placeholder="Username" spellcheck="false" />
-                    </div>
-                    <div>
-                        <span>Password: </span>
-                        <input id="password" type="password" placeholder="Password" />
-                    </div>
-                </div>
-                <div class="buttons">
-                    <div id="signin" class="button">
-                        <span class="btnText">Sign In!</span>
-                    </div>
-                    <div id="signup" class="button new_acc">
-                        <span class="btnText">Create an account</span>
-                    </div>
+            <div id="heading" class="center">
+                Learntaculous
+            </div>
+            <div id="login">
+                <div id="login_link" class="field center link">
+                    Login
                 </div>
             </div>
-            <div id="create" class="options">
-                <div class="fields">
-                    <div>
-                        <span>Username: </span>
-                        <input id="cr_username" type="text" placeholder="Username" spellcheck="false" />
-                    </div>
-                    <div>
-                        <span>Password: </span>
-                        <input id="cr_password" type="password" placeholder="Password" />
-                    </div>
-                    <div>
-                        <span>First Name: </span>
-                        <input id="cr_firstname" type="text" placeholder="First Name" spellcheck="false" />
-                    </div>
-                    <div>
-                        <span>Last Name: </span>
-                        <input id="cr_lastname" type="text" placeholder="Last Name" spellcheck="false"/>
-                    </div>
+            <div id="logout">
+                <div class="field center">
+                    <span class="btnText">Logged In:&nbsp;&nbsp;</span>
+                    <span id="username"></span>&nbsp;&nbsp;
+                    <span>[</span>
+                    <span id="logout_link" class="link">Logout</span>
+                    <span>]</span>
                 </div>
-                <div class="buttons">
-                    <div id="create_acc" class="button">
-                        <span class="btnText">Create my account</span>
-                    </div>
-                    <div id="show_login" class="link">
-                        Try logging in?
-                    </div>
+                <div id="sites_link" class="field center link">
+                    Approved Sites List
                 </div>
             </div>
-            <div id="message"></div>
+            <div id="info_link" class="field center link">
+                More Information and Privacy Policy
+            </div>
         </div>
         <script src="popup.js"></script>
     </body>

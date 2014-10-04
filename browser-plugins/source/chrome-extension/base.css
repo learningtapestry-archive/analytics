@@ -1,0 +1,55 @@
+.base {
+    width: 500px;
+    padding: 20px;
+    border: 2px solid #999999;
+    border-radius: 10px;
+    background: #f3f3f3;
+    position: absolute;
+    left: 50%;
+    top: 25%;
+    -webkit-box-shadow: 2px 3px 4px 0px #303030;
+    -webkit-transform: translate(-50%, -25%);
+    -webkit-user-select: none;
+}
+
+.heading {
+    font-family: "Open Sans";
+    font-size: 28px;
+    font-weight: 900;
+    margin-bottom: 25px;
+}
+
+.subheading {
+    font-family: "Open Sans";
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.main {
+    margin-bottom: 20px;
+}
+
+.field {
+    height: 35px;
+    font-family: "Open Sans";
+    font-size: 18px;
+    font-weight: 600;
+    color: #222222;
+}
+
+.center {
+    text-align: center;
+}
+
+.left {
+    padding-left: 20px;
+}
+
+.link {
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    color: #003399;
+    text-decoration: underline;
+}

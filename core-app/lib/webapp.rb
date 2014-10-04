@@ -52,7 +52,8 @@ module LT
 
         # If the source is the extension, then set a cookie for the extension long-lived session  
         if params[:src] == "ext" then
-          response.set_cookie('api_key', httponly: true, value: ApiKey.create_api_key(user_retval[:user].id).to_s + "." + user_retval[:user].id.to_s + "." + user_retval[:user].first_name)
+          user = user_retval[:user]
+          response.set_cookie('api_key', httponly: true, value: "#{ApiKey.create_api_key(user.id)}.#{user.id}.#{user.first_name}")
         end
 
         redirect '/dashboard'
@@ -78,64 +79,7 @@ module LT
 
     ### START API
 
-    post '/api/v1/login' do
-      content_type :json
-      begin
-        begin
-          parsed_json = JSON.parse(request.body.read)
-          api_key = LT::SessionManager.validate_user(parsed_json["username"], parsed_json["password"])
-          status 200
-          { :status => "login success", :api_key => api_key }.to_json
-        rescue Exception => e
-          if e.is_a?(LT::UserNotFound) then
-            status 401 # = HTTP unauthorized
-            { :status => 'username invalid' }.to_json          
-          elsif e.is_a?(LT::PasswordInvalid) then
-            status 401 # = HTTP unauthorized
-            { :status => 'password invalid' }.to_json
-          elsif
-            status 500
-            LT::logger.error "Unknown error in /api/v1/login: #{e.message}"
-            API_ERROR_MESSAGE
-          end
-        end
-      end
-    end # '/api/v1/login'
-
-    get '/api/v1/logout' do
-      content_type :json
-      status 501
-      { status: "logged out not yet implemented" }.to_json
-    end # '/api/v1/logout'
-
-    post '/api/v1/signup' do
-      content_type :json
-      begin
-        user = User.create_user_from_json(request.body.read)
-        if user
-          status 200
-          # TODO: Return back API key as well
-          { status: "user created" }.to_json
-        else
-          status 500
-          LT::logger.error "User not returned in /api/v1/signup"
-          API_ERROR_MESSAGE
-        end
-      rescue Exception => e
-        status 500
-        LT::logger.error "Unknown error in /api/v1/signup: #{e.message}"
-        API_ERROR_MESSAGE
-      end
-    end # '/api/v1/signup'
-
     get '/api/v1/approved-sites' do
-      # TODO:  Note this will be replaced with below once new extension is ready
-      content_type :json
-      ApprovedSiteAction.get_actions_with_sites.to_json
-    end # '/api/v1/approved_sites'
-
-    get '/api/v1/approved-sites-new' do
-      # TODO:  Note this will replace above once new extension is ready
       content_type :json
       ApprovedSite.get_all_with_actions.to_json
     end # '/api/v1/approved_sites

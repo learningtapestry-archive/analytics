@@ -1,42 +1,18 @@
 class InitSchema < ActiveRecord::Migration
   def change
-    create_table "approved_sites", :force => true do |t|
-      t.string   "site_name",       :null => false
-      t.uuid     "site_uuid",       :null => false
-      t.string   "url",             :null => false, :limit => 4096
-      t.string   "logo_url_small",  :limit => 4096
-      t.string   "logo_url_large",  :limit => 4096
-      t.timestamps
-    end
 
-    create_table "approved_site_actions", :force => true do |t|
-      t.integer  "approved_site_id", :null => false
-      t.string   "action_type",     :null => false # CLICK, PAGEVIEW, EXTRACT 
-      t.string   "url_pattern",     :null => false, :limit => 4096
-      t.string   "css_selector"
-      t.timestamps
-    end
-    
-    #"user id X viewed this page http://xyz (display "Understanding Fractions") at this time"
-    # [user x] [viewed] [site y] [page z] on [date abc]"
-    # user x = subject, verb = viewed, object = site y, object_detail = page z
-    # date abc = occured_at
-    # also store in result: "page display title" and "site display name"
-    create_table "actions", :force => true do |t|
-      t.string "subject"
-      t.string "verb" 
-      t.string "object" 
-      t.string "object_detail"
-      t.json "result"
-        #"display title"
-        #"display site"
-      t.datetime "occurred_at"
+    ### Begin Message Collection Tables
+
+    create_table "api_keys", :force => true do |t|
+      t.integer  "user_id",      :null => false
+      t.string   "key",          :null => false
       t.timestamps
     end
 
     create_table "raw_messages", :force => true do |t|
       t.string   "api_key",          :null => false
-      t.integer  "user_id",          :null => false
+      t.integer  "user_id"
+      t.string   "username"
       t.string   "page_title"
       t.uuid     "site_uuid"
       t.string   "verb"
@@ -61,6 +37,23 @@ class InitSchema < ActiveRecord::Migration
     end
 
     add_index :sites, :url, :unique => true
+
+    create_table "approved_site_actions", :force => true do |t|
+      t.integer  "approved_site_id", :null => false
+      t.string   "action_type",     :null => false # CLICK, PAGEVIEW, EXTRACT 
+      t.string   "url_pattern",     :null => false, :limit => 4096
+      t.string   "css_selector"
+      t.timestamps
+    end
+
+    create_table "approved_sites", :force => true do |t|
+      t.string   "site_name",       :null => false
+      t.uuid     "site_uuid",       :null => false
+      t.string   "url",             :null => false, :limit => 4096
+      t.string   "logo_url_small",  :limit => 4096
+      t.string   "logo_url_large",  :limit => 4096
+      t.timestamps
+    end
 
     create_table "pages", :force => true do |t|
       t.string   "url",         :null => false, :limit => 4096
@@ -91,41 +84,6 @@ class InitSchema < ActiveRecord::Migration
       t.belongs_to :page  # In future, this will belong to page_visits once relationships figured out
     end
 
-    create_table "schools", :force => true do |t|
-      t.string   "state_id"
-      t.string   "nces_id"
-      t.string   "sis_id"
-      t.string   "other_id"
-      t.string   "name",         :null => false
-      t.string   "address"
-      t.string   "city"
-      t.string   "state"
-      t.string   "phone"
-      t.string   "grade_low"
-      t.string   "grade_high"
-      t.timestamps
-    end
-    
-    create_table "course_offerings", :force => true do |t|
-      t.integer  "course_id",    :null => false
-      t.string   "sis_id"
-      t.string   "other_id"
-      t.date     "date_start"
-      t.date     "date_end"
-      t.timestamps
-    end
-    
-    create_table "courses", :force => true do |t|
-      t.string   "course_code"
-      t.string   "sis_id"
-      t.string   "other_id"
-      t.string   "name",         :null => false
-      t.string   "description"
-      t.string   "subject_area"
-      t.boolean  "high_school_requirement"
-      t.timestamps
-    end
-    
     create_table "districts", :force => true do |t|
       t.string   "state_id"
       t.string   "nces_id"
@@ -141,6 +99,41 @@ class InitSchema < ActiveRecord::Migration
       t.timestamps
     end
 
+    create_table "schools", :force => true do |t|
+      t.string   "state_id"
+      t.string   "nces_id"
+      t.string   "sis_id"
+      t.string   "other_id"
+      t.string   "name",         :null => false
+      t.string   "address"
+      t.string   "city"
+      t.string   "state"
+      t.string   "phone"
+      t.string   "grade_low"
+      t.string   "grade_high"
+      t.timestamps
+    end
+    
+    create_table "courses", :force => true do |t|
+      t.string   "course_code"
+      t.string   "sis_id"
+      t.string   "other_id"
+      t.string   "name",         :null => false
+      t.string   "description"
+      t.string   "subject_area"
+      t.boolean  "high_school_requirement"
+      t.timestamps
+    end
+
+    create_table "course_offerings", :force => true do |t|
+      t.integer  "course_id",    :null => false
+      t.string   "sis_id"
+      t.string   "other_id"
+      t.date     "date_start"
+      t.date     "date_end"
+      t.timestamps
+    end
+
     create_table "sections", :force => true do |t|
       t.string   "section_code"
       t.integer  "course_offering_id"
@@ -151,8 +144,7 @@ class InitSchema < ActiveRecord::Migration
     end
 
     create_table "section_users", :force => true do |t|
-      t.string   "user_type" # defines the type of relationship user has to section
-        # e.g.: "teacher" "student" "TA" "auditing"
+      t.string   "user_type" # defines type of relationship user has to section (e.g.: "teacher" "student" "TA" "auditing")
       t.belongs_to :section
       t.belongs_to :user
     end
@@ -176,12 +168,6 @@ class InitSchema < ActiveRecord::Migration
       t.belongs_to :user
     end
 
-    create_table "api_keys", :force => true do |t|
-      t.integer  "user_id",      :null => false
-      t.string   "key",          :null => false
-      t.timestamps
-    end
-
     create_table "students", :force => true do |t|
       t.string   "state_id"
       t.string   "sis_id"
@@ -199,5 +185,6 @@ class InitSchema < ActiveRecord::Migration
       t.belongs_to :user
       t.timestamps
     end 
+
   end #def change
 end # class migration

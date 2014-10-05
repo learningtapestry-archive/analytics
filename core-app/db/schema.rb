@@ -16,17 +16,6 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "actions", force: true do |t|
-    t.string   "subject"
-    t.string   "verb"
-    t.string   "object"
-    t.string   "object_detail"
-    t.json     "result"
-    t.datetime "occurred_at"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "api_keys", force: true do |t|
     t.integer  "user_id",    null: false
     t.string   "key",        null: false
@@ -128,7 +117,8 @@ ActiveRecord::Schema.define(version: 20140902210605) do
 
   create_table "raw_messages", force: true do |t|
     t.string   "api_key",                  null: false
-    t.integer  "user_id",                  null: false
+    t.integer  "user_id"
+    t.string   "username"
     t.string   "page_title"
     t.uuid     "site_uuid"
     t.string   "verb"

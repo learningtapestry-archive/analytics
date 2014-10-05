@@ -1,5 +1,6 @@
 require 'sinatra/base'
 #require 'sinatra/contrib'
+require 'sinatra/reloader'
 require 'sinatra/cookies'
 require 'json'
 require File::join(LT::lib_path, 'util', 'session_manager.rb')
@@ -22,7 +23,14 @@ module LT
       set :dump_errors, false
       set :show_exceptions, false
     end
-
+    if LT::development? then
+      register Sinatra::Reloader
+      # set this to prevent reloading of specific files
+      # dont_reload '/path/to/other/file'
+    end
+    
+    set :public_folder, LT::web_root_path
+    
     include WebAppHelper
 
     API_ERROR_MESSAGE = { :status => "unknown error" }.to_json
@@ -78,6 +86,14 @@ module LT
     ### END Dashboard
 
     ### START API
+    configure do
+      mime_type :javascript, 'application/javascript'
+    end
+    # this is a dynamically rendered js file
+    get '/api/v1/collector.js' do
+      content_type :javascript
+      erb :"collector.js", :layout => false
+    end
 
     get '/api/v1/approved-sites' do
       content_type :json

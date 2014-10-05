@@ -30,4 +30,9 @@ class StaffMember < ActiveRecord::Base
     User.find_by_username(username).staff_member
   end
 
+  def add_to_school(school)
+    self.user.school = school
+    self.user.save
+  end
+
 end

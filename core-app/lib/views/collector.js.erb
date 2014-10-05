@@ -7,14 +7,22 @@
 */
 
 // if someone has already loaded jQuery, make sure their version is still
-// available as default
+// available as default after we load the version we need
 (function(){
   var script = document.createElement('script');
   script.type = "text/javascript";
   script.src = "//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js";
   script.onload = function () {
-      window.ltjq = jQuery.noConflict( true );
+    window.ltjq = jQuery.noConflict( true );
+    window.ltjq( document ).ready(function() {
+      //send message that page was loaded: "click" event
+      //start timer that we are on page
+      //hook document focus/blur events to manage timer
+      //hook document unload event to send timer data: "pageview" event
+    });
   };
   document.getElementsByTagName('head')[0].appendChild(script);
 })();
+
+
 

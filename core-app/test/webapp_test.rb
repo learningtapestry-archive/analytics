@@ -52,6 +52,9 @@ class WebAppTest < Minitest::Test
     #u = User.find_by_username(@joe_smith[:username])
 
   end
+  def test_approved_site_list
+    skip #TODO
+  end
 
   @first_run
   def before_suite

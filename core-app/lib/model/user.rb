@@ -164,7 +164,7 @@ class User < ActiveRecord::Base
     if user.nil?
       return {:error_msg=>"User not found: #{username}", :exception => LT::UserNotFound.new}
     else 
-      if !user.authenticate(password) then
+      if user.password_digest.nil? || !user.authenticate(password) then
         return {:error_msg=>"Password invalid for user: #{username}", :exception => LT::PasswordInvalid.new}
       else
         return {:user=>user}

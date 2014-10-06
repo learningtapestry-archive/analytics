@@ -55,7 +55,7 @@ module LT
       user_retval = User.get_validated_user(params[:username], params[:password])
 
       if user_retval[:exception] then
-        erb :home, locals: {page_title: "Welcome", exception: user[:exception]}, layout: :layout_noauth 
+        erb :home, locals: {page_title: "Welcome", exception: user_retval[:exception], extension_login: (params[:src] == "ext")}, layout: :layout_noauth 
       else
         session[:user_id] = user_retval[:user].id
 

@@ -23,9 +23,21 @@ class WebAppTest < Minitest::Test
     assert_equal "Please Sign In", result
   end
   def test_dashboard
-    skip "TODO:  Will need to be refactored to process a login before viewing dashboard"
     teacher_username = @jane_doe[:username]
+    teacher_password = @jane_doe[:password]
     teacher = User.find_by_username(teacher_username)
+
+    request "/", method: :post, params: { username: teacher_username, password: teacher_password }
+    follow_redirect!
+
+    response_html =  Nokogiri.parse(last_response.body)
+    page_title = response_html.css("title").text
+    assert_equal "Learntaculous - Your Dashboard", page_title
+    
+    teacher_name = response_html.css("div.user-panel > div.info > p:first-child").text
+    assert_equal "Hello, #{teacher.first_name}", teacher_name
+
+=begin
     get "/dashboard"
     assert_equal 200, last_response.status, last_response.body
     html = Nokogiri.parse(last_response.body)
@@ -50,10 +62,20 @@ class WebAppTest < Minitest::Test
       assert student_name_html.size > 5
     end
     #u = User.find_by_username(@joe_smith[:username])
+=end
 
   end
   def test_approved_site_list
-    skip #TODO
+    request "/api/v1/approved-sites"
+    response_json = JSON.parse(last_response.body)
+    khan_found = false ; codeacad_found = false
+    response_json.each do |approved_site|
+      if approved_site["url"] == LT::Scenarios::Sites.khanacademy_data[:url] then khan_found = true end
+      if approved_site["url"] == LT::Scenarios::Sites.codeacademy_data[:url] then codeacad_found = true end
+    end
+
+    assert_equal true, khan_found
+    assert_equal true, codeacad_found
   end
 
   @first_run

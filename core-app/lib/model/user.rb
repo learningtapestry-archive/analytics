@@ -53,24 +53,19 @@ class User < ActiveRecord::Base
   def get_site_visits(opts={})
     begin_date = opts[:begin_date] || Time::now
     end_date = opts[:end_date] || Time::now
-      #.select("sites.display_name, sites.url, sum(page_visits.time_active) as time_active_sum")
-
-    site_visits = self.class
-      .select(User.arel_table[:id])
+    site_visits = Site
+      .select(Site.arel_table[:id])
       .select(Site.arel_table[:display_name])
       .select(Site.arel_table[:url])
-      .select(PageVisit.arel_table[:time_active].sum.as("time_active_sum"))
-      .joins("JOIN page_visits ON page_visits.user_id = users.id")
-      .joins("JOIN pages ON page_visits.page_id = pages.id")
-      .joins("JOIN sites ON sites.id = pages.site_id")
-      .where(["page_visits.date_visited >= ? and page_visits.date_visited <= ?", begin_date, end_date])
-      .where(id: self.id)
-      .group(User.arel_table[:id])
+      .select(PageVisit.arel_table[:time_active].sum.as("time_active"))
+      .joins("JOIN pages ON pages.site_id = sites.id")
+      .joins("JOIN page_visits ON page_visits.page_id = pages.id")
+      .joins("JOIN users ON users.id = page_visits.user_id")
+      .where(["page_visits.date_visited BETWEEN SYMMETRIC ? and ?", begin_date, end_date])
+      .where(["users.id = ?", self.id])
+      .group(Site.arel_table[:id])
       .group(Site.arel_table[:display_name])
       .group(Site.arel_table[:url])
-#      .group("sites.display_name, sites.url, users.id")
-#      .as_json(only: [ :display_name, :url, :time_active_sum ])
-
     site_visits
   end
 

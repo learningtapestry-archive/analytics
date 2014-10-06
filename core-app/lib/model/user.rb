@@ -43,7 +43,40 @@ class User < ActiveRecord::Base
     # join user on user.id = sites_visited.user_id
     # where date_visited between "#{Time.now}" and "#{Time.now-time_frame}"
     # group by date_visited, url, display_name
+
+    # PageVisit.select("sites.display_name, sum(page_visits.time_active)").joins(:page,:site,:user).where("date_visited between '09-18-2014 00:00:00' and '09-18-2014 23:59:59' and users.id = 1").group("sites.display_name")
+
+
   end
+
+  def get_site_visits(opts={})
+    begin_date = opts[:begin_date] || Time::now
+    end_date = opts[:end_date] || Time::now
+
+    site_visits = Site
+      .select("sites.display_name, sites.url, sum(page_visits.time_active) as time_active_sum")
+      .joins(:pages)
+      .joins("INNER JOIN page_visits on page_visits.id = pages.id")
+      .joins("INNER JOIN users on page_visits.user_id = users.id")
+      .where(["date_visited >= ? and date_visited <= ? and users.id = ?", begin_date, end_date, self.id])
+      .group("sites.display_name, sites.url")
+      .as_json(only: [ :display_name, :url, :time_active_sum ])
+
+    site_visits
+  end
+
+  ## Site Usage by Users on a Given Date
+=begin
+  select sites.display_name, users.id, sum(page_visits.time_active) as time_active_sum from page_visits
+  join pages on pages.id = page_visits.page_id
+  join sites on sites.id = pages.site_id
+  join users on users.id = page_visits.user_id
+  where page_visits.user_id in (1,2) and 
+  page_visits.date_visited >= '09-18-2014 00:00:00' and
+  page_visits.date_visited <= '09-18-2014 23:59:59'
+  group by sites.id, users.id
+  order by time_active_sum desc
+=end
 
   # required parameters: 
   #   :site => Site or SiteVisit model instance

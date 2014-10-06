@@ -1,6 +1,7 @@
 gem "minitest"
 require 'minitest/autorun'
 require 'database_cleaner'
+require 'debugger'
 
 class UserSecurityTest < Minitest::Test
   def test_password_hashing_validation
@@ -38,6 +39,7 @@ class UserModelTest < Minitest::Test
   def setup
     # set database transaction, so we can revert seeds
     DatabaseCleaner.start
+
     @username = "testuser"
     @password = "testpass"
     @first_name = "Test"
@@ -119,11 +121,31 @@ class UserModelTest < Minitest::Test
     user2 = retval[:user]
     assert !user2
     assert_equal LT::UserNotFound, retval[:exception].class
-
   end
 
-  def self.before_suite
-    DatabaseCleaner.strategy = :transaction
+  def test_get_sites
+    @scenario = LT::Scenarios::Students::create_joe_smith_scenario
+    @joe_smith = @scenario[:student]
+    @page_visits = @scenario[:page_visits]
+    @sites = @scenario[:sites]
+    @pages = @scenario[:pages]
+
+    joe_smith = User.find_by_username([@joe_smith[:username]])
+    refute_nil joe_smith
+
+    sites_visited = joe_smith.get_site_visits(begin_date: 14.days.ago.strftime("%Y-%m-%d 00:00:00"), end_date: Time.now.strftime("%Y-%m-%d 23:59:59") )
+
+    refute_nil sites_visited
+    assert_equal 2, sites_visited.count
+  end
+
+  @first_run
+  def before_suite
+    if !@first_run
+      DatabaseCleaner[:active_record].strategy = :transaction
+      DatabaseCleaner[:redis].strategy = :truncation
+    end
+    @first_run = true
   end
 
   def teardown

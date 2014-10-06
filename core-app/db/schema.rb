@@ -28,6 +28,7 @@ ActiveRecord::Schema.define(version: 20140902210605) do
     t.integer  "site_id",     null: false
     t.integer  "district_id"
     t.integer  "school_id"
+    t.integer  "section_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

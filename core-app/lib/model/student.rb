@@ -4,6 +4,7 @@ class Student < ActiveRecord::Base
   delegate :page_visits, :to => :user
   delegate :site_visits, :to => :user
   delegate :sections, :to => :user
+  delegate :school, :to => :user
   delegate :full_name, :to => :user
   delegate :first_name, :to => :user
   delegate :last_name, :to => :user
@@ -24,6 +25,10 @@ class Student < ActiveRecord::Base
     # this creates a section user entry, attaches section to it,
     #   and sets the section_user.user_type correctly
     self.user.section_user.create(:section=>section, :user_type=>user_type)
+    self.user.save
+  end
+  def add_to_school(school)
+    self.user.school = school
     self.user.save
   end
   # TODO these can be moved into a module and loaded for staff_member and student

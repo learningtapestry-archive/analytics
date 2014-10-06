@@ -3,6 +3,7 @@ class User < ActiveRecord::Base
   has_secure_password
   has_one :student
   has_one :staff_member
+  belongs_to :school
   has_many :emails
   has_many :section_user
   has_many :sections, through: :section_user

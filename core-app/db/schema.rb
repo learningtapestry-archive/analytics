@@ -17,31 +17,22 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   enable_extension "plpgsql"
 
   create_table "api_keys", force: true do |t|
-    t.integer  "user_id",     null: false
     t.string   "key",         null: false
     t.string   "org_api_key"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "approved_site_actions", force: true do |t|
-    t.integer  "approved_site_id",              null: false
-    t.string   "action_type",                   null: false
-    t.string   "url_pattern",      limit: 4096, null: false
-    t.string   "css_selector"
+    t.integer  "user_id",     null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "approved_sites", force: true do |t|
-    t.string   "site_name",                   null: false
-    t.uuid     "site_uuid",                   null: false
-    t.string   "url",            limit: 4096, null: false
-    t.string   "logo_url_small", limit: 4096
-    t.string   "logo_url_large", limit: 4096
+    t.integer  "site_id",     null: false
+    t.integer  "district_id"
+    t.integer  "school_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "approved_sites", ["site_id"], name: "index_approved_sites_on_site_id", using: :btree
 
   create_table "course_offerings", force: true do |t|
     t.integer  "course_id",  null: false
@@ -135,13 +126,14 @@ ActiveRecord::Schema.define(version: 20140902210605) do
     t.string   "nces_id"
     t.string   "sis_id"
     t.string   "other_id"
-    t.string   "name",       null: false
+    t.string   "name",        null: false
     t.string   "address"
     t.string   "city"
     t.string   "state"
     t.string   "phone"
     t.string   "grade_low"
     t.string   "grade_high"
+    t.integer  "district_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -158,6 +150,15 @@ ActiveRecord::Schema.define(version: 20140902210605) do
     t.string   "sis_id"
     t.string   "other_id"
     t.string   "name",               null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "site_actions", force: true do |t|
+    t.string   "action_type",               null: false
+    t.string   "url_pattern",  limit: 4096, null: false
+    t.string   "css_selector"
+    t.integer  "site_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -207,6 +208,7 @@ ActiveRecord::Schema.define(version: 20140902210605) do
     t.string   "username",        null: false
     t.string   "password_digest"
     t.date     "date_of_birth"
+    t.integer  "school_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

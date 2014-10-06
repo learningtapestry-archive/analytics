@@ -43,6 +43,16 @@ Server Configuration
 # Server Management Notes
 
 * Server is located at: lt-dev01.learntaculo.us
+  * When connecting via vpn:
+    * Set virtualbox network adapter to bridged
+      * To get VB options: right-ctrl-home
+    * nmcli con up id lt-dev01
+    * ssh steve@192.168.247.1
+  * When disconnecting from vpn:
+    * Exit all shells
+    * nmcli con down id lt-dev01
+    * Set virtualbox network adapter to NAT
+
 * byobu: multi-terminal window manager
   * byobu-enable/disable: turn this service on/off
   * ctrl-a: screen manager

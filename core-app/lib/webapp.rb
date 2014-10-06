@@ -86,6 +86,8 @@ module LT
 
     ### END Dashboard
 
+    # TODO make '/assets/tests/' only work dev/test environment?
+
     ### START API
     configure do
       mime_type :javascript, 'application/javascript'
@@ -96,11 +98,18 @@ module LT
       # TODO look up org_api_key and username from parameters
       username = params[:username]
       org_api_key = params[:org_api_key]
-      # TODO fail if parameters are invalid? 
+      # TODO fail if username/org pair are invalid? 
       locals = {
         api_key: org_api_key,
         user_id: username,
-        site_uuid: "foobar"
+        site_uuid: "foobar",
+        # TODO IRL this needs to point to staging or production servers
+        #  Ideally we solve this by adding a config.yml file for our servers
+        #  We have endpoints defined for dev/test/stage/prod just like for databases
+        #  Then we just load that config when Sinatra loads and feed those configs to 
+        #  local vars like this
+        #  the Sinatra routes definitions themselves should depend on this config file as well
+        assert_end_point: "/api/v1/assert"
       }
       erb :"collector.js", :layout => false, locals: locals
     end

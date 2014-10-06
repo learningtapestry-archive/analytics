@@ -49,18 +49,27 @@ class User < ActiveRecord::Base
 
   end
 
+  # returns aggregate site visits for this user as a user object
   def get_site_visits(opts={})
     begin_date = opts[:begin_date] || Time::now
     end_date = opts[:end_date] || Time::now
+      #.select("sites.display_name, sites.url, sum(page_visits.time_active) as time_active_sum")
 
-    site_visits = Site
-      .select("sites.display_name, sites.url, sum(page_visits.time_active) as time_active_sum")
-      .joins(:pages)
-      .joins("INNER JOIN page_visits on page_visits.id = pages.id")
-      .joins("INNER JOIN users on page_visits.user_id = users.id")
-      .where(["date_visited >= ? and date_visited <= ? and users.id = ?", begin_date, end_date, self.id])
-      .group("sites.display_name, sites.url")
-      .as_json(only: [ :display_name, :url, :time_active_sum ])
+    site_visits = self.class
+      .select(User.arel_table[:id])
+      .select(Site.arel_table[:display_name])
+      .select(Site.arel_table[:url])
+      .select(PageVisit.arel_table[:time_active].sum.as("time_active_sum"))
+      .joins("JOIN page_visits ON page_visits.user_id = users.id")
+      .joins("JOIN pages ON page_visits.page_id = pages.id")
+      .joins("JOIN sites ON sites.id = pages.site_id")
+      .where(["page_visits.date_visited >= ? and page_visits.date_visited <= ?", begin_date, end_date])
+      .where(id: self.id)
+      .group(User.arel_table[:id])
+      .group(Site.arel_table[:display_name])
+      .group(Site.arel_table[:url])
+#      .group("sites.display_name, sites.url, users.id")
+#      .as_json(only: [ :display_name, :url, :time_active_sum ])
 
     site_visits
   end

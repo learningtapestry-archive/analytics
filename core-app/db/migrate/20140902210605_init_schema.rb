@@ -4,9 +4,9 @@ class InitSchema < ActiveRecord::Migration
     ### Begin Message Collection Tables
 
     create_table "api_keys", :force => true do |t|
-      t.integer  "user_id",      :null => false
       t.string   "key",          :null => false
       t.string   "org_api_key"
+      t.belongs_to  :user,       :null => false
       t.timestamps
     end
 
@@ -20,6 +20,7 @@ class InitSchema < ActiveRecord::Migration
       t.json     "action"
       t.string   "url",              :limit => 4096
       t.datetime "captured_at"
+      t.belongs_to  :user
       t.timestamps
     end
 
@@ -28,6 +29,10 @@ class InitSchema < ActiveRecord::Migration
       t.belongs_to :raw_message
       t.timestamps
     end
+
+    ### End Message Collection Tables
+
+    ### Begin Monitored Sites Tables
 
     create_table "sites", :force => true do |t|
       t.string   "url",             :null => false, :limit => 4096
@@ -39,22 +44,25 @@ class InitSchema < ActiveRecord::Migration
 
     add_index :sites, :url, :unique => true
 
-    create_table "approved_site_actions", :force => true do |t|
-      t.integer  "approved_site_id", :null => false
+    create_table "site_actions", :force => true do |t|
       t.string   "action_type",     :null => false # CLICK, PAGEVIEW, EXTRACT 
       t.string   "url_pattern",     :null => false, :limit => 4096
       t.string   "css_selector"
+      t.belongs_to  :site
       t.timestamps
     end
 
     create_table "approved_sites", :force => true do |t|
-      t.string   "site_name",       :null => false
-      t.uuid     "site_uuid",       :null => false
-      t.string   "url",             :null => false, :limit => 4096
-      t.string   "logo_url_small",  :limit => 4096
-      t.string   "logo_url_large",  :limit => 4096
+      t.belongs_to :site,           :null => false, :index => true
+      t.belongs_to :district
+      t.belongs_to :school
+      # Potentially course and section, but for the future
       t.timestamps
     end
+
+    ### End Monitored Sites Tables
+
+    ### Begin Collected Data Schemantic Tables
 
     create_table "pages", :force => true do |t|
       t.string   "url",         :null => false, :limit => 4096
@@ -85,6 +93,10 @@ class InitSchema < ActiveRecord::Migration
       t.belongs_to :page  # In future, this will belong to page_visits once relationships figured out
     end
 
+    ### End Collected Data Schemantic Tables
+
+    ### Begin Education Organization and Course Tables
+
     create_table "districts", :force => true do |t|
       t.string   "state_id"
       t.string   "nces_id"
@@ -112,6 +124,7 @@ class InitSchema < ActiveRecord::Migration
       t.string   "phone"
       t.string   "grade_low"
       t.string   "grade_high"
+      t.belongs_to :district
       t.timestamps
     end
     
@@ -150,6 +163,10 @@ class InitSchema < ActiveRecord::Migration
       t.belongs_to :user
     end
 
+    ### End Education Organization and Course Tables
+
+    ### Begin User Tables
+
     create_table "users", :force => true do |t|
       t.string   "first_name",    :null => false
       t.string   "middle_name"
@@ -158,6 +175,7 @@ class InitSchema < ActiveRecord::Migration
       t.string   "username",     :null => false
       t.string   "password_digest"
       t.date     "date_of_birth"
+      t.belongs_to  :school
       t.timestamps
     end
 
@@ -186,6 +204,8 @@ class InitSchema < ActiveRecord::Migration
       t.belongs_to :user
       t.timestamps
     end 
+
+    ### End User Tables
 
   end #def change
 end # class migration

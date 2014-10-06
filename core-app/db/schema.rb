@@ -17,8 +17,9 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   enable_extension "plpgsql"
 
   create_table "api_keys", force: true do |t|
-    t.integer  "user_id",    null: false
-    t.string   "key",        null: false
+    t.integer  "user_id",     null: false
+    t.string   "key",         null: false
+    t.string   "org_api_key"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

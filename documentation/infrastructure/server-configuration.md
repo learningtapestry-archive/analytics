@@ -20,7 +20,7 @@ Server Configuration
 
 * This server is using CruiseControl.rb (CCrb) for CI.  The user context is "learntac".  CCrb is set to run on startup in /etc/rc.local (tested).  CCrb will pull from GitHub science/lt project every 5 minutes.  If a change has been detected, it will kick off a new build.  If the status changes been success to failure or vise-versa, it will send an email to Jason and Steve.  CCrb has a web dashboard to view job status at port 3333, however this is currently blocked by the firewall. Planning to make accessible only via SSH or OpenVPN access for security in future.  Project directory is /home/learntac/.cruise/projects/learntaculous/work.  CCrb is /home/learntac/Procjects/cruisecontrol.rb. **NOTE:**  learntac doesn't have sudo access, so new gems may break a build until ran manually on server.
 
-
+* Server needs phantomjs installed for testing.
 
 ### To Dos
 

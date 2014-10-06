@@ -33,7 +33,8 @@ module LT
     
     include WebAppHelper
 
-    API_ERROR_MESSAGE = { :status => "unknown error" }.to_json
+    API_ERROR_MESSAGE ||= { :status => "unknown error" }.to_json
+
     # set up UI layout container
     # we need this container to set dynamic content in the layout template
     # we can set things like CSS templates, Javascript includes, etc.
@@ -92,7 +93,16 @@ module LT
     # this is a dynamically rendered js file
     get '/api/v1/collector.js' do
       content_type :javascript
-      erb :"collector.js", :layout => false
+      # TODO look up org_api_key and username from parameters
+      username = params[:username]
+      org_api_key = params[:org_api_key]
+      # TODO fail if parameters are invalid? 
+      locals = {
+        api_key: org_api_key,
+        user_id: username,
+        site_uuid: "foobar"
+      }
+      erb :"collector.js", :layout => false, locals: locals
     end
 
     get '/api/v1/approved-sites' do

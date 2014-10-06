@@ -13,8 +13,53 @@
   script.type = "text/javascript";
   script.src = "//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js";
   script.onload = function () {
-    window.ltjq = jQuery.noConflict( true );
-    window.ltjq( document ).ready(function() {
+    window.ltG = {};
+    window.lt$ = jQuery.noConflict( true );
+    window.ltG.apiKey = "<%=api_key%>";
+    window.ltG.userId = "<%=user_id%>";
+    window.ltG.siteUUID = "<%=site_uuid%>";
+
+    window.ltG.toISOString = function(dateObj) {
+      function pad(number) {
+        var r = String(number);
+        if ( r.length === 1 ) {
+          r = '0' + r;
+        }
+        return r;
+      };
+
+      return dateObj.getUTCFullYear()
+        + '-' + pad( dateObj.getUTCMonth() + 1 )
+        + '-' + pad( dateObj.getUTCDate() )
+        + 'T' + pad( dateObj.getUTCHours() )
+        + ':' + pad( dateObj.getUTCMinutes() )
+        + ':' + pad( dateObj.getUTCSeconds() )
+        + 'Z';
+    };
+    window.ltG.fGenPageViewMsg = function(uRL, pageTitle, timeOnPage) {
+      action = {
+        time: timeOnPage,
+        page_title: pageTitle
+      };
+      return window.ltG.priv.fGenRawMsg(uRL, pageTitle, 'viewed', action);
+    };
+    window.ltG.priv = {};
+    window.ltG.priv.fGenRawMsg = function(uRL, pageTitle, verb, action) {
+      msg = {
+        api_key: window.ltG.apiKey,
+        username: ltG.userId,
+        site_uuid: ltG.siteUUID,
+        verb: verb,
+        url: uRL,
+        page_title: pageTitle,
+        captured_at: ltG.toISOString(new Date(lt$.now()))
+      };
+      msg.action = action;
+      return msg;
+    };
+
+    // main event handler code
+    window.lt$( document ).ready(function() {
       //send message that page was loaded: "click" event
       //start timer that we are on page
       //hook document focus/blur events to manage timer

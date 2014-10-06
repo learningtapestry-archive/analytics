@@ -1,5 +1,6 @@
 require 'sinatra/base'
 #require 'sinatra/contrib'
+require 'sinatra/reloader'
 require 'sinatra/cookies'
 require 'json'
 require File::join(LT::lib_path, 'util', 'session_manager.rb')
@@ -22,10 +23,18 @@ module LT
       set :dump_errors, false
       set :show_exceptions, false
     end
-
+    if LT::development? then
+      register Sinatra::Reloader
+      # set this to prevent reloading of specific files
+      # dont_reload '/path/to/other/file'
+    end
+    
+    set :public_folder, LT::web_root_path
+    
     include WebAppHelper
 
-    API_ERROR_MESSAGE = { :status => "unknown error" }.to_json
+    API_ERROR_MESSAGE ||= { :status => "unknown error" }.to_json
+
     # set up UI layout container
     # we need this container to set dynamic content in the layout template
     # we can set things like CSS templates, Javascript includes, etc.
@@ -78,6 +87,23 @@ module LT
     ### END Dashboard
 
     ### START API
+    configure do
+      mime_type :javascript, 'application/javascript'
+    end
+    # this is a dynamically rendered js file
+    get '/api/v1/collector.js' do
+      content_type :javascript
+      # TODO look up org_api_key and username from parameters
+      username = params[:username]
+      org_api_key = params[:org_api_key]
+      # TODO fail if parameters are invalid? 
+      locals = {
+        api_key: org_api_key,
+        user_id: username,
+        site_uuid: "foobar"
+      }
+      erb :"collector.js", :layout => false, locals: locals
+    end
 
     get '/api/v1/approved-sites' do
       content_type :json

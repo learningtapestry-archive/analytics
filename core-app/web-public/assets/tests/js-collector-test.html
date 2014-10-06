@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>LT JS Collector Tests</title>
+  <link rel="stylesheet" href="qunit-1.15.0.css">
+  <script src="qunit-1.15.0.js"></script>
+  <script src="qunit-reporter-junit.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script>
+    // set up testing variables 
+    ltTestUsername = encodeURIComponent('public@misuse.org');
+    ltTestOrgApiKey = encodeURIComponent('abc123');
+    ltCollectorScriptTag = '<scr'+'ipt src="/api/v1/collector.js?username='+ltTestUsername+'&org_api_key='+ltTestOrgApiKey+'"></scr'+'ipt>';
+    document.write(ltCollectorScriptTag);
+  </script>
+</head>
+<body>
+  <div id="qunit"></div>
+  <div id="qunit-fixture"></div>
+<script>
+
+QUnit.test("Collector javascript setup test", function( assert){
+  assert.ok(true, "Test should always pass");
+  // check that jQuery and lt$ vars are set up property
+  assert.ok(!(typeof $ === 'undefined'), "JQuery var should exist.")
+  assert.equal("2.1.1",$.fn.jquery, "JQuery should be 2.1.1. Ver:" +$.fn.jquery); 
+  assert.ok(!(typeof window.lt$ === 'undefined'), "ltG should be present.");
+  assert.equal("1.11.1", window.lt$.fn.jquery, "lt$ should be version 1.11.1." )
+});
+QUnit.test("ltG vars and methods tests", function(assert){
+  assert.ok(true, "Test should always pass");
+  var timeOnPage = "10M11S";
+  var pageURL = window.lt$(location).attr('href');
+  var pageTitle = "pTitle";
+  // validate that we can generate a valid page_view json message
+  msg = window.ltG.fGenPageViewMsg(pageURL, pageTitle, timeOnPage);
+  assert.equal(msg.url, pageURL);
+  assert.equal(msg.page_title, pageTitle);
+  assert.ok((msg.captured_at.length > 5) && (typeof msg.captured_at == "string"))
+  assert.equal(msg.api_key, window.ltG.apiKey);
+  assert.equal(msg.userId, window.ltG.username);
+  assert.equal(msg.site_uuid, window.ltG.siteUUID);
+  assert.equal(msg.action.time, timeOnPage);
+  assert.equal(msg.action.page_title, pageTitle);
+  assert.equal(msg.verb, "viewed");
+});
+
+//we write the results of our tests to xml in this document
+QUnit.jUnitReport = function(report) {
+    lt$("#xmlTestResults").append(report.xml);
+};
+
+</script>
+<span id="xmlTestResults">
+
+</span>
+</body>
+</html>

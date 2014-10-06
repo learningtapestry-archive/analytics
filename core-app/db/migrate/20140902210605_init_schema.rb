@@ -5,6 +5,7 @@ class InitSchema < ActiveRecord::Migration
 
     create_table "api_keys", :force => true do |t|
       t.string   "key",          :null => false
+      t.string   "org_api_key"
       t.belongs_to  :user,       :null => false
       t.timestamps
     end

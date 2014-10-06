@@ -18,6 +18,7 @@
     window.ltG.apiKey = "<%=api_key%>";
     window.ltG.userId = "<%=user_id%>";
     window.ltG.siteUUID = "<%=site_uuid%>";
+    window.ltG.assert_end_point = "<%=assert_end_point%>";
 
     window.ltG.toISOString = function(dateObj) {
       function pad(number) {
@@ -36,6 +37,7 @@
         + ':' + pad( dateObj.getUTCSeconds() )
         + 'Z';
     };
+    // Generate a PageView message suitable for sending via fSendMsg
     window.ltG.fGenPageViewMsg = function(uRL, pageTitle, timeOnPage) {
       action = {
         time: timeOnPage,
@@ -43,7 +45,30 @@
       };
       return window.ltG.priv.fGenRawMsg(uRL, pageTitle, 'viewed', action);
     };
+    window.ltG.fSendPageView = function(uRL, pageTitle, timeOnPage) {
+      var msg = window.ltG.fGenPageViewMsg(uRL, pageTitle, timeOnPage);
+      window.ltG.priv.fSendMsg(msg);
+    };
+    
     window.ltG.priv = {};
+    window.ltG.priv.fSendMsg = function(msg){
+      window.lt$.ajax({
+        url: window.ltG.assert_end_point,
+        type: "POST",
+        data: JSON.stringify(msg),
+        headers: {"X_LT_API_KEY": msg.api_key},
+        contentType:"application/json; charset=utf-8",
+        success: function(){
+          //
+        },
+        error: function(jqxhr,error){
+          console.log("fSendMsg JS failed.");
+          console.log(jqxhr.responseText);
+          console.log(jqxhr.statusText)
+        }
+      });
+    };
+
     window.ltG.priv.fGenRawMsg = function(uRL, pageTitle, verb, action) {
       msg = {
         api_key: window.ltG.apiKey,
@@ -58,6 +83,60 @@
       return msg;
     };
 
+    // utility/debug function to inspect variables/objects content
+    window.ltG.priv.inspect = function(obj, maxLevels, level)
+      {
+        var str = '', type, msg;
+
+          // Start Input Validations
+          // Don't touch, we start iterating at level zero
+          if(level == null)  level = 0;
+
+          // At least you want to show the first level
+          if(maxLevels == null) maxLevels = 1;
+          if(maxLevels < 1)     
+              return 'Error: Levels number must be > 0';
+
+          // We start with a non null object
+          if(obj == null)
+          return 'Error: Object *NULL*\n';
+          // End Input Validations
+
+          // Each Iteration must be indented
+          str += '  ';
+
+          // Start iterations for all objects in obj
+          for(var property in obj)
+          {
+            try
+            {
+                // Show "property" and "type property"
+                type =  typeof(obj[property]);
+                str += '* (' + type + ') ' + property + 
+                       ( (obj[property]==null)?(': *null*'):(''))+'\n';
+
+                // We keep iterating if this property is an Object, non null
+                // and we are inside the required number of levels
+                if((type == 'object') && (obj[property] != null) && (level+1 < maxLevels))
+                str += inspect(obj[property], maxLevels, level+1);
+            }
+            catch(err)
+            {
+              // Are there some properties in obj we can't access? Print it red.
+              if(typeof(err) == 'string') msg = err;
+              else if(err.message)        msg = err.message;
+              else if(err.description)    msg = err.description;
+              else                        msg = 'Unknown';
+
+              str += '* (Error) ' + property + ': ' + msg + '\n';
+            }
+          }
+
+            // Close indent
+            str += '\n';
+
+          return str;
+      }
     // main event handler code
     window.lt$( document ).ready(function() {
       //send message that page was loaded: "click" event

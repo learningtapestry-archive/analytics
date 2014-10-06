@@ -23,5 +23,4 @@ class SiteVisit < ActiveRecord::Base
   # has_many :pages_visited, through: :pages, 
   #   select: 'distinct (pages_visited.id), pages_visited.*', 
   #   conditions: proc {["pages_visited.user_id = ?",self.user_id]}
-
 end

@@ -56,7 +56,8 @@ class InitSchema < ActiveRecord::Migration
       t.belongs_to :site,           :null => false, :index => true
       t.belongs_to :district
       t.belongs_to :school
-      # Potentially course and section, but for the future
+      t.belongs_to :section
+      # Potentially course and user, but for the future if needed
       t.timestamps
     end
 

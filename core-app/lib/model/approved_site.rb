@@ -1,7 +1,8 @@
 class ApprovedSite < ActiveRecord::Base
 	has_many :sites
-  has_many :schools
   has_many :districts
+  has_many :schools
+  has_many :sections
 
   def self.get_all_with_actions
     Site.all.as_json(
@@ -10,6 +11,7 @@ class ApprovedSite < ActiveRecord::Base
       )
   end
 
+  # TODO:  Refactor this to get_actions_by_user_id, scanning districts, schools and sections
   def self.get_with_actions_by_school(school)
     Site.joins(:approved_sites)
     .where(approved_sites: { school_id: school.id })

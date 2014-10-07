@@ -119,6 +119,12 @@ module LT
       ApprovedSite.get_all_with_actions.to_json
     end # '/api/v1/approved_sites
 
+
+    post '/api/v1/assert-org' do
+      request.env["HTTP_X_LT_ORG_API_KEY"]
+    end
+
+    
     post '/api/v1/assert' do
       begin
         api_key = request.env["HTTP_X_LT_API_KEY"] 

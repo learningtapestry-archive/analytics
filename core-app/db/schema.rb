@@ -17,9 +17,8 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   enable_extension "plpgsql"
 
   create_table "api_keys", force: true do |t|
-    t.string   "key",         null: false
-    t.string   "org_api_key"
-    t.integer  "user_id",     null: false
+    t.string   "key",        null: false
+    t.integer  "user_id",    null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -77,6 +76,10 @@ ActiveRecord::Schema.define(version: 20140902210605) do
     t.string  "email"
     t.boolean "primary"
     t.integer "user_id"
+  end
+
+  create_table "organizations", force: true do |t|
+    t.string "org_api_key"
   end
 
   create_table "page_clicks", force: true do |t|

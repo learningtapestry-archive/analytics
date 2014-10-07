@@ -14,6 +14,13 @@ class WebAppJSTest < Minitest::Test
   include Rack::Test::Methods
   include Capybara::DSL
 
+  def save_load_screenshot(page)
+    file_screenshot = File::expand_path(File::join(LT::tmp_path, "collector_errors.png"))
+    page.save_screenshot(file_screenshot)
+    `google-chrome #{file_screenshot}`
+    file_screenshot
+  end
+
   # this method is somewhat indirect
   # It calls an html test page via capybara/poltergeist/phantomjs
   # This html page runs a series of qUnit javascript tests
@@ -23,7 +30,17 @@ class WebAppJSTest < Minitest::Test
   # It will also save a screenshot of the failing qUnit test results page (to LT::tmp_dir)
   # It will try to open that screenshot in chrome
   def test_js_collector
-    visit('/assets/tests/js-collector-test.html')
+    # set up data to make collector test work
+    joe_smith_username=CGI::escape(@joe_smith[:username])
+    acme_org_api_key = CGI::escape(@acme_org[:org_api_key])
+    collector_test_url = "/assets/tests/js-collector-test.html?username=#{joe_smith_username}&org_api_key=#{acme_org_api_key}"
+    collector_js_url = "/api/v1/collector.js?username=#{joe_smith_username}&org_api_key=#{acme_org_api_key}"
+    # verify that we can get to the collector.js file itself without errors
+    get(collector_js_url)
+    assert_equal 200, last_response.status
+    # after confirming that the collector.js file is obtainable
+    # we can make the full headless browser call to the test file
+    visit(collector_test_url)
     i = 0
     # wait for qunit tests to execute in phantomjs
     # we are waiting for this element to appear on the page: <div id="qunit">
@@ -47,9 +64,7 @@ class WebAppJSTest < Minitest::Test
       test_failed = false
       # take a screenshot of qunit results, if there are errors
       if num_failures!="0" then
-        file_screenshot = File::expand_path(File::join(LT::tmp_path, "collector_errors.png"))
-        page.save_screenshot(file_screenshot)
-        `google-chrome #{file_screenshot}`
+        file_screenshot = save_load_screenshot(page)
       end
       fail_message = "QUnit Javascript testcase named \"#{testcase_name}\" had #{num_failures} failures.\n"\
        "Screenshot of testrun failures at #{file_screenshot}.\n"\
@@ -81,6 +96,7 @@ class WebAppJSTest < Minitest::Test
   @first_run
   def before_suite
     if !@first_run
+      LT::RedisServer::clear_all_test_lists
       DatabaseCleaner[:active_record].strategy = :transaction
       DatabaseCleaner[:redis].strategy = :truncation
       Capybara.app = LT::WebApp
@@ -117,6 +133,7 @@ class WebAppJSTest < Minitest::Test
     @site_visits = @scenario[:site_visits]
     @sites = @scenario[:sites]
     @pages = @scenario[:pages]
+    @acme_org = @scenario[:organizations].first
   end
   def teardown
     DatabaseCleaner.clean # cleanup of the database

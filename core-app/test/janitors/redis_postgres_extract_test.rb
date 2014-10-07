@@ -14,6 +14,7 @@ class RedisPostgresExtractTest < Minitest::Test
     joe_smith_username =scenario[:students][0][:username]
     joe_smith = User.find_by_username(joe_smith_username)
     joe_smith_id = joe_smith.id
+    acme_org_api_key = scenario[:organizations].first[:org_api_key]
     assert_equal scenario[:students][0][:first_name], joe_smith.first_name
     assert LT::RedisServer::raw_message_queue_length >=4
     assert_equal scenario[:raw_messages].size, LT::RedisServer::raw_message_queue_length
@@ -34,6 +35,9 @@ class RedisPostgresExtractTest < Minitest::Test
     logs = test_msg.raw_message_logs
     assert_equal RawMessageLog::Actions::FROM_REDIS, logs.first.action
     assert_equal 1, test_msg.raw_message_logs.size
+    # verify that org_api_key message was correctly created in raw_messages
+    org_api_raw_message = RawMessage.find_by_org_api_key(acme_org_api_key)
+    assert_equal acme_org_api_key, org_api_raw_message.org_api_key
 
     # prep/verify data before converting raw to pv
     assert_equal 0, PageVisit.count
@@ -73,6 +77,12 @@ class RedisPostgresExtractTest < Minitest::Test
     site = Site.where(url: site_url)
     assert_equal 1, site.size
     assert_equal site_url, site.first.url
+
+    # verify that we can find the org_api raw message as a PageVisit
+    date_visited = org_api_raw_message.captured_at
+    pv = PageVisit.find_by_date_visited(date_visited)
+    assert_equal date_visited, pv.date_visited
+
     # re-running RawMessagesExtract should not process any records
     #  this confirms that RawMessages that were processed have been correctly
     #  tagged as having already been processed into page_visits

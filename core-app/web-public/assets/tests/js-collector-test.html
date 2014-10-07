@@ -8,9 +8,21 @@
   <script src="qunit-reporter-junit.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <script>
+    window.getUrlParameter = function(sParam){
+      var sPageURL = window.location.search.substring(1);
+      var sURLVariables = sPageURL.split('&');
+      for (var i = 0; i < sURLVariables.length; i++){
+          var sParameterName = sURLVariables[i].split('=');
+          if (sParameterName[0] == sParam){
+              return sParameterName[1];
+          }
+      }
+    };
+  </script>
+  <script>
     // set up testing variables 
-    ltTestUsername = encodeURIComponent('public@misuse.org');
-    ltTestOrgApiKey = encodeURIComponent('abc123');
+    var ltTestOrgApiKey = window.getUrlParameter('org_api_key');
+    var ltTestUsername = window.getUrlParameter('username');
     ltCollectorScriptTag = '<scr'+'ipt src="/api/v1/collector.js?username='+ltTestUsername+'&org_api_key='+ltTestOrgApiKey+'"></scr'+'ipt>';
     document.write(ltCollectorScriptTag);
   </script>
@@ -48,7 +60,7 @@ QUnit.test("ltG vars and methods tests", function(assert){
 
 //we write the results of our tests to xml in this document
 QUnit.jUnitReport = function(report) {
-    lt$("#xmlTestResults").append(report.xml);
+    window.lt$("#xmlTestResults").append(report.xml);
 };
 
 </script>

@@ -15,9 +15,8 @@
   script.onload = function () {
     window.ltG = {};
     window.lt$ = jQuery.noConflict( true );
-    window.ltG.apiKey = "<%=api_key%>";
+    window.ltG.orgApiKey = "<%=org_api_key%>";
     window.ltG.userId = "<%=user_id%>";
-    window.ltG.siteUUID = "<%=site_uuid%>";
     window.ltG.assert_end_point = "<%=assert_end_point%>";
 
     window.ltG.toISOString = function(dateObj) {
@@ -56,7 +55,7 @@
         url: window.ltG.assert_end_point,
         type: "POST",
         data: JSON.stringify(msg),
-        headers: {"X_LT_API_KEY": msg.api_key},
+        headers: {"X_LT_ORG_API_KEY": msg.org_api_key},
         contentType:"application/json; charset=utf-8",
         success: function(){
           //
@@ -71,9 +70,8 @@
 
     window.ltG.priv.fGenRawMsg = function(uRL, pageTitle, verb, action) {
       msg = {
-        api_key: window.ltG.apiKey,
+        org_api_key: window.ltG.orgApiKey,
         username: ltG.userId,
-        site_uuid: ltG.siteUUID,
         verb: verb,
         url: uRL,
         page_title: pageTitle,

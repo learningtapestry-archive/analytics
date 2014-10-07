@@ -77,6 +77,15 @@ module LT
         :site_url=>'http://www.codeacademy.com'}]
       end
     end; end # Pages
+    module Organizations class << self
+      @acme_org_api_key = nil
+      def acme_organization_data
+        @acme_org_api_key = SecureRandom.uuid if !@acme_org_api_key
+        {
+          org_api_key: @acme_org_api_key
+        }
+      end
+    end; end # Organizations
     # create a user in a section
     module Students class << self
       def joe_smith_data
@@ -107,6 +116,9 @@ module LT
             :name=>"CompSci Period 2",
             :section_code=>"Comp Sci Room 2"
           },
+          :organizations=>[
+            Organizations::acme_organization_data
+          ],
           :school=>Schools::acme_high_school_data,
           :teacher=>Teachers::jane_doe_data,
           :sites=>[
@@ -190,7 +202,9 @@ module LT
         student.add_to_school(school)
         student2.add_to_school(school)
         teacher.add_to_school(school)
-
+        scenario[:organizations].each do |organization|
+          Organization.create!(organization)
+        end
         # we add all user activity data to two students
         # this is to make sure that we can find data associated with only student at a time
         [student, student2].each do |student|
@@ -262,6 +276,9 @@ module LT
             Students::joe_smith_data,
             Students::bob_newhart_data
           ],
+          organizations: [
+            Organizations::acme_organization_data
+          ],
           raw_messages: [
             {
             username: Students::joe_smith_data[:username],
@@ -319,7 +336,20 @@ module LT
             captured_at: 2.days.ago.iso8601,
             api_key: "2866b962-a7be-44f8-9a0c-66502fba7d31",
             url: Pages::khanacademy_data[0][:url]
-            },
+            }, 
+            { # This is an org_api_key raw_message to validate that janitor handles both
+            username: Students::joe_smith_data[:username],
+            verb: "viewed",
+            action:
+              {
+              id: "verbs/viewed",
+              display: {:"en-US" => "viewed"},
+              value: {time: "12M24S"}
+              },
+            captured_at: 4.days.ago.iso8601,
+            org_api_key: Organizations::acme_organization_data[:org_api_key],
+            url: Pages::khanacademy_data[0][:url]
+            }
           ]
         }
         scenario
@@ -332,11 +362,15 @@ module LT
           user = User.create_user(s)[:user]
           usernames_ids[user.username] = user.id
         end
-
+        scenario[:organizations].each do |organization|
+          Organization.create!(organization)
+        end
         scenario[:raw_messages].each do |raw_message|
           # delete username and swap in the user_id
           raw_message[:user_id]=usernames_ids[raw_message.delete(:username)]
-          raise StandardError if raw_message[:user_id].nil?
+          if raw_message[:user_id].nil? && raw_message[:org_api_key].nil? then
+            raise StandardError
+          end
           json_message = raw_message.to_json
           LT::RedisServer::raw_message_push(json_message)
         end

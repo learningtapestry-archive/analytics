@@ -12,6 +12,7 @@ module LT
           # Store static queue / hashlist names
           @queue_raw_message = redis_config[LT::run_env]["queue_raw_messages"]
           @hashlist_api_keys = redis_config[LT::run_env]["hashlist_api_keys"]
+          @hashlist_org_api_keys = redis_config[LT::run_env]["hashlist_org_api_keys"]
           
           # Define and connect to server
           @redis = Redis.new(:url => @redis_url)
@@ -25,6 +26,19 @@ module LT
           raise e
         end
       end
+
+      # utility
+
+      def clear_all_test_lists
+        if !LT::testing? && !LT::development? then
+          raise LT::BaseException.new("clear_all_test_lists must be run in testing or dev env")
+        end
+        self.raw_messages_queue_clear
+        self.api_keys_hashlist_clear
+        self.org_api_keys_hashlist_clear
+      end
+
+      # raw messages
 
       def raw_messages_queue_clear
         @redis.del @queue_raw_message
@@ -42,6 +56,7 @@ module LT
         @redis.llen @queue_raw_message
       end
 
+      # api keys
 
       def api_keys_hashlist_clear
         @redis.del @hashlist_api_keys
@@ -61,6 +76,32 @@ module LT
 
       def api_key_hashlist_length
         @redis.hlen @hashlist_api_keys
+      end
+
+      # org api keys
+      # org api keys have an organization_id as value for an org_api_key key
+      def org_api_keys_hashlist_clear
+        @redis.del @hashlist_org_api_keys
+      end
+
+      def has_org_api_key?(key)
+        !!@redis.hget(@hashlist_org_api_keys, key)
+      end
+
+      def org_api_key_get(key)
+        @redis.hget @hashlist_org_api_keys, key
+      end
+
+      def org_api_key_set(key, value)
+        @redis.hset @hashlist_org_api_keys, key, value
+      end
+
+      def org_api_key_remove(key)
+        @redis.hdel @hashlist_org_api_keys, key
+      end
+
+      def org_api_key_hashlist_length
+        @redis.hlen @hashlist_org_api_keys
       end
 
     end

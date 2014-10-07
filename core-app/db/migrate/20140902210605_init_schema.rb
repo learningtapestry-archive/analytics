@@ -5,14 +5,18 @@ class InitSchema < ActiveRecord::Migration
 
     create_table "api_keys", :force => true do |t|
       t.string   "key",          :null => false
-      t.string   "org_api_key"
       t.belongs_to  :user,       :null => false
       t.timestamps
     end
 
+    create_table "organizations", :force => true do |t|
+      t.string "org_api_key"
+    end
+
     create_table "raw_messages", :force => true do |t|
-      t.string   "api_key",          :null => false
+      t.string   "api_key"
       t.integer  "user_id"
+      t.string   "org_api_key"
       t.string   "username"
       t.string   "page_title"
       t.uuid     "site_uuid"

@@ -17,9 +17,8 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   enable_extension "plpgsql"
 
   create_table "api_keys", force: true do |t|
-    t.string   "key",         null: false
-    t.string   "org_api_key"
-    t.integer  "user_id",     null: false
+    t.string   "key",        null: false
+    t.integer  "user_id",    null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -79,6 +78,10 @@ ActiveRecord::Schema.define(version: 20140902210605) do
     t.integer "user_id"
   end
 
+  create_table "organizations", force: true do |t|
+    t.string "org_api_key"
+  end
+
   create_table "page_clicks", force: true do |t|
     t.datetime "date_visited"
     t.string   "url_visited",  limit: 4096
@@ -109,8 +112,9 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   end
 
   create_table "raw_messages", force: true do |t|
-    t.string   "api_key",                  null: false
+    t.string   "api_key"
     t.integer  "user_id"
+    t.string   "org_api_key"
     t.string   "username"
     t.string   "page_title"
     t.uuid     "site_uuid"

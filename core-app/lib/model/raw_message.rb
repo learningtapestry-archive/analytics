@@ -16,6 +16,7 @@ class RawMessage < ActiveRecord::Base
     # TODO SECURITY verify that api_key and user_id in raw_message
     #   are associated with a record in api_key table
     #   We may want an option to skip validation of user_id/api_key
+    #   Or make sure that org_api_key is valid
     record = new(message)
     record.raw_message_logs << log_entry
     record

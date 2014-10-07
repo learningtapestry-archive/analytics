@@ -92,26 +92,25 @@ module LT
     configure do
       mime_type :javascript, 'application/javascript'
     end
+
+    ORG_API_KEY_ASSERT_ROUTE = "/api/v1/assert-org"
     # this is a dynamically rendered js file
     get '/api/v1/collector.js' do
       content_type :javascript
-      # TODO look up org_api_key and username from parameters
       username = params[:username]
       org_api_key = params[:org_api_key]
-      # TODO fail if username/org pair are invalid? 
-      locals = {
-        api_key: org_api_key,
-        user_id: username,
-        site_uuid: "foobar",
-        # TODO IRL this needs to point to staging or production servers
-        #  Ideally we solve this by adding a config.yml file for our servers
-        #  We have endpoints defined for dev/test/stage/prod just like for databases
-        #  Then we just load that config when Sinatra loads and feed those configs to 
-        #  local vars like this
-        #  the Sinatra routes definitions themselves should depend on this config file as well
-        assert_end_point: "/api/v1/assert"
-      }
-      erb :"collector.js", :layout => false, locals: locals
+      # reject this request unless org_api_key is found in Redis
+      if LT::RedisServer::org_api_key_get(org_api_key).nil? then
+        status 401
+        return
+      else
+        locals = {
+          org_api_key: org_api_key,
+          user_id: username,
+          assert_end_point: ORG_API_KEY_ASSERT_ROUTE
+        }
+        erb :"collector.js", :layout => false, locals: locals
+      end
     end
 
     get '/api/v1/approved-sites' do
@@ -120,11 +119,18 @@ module LT
     end # '/api/v1/approved_sites
 
 
-    post '/api/v1/assert-org' do
-      request.env["HTTP_X_LT_ORG_API_KEY"]
+    post ORG_API_KEY_ASSERT_ROUTE do
+      org_api_key = request.env["HTTP_X_LT_ORG_API_KEY"]
+      if !org_api_key.nil? && LT::RedisServer::has_org_api_key?(org_api_key)
+        LT::RedisServer.raw_message_push(request.body.read)
+        status 200
+      else
+        status 401 
+      end
+
     end
 
-    
+
     post '/api/v1/assert' do
       begin
         api_key = request.env["HTTP_X_LT_API_KEY"] 

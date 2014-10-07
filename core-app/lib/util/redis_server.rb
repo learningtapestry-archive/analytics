@@ -27,6 +27,17 @@ module LT
         end
       end
 
+      # utility
+
+      def clear_all_test_lists
+        if !LT::testing? && !LT::development? then
+          raise LT::BaseException.new("clear_all_test_lists must be run in testing or dev env")
+        end
+        self.raw_messages_queue_clear
+        self.api_keys_hashlist_clear
+        self.org_api_keys_hashlist_clear
+      end
+
       # raw messages
 
       def raw_messages_queue_clear
@@ -71,6 +82,10 @@ module LT
       # org api keys have an organization_id as value for an org_api_key key
       def org_api_keys_hashlist_clear
         @redis.del @hashlist_org_api_keys
+      end
+
+      def has_org_api_key?(key)
+        !!@redis.hget(@hashlist_org_api_keys, key)
       end
 
       def org_api_key_get(key)

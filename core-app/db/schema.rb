@@ -112,8 +112,9 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   end
 
   create_table "raw_messages", force: true do |t|
-    t.string   "api_key",                  null: false
+    t.string   "api_key"
     t.integer  "user_id"
+    t.string   "org_api_key"
     t.string   "username"
     t.string   "page_title"
     t.uuid     "site_uuid"

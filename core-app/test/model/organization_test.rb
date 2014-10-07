@@ -4,7 +4,16 @@ require 'database_cleaner'
 require 'debugger'
 
 class OrganizationTest < Minitest::Test
-  def test_create
+  def test_create_simple
+    # show that we can create an org with a predefined key
+    # and that is the key that will be persisted
+    org_api_key = SecureRandom.uuid
+    o = Organization.create(org_api_key: org_api_key)
+    assert !o.new_record?
+    assert_equal org_api_key, o.org_api_key
+  end
+
+  def test_create_complex
     # show that redis has no org_api_keys
     assert_equal 0, LT::RedisServer::org_api_key_hashlist_length
     # create an org with no org_api_key

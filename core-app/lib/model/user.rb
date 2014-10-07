@@ -28,6 +28,7 @@ class User < ActiveRecord::Base
 
   def each_site_visit(opts={})
     time_frame = opts[:time_frame] || DEFAULT_VISIT_TIME_FRAME
+    # BUG TODO 7.days below should be "time_frame" or maybe ChronicDuration.parse(time_frame)
     retval = self.site_visits
       .select("sum(site_visits.time_active) as time_active, \
         max(site_visits.date_visited) as date_visited, \

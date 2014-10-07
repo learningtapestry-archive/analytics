@@ -7,9 +7,8 @@ class User < ActiveRecord::Base
   has_many :emails
   has_many :section_user
   has_many :sections, through: :section_user
-  has_many :site_visits
   has_many :page_visits
-  has_many :sites, through: :site_visits
+  has_many :sites
   has_many :pages, through: :sites
 
   # Instance methods
@@ -26,32 +25,8 @@ class User < ActiveRecord::Base
     retval.gsub(/\s\s+/," ").strip
   end
 
-  def each_site_visit(opts={})
-    time_frame = opts[:time_frame] || DEFAULT_VISIT_TIME_FRAME
-    # BUG TODO 7.days below should be "time_frame" or maybe ChronicDuration.parse(time_frame)
-    retval = self.site_visits
-      .select("sum(site_visits.time_active) as time_active, \
-        max(site_visits.date_visited) as date_visited, \
-        site_visits.user_id, site_visits.site_id")
-      .joins(:site,:user)
-      .where(["date_visited between ? and ?", Time::now-7.days, Time::now])
-      .group("site_visits.user_id, site_visits.site_id")
-    retval.each do |site_visit|
-      yield site_visit
-    end
-    # select sum(time_active), date_visited, url, display_name from sites_visited
-    # join sites on sites.id = sites_visited.site_id
-    # join user on user.id = sites_visited.user_id
-    # where date_visited between "#{Time.now}" and "#{Time.now-time_frame}"
-    # group by date_visited, url, display_name
-
-    # PageVisit.select("sites.display_name, sum(page_visits.time_active)").joins(:page,:site,:user).where("date_visited between '09-18-2014 00:00:00' and '09-18-2014 23:59:59' and users.id = 1").group("sites.display_name")
-
-
-  end
-
   # returns aggregate site visits for this user as a user object
-  def get_site_visits(opts={})
+  def site_visits(opts={})
     begin_date = opts[:begin_date] || Time::now
     end_date = opts[:end_date] || Time::now
     site_visits = Site
@@ -69,19 +44,6 @@ class User < ActiveRecord::Base
       .group(Site.arel_table[:url])
     site_visits
   end
-
-  ## Site Usage by Users on a Given Date
-=begin
-  select sites.display_name, users.id, sum(page_visits.time_active) as time_active_sum from page_visits
-  join pages on pages.id = page_visits.page_id
-  join sites on sites.id = pages.site_id
-  join users on users.id = page_visits.user_id
-  where page_visits.user_id in (1,2) and 
-  page_visits.date_visited >= '09-18-2014 00:00:00' and
-  page_visits.date_visited <= '09-18-2014 23:59:59'
-  group by sites.id, users.id
-  order by time_active_sum desc
-=end
 
   # required parameters: 
   #   :site => Site or SiteVisit model instance
@@ -165,7 +127,7 @@ class User < ActiveRecord::Base
     if user.nil?
       return {:error_msg=>"User not found: #{username}", :exception => LT::UserNotFound.new}
     else 
-      if !user.authenticate(password) then
+      if user.password_digest.nil? || !user.authenticate(password) then
         return {:error_msg=>"Password invalid for user: #{username}", :exception => LT::PasswordInvalid.new}
       else
         return {:user=>user}

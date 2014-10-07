@@ -1,5 +1,5 @@
 require 'redis'
-
+require 'debugger'
 module LT
   module RedisServer
     class << self
@@ -7,7 +7,7 @@ module LT
         # Connect to Redis
         begin
           redis_config = YAML::load(File.open(config_file))
-          redis_url = redis_config[LT::run_env]["url"]
+          @redis_url = redis_config[LT::run_env]["url"]
           
           # Store static queue / hashlist names
           @queue_raw_message = redis_config[LT::run_env]["queue_raw_messages"]
@@ -27,8 +27,11 @@ module LT
         end
       end
 
-      # utility
+      def connection_string
+        @redis_url
+      end
 
+      # utility
       def clear_all_test_lists
         if !LT::testing? && !LT::development? then
           raise LT::BaseException.new("clear_all_test_lists must be run in testing or dev env")
@@ -39,7 +42,6 @@ module LT
       end
 
       # raw messages
-
       def raw_messages_queue_clear
         @redis.del @queue_raw_message
       end

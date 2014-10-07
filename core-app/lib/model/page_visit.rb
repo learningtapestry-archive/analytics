@@ -1,3 +1,6 @@
+require 'chronic'
+require 'chronic_duration'
+
 class PageVisit < ActiveRecord::Base
   include ActionView::Helpers::DateHelper
   belongs_to :user

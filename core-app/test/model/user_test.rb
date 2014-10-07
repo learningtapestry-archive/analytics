@@ -21,6 +21,7 @@ class UserSecurityTest < Minitest::Test
     if !@first_run
       DatabaseCleaner[:active_record].strategy = :transaction
       DatabaseCleaner[:redis].strategy = :truncation
+      DatabaseCleaner[:redis, {connection: LT::RedisServer.connection_string}]
     end
     @first_run = true
   end
@@ -106,7 +107,7 @@ class UserModelTest < Minitest::Test
     assert_equal LT::UserNotFound, retval[:exception].class
   end
 
-  def test_get_sites
+  def test_sites_visits
     @scenario = LT::Scenarios::Students::create_joe_smith_scenario
     @joe_smith = @scenario[:student]
     @page_visits = @scenario[:page_visits]
@@ -117,7 +118,7 @@ class UserModelTest < Minitest::Test
     refute_nil joe_smith
     begin_date = 14.days.ago
     end_date = Time.now
-    sites_visited = joe_smith.get_site_visits(begin_date: begin_date, end_date: end_date)
+    sites_visited = joe_smith.site_visits(begin_date: begin_date, end_date: end_date)
     refute_nil sites_visited
     # Nb: normally use "size" to get counts - length here works b/c AR associations are weird I think
     assert_equal 2, sites_visited.length 

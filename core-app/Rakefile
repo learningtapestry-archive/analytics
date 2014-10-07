@@ -1,6 +1,9 @@
 require './lib/lt_base.rb'
 require './lib/util/redis_server.rb'
 require 'irb'
+require 'pry'
+require 'pry-debugger'
+require 'pry-stack_explorer'
 
 ## AR 4: The following section allows us to run AR w/out Rails
 # Overwrite the already existing Rake task "load_config"
@@ -103,6 +106,11 @@ namespace :lt do
     IRB.conf[:MAIN_CONTEXT] = IRB::Irb.new.context
     require 'irb/ext/multi-irb'
     IRB.irb nil, self
+  end
+
+  task :console_pry do
+    LT::boot_all(File::dirname(__FILE__))
+    binding.pry
   end
 
   desc "Boot Core-app system"

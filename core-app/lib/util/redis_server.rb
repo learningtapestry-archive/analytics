@@ -1,5 +1,5 @@
 require 'redis'
-
+require 'debugger'
 module LT
   module RedisServer
     class << self
@@ -7,7 +7,7 @@ module LT
         # Connect to Redis
         begin
           redis_config = YAML::load(File.open(config_file))
-          redis_url = redis_config[LT::run_env]["url"]
+          @redis_url = redis_config[LT::run_env]["url"]
           
           # Store static queue / hashlist names
           @queue_raw_message = redis_config[LT::run_env]["queue_raw_messages"]
@@ -24,6 +24,10 @@ module LT
           LT::logger.error("Cannot connect to Redis, connect url: #{@redis_url}, error: #{e.message}")
           raise e
         end
+      end
+
+      def connection_string
+        @redis_url
       end
 
       def raw_messages_queue_clear

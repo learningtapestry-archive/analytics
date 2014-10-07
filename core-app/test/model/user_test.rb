@@ -21,6 +21,7 @@ class UserSecurityTest < Minitest::Test
     if !@first_run
       DatabaseCleaner[:active_record].strategy = :transaction
       DatabaseCleaner[:redis].strategy = :truncation
+      DatabaseCleaner[:redis, {connection: LT::RedisServer.connection_string}]
     end
     @first_run = true
   end

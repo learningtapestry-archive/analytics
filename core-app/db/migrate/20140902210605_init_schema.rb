@@ -77,13 +77,6 @@ class InitSchema < ActiveRecord::Migration
 
     add_index :pages, :url, :unique => true
 
-    create_table "site_visits", :force => true do |t|
-      t.datetime "date_visited"
-      t.column   "time_active", :interval
-      t.belongs_to :user
-      t.belongs_to :site
-    end
-
     create_table "page_visits", :force => true do |t|
       t.datetime "date_visited"
       t.column   "time_active", :interval

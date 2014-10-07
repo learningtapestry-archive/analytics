@@ -28,6 +28,9 @@ gem 'rerun' # process reload agent, helpful for sinatra development
 gem 'bcrypt', '>= 3.1.7'
 gem 'chronic', '>= 0.10.2'
 gem 'chronic_duration', '>= 0.10.6'
+gem 'pry', '>=0.10.1'
+gem 'pry-debugger', '>=0.2.3'
+gem 'pry-stack_explorer', '>=0.4.9.1'
 # public suffix is a project that helps decompose web hosts into their
 # meaningful parts (e.g. to figure out google.co.uk and google.com both are "google")
 # Possibly useful in the future so documenting here
@@ -42,4 +45,3 @@ group :test do
   gem 'poltergeist'
   gem 'capybara'
 end
-

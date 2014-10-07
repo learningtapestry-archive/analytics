@@ -123,28 +123,6 @@ module LT
             ApprovedSites::approved_codeacademy_data
           ],
           :pages=>(Pages::khanacademy_data+Pages::codeacademy_data),
-          :site_visits=>[{
-            # this field is not part of the model - used to help seed below
-            :url=>'http://www.khanacademy.org', 
-            :date_visited=>1.day.ago,
-            :time_active=>42.minutes.to_i
-            },
-            {
-            :url=>'http://www.khanacademy.org',
-            :date_visited=>2.days.ago,
-            :time_active=>33.minutes.to_i
-            },
-            {
-            :url=>'http://www.codeacademy.com',
-            :date_visited=>3.days.ago,
-            :time_active=>33.minutes.to_i
-            },
-            {
-            :url=>'http://www.codeacademy.com',
-            :date_visited=>13.days.ago,
-            :time_active=>44.minutes.to_i
-            }
-          ],
           :page_visits=>[{
             # this field is not part of the model - used to help seed below
             :url=>'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-decimals-to-fractions-2-ex-1',
@@ -200,15 +178,6 @@ module LT
           scenario[:sites].each do |site|
             site = site.dup
             s = Site.find_or_create_by(site)
-            scenario[:site_visits].each do |site_visit|
-              site_visit = site_visit.dup
-              if s.url == site_visit[:url] then
-                site_visit.delete(:url)
-                sv = SiteVisit.create(site_visit)
-                s.site_visits << sv
-                student.site_visits << sv
-              end
-            end
           end
           # create page records, and associated page_visited records
           # we have to tie pages to sites as well as pages_visited

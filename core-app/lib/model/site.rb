@@ -1,7 +1,6 @@
 require 'uri'
 
 class Site < ActiveRecord::Base
-  has_many :site_visits
   has_many :pages
   has_many :site_actions
   has_many :approved_sites

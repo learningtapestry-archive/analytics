@@ -14,7 +14,6 @@ class StudentModelTest < Minitest::Test
     @jane_doe = @scenario[:teacher]
     @section = @scenario[:section]
     @page_visits = @scenario[:page_visits]
-    @site_visits = @scenario[:site_visits]
     @sites = @scenario[:sites]
     @pages = @scenario[:pages]
   end
@@ -45,15 +44,11 @@ class StudentModelTest < Minitest::Test
     # Joe Smith has visited some Khan Academy sites recently
     student = Student.find_by_username(@joe_smith[:username])
     teacher = StaffMember.find_by_username(@jane_doe[:username])
-    assert_equal @site_visits.size, student.site_visits.size
-    assert student.site_visits.size >= 2
     assert_equal @page_visits.size, student.page_visits.size
     assert student.page_visits.size >= 2
     section_found = 0
     joe_smith_found = 0
-    khan_site_visit_count = 0
-    first_page_visit_count = 0
-    second_page_visit_count = 0
+    #khan_site_visit_count = 0
     students_in_section_count = 0
     each_page_visited_list = []
     # test data browsing that we expect to need for dashboard view
@@ -65,31 +60,24 @@ class StudentModelTest < Minitest::Test
         students_in_section_count += 1
         if student.username == @joe_smith[:username] then
           joe_smith_found += 1
-          student.each_site_visit do |site_visit|
-            if site_visit.url == @sites.first[:url] then
-              khan_site_visit_count += 1
-            end
-            student.each_page_visit(site: site_visit.site) do |page_visit|
-              if site_visit.url == @sites.first[:url] then
+          student.site_visits(begin_date: 14.days.ago).each do |site|
+            student.each_page_visit(site: site) do |page_visit|
+              if site.url == @sites.first[:url] then
                 each_page_visited_list << page_visit
-              end 
+              end # if site.url
             end # student.each_page_visit
-          end # if site_visit.url ==
+          end # student.site_visits
         end # if student.username 
       end #section.students.each
     end # teacher.sections.each
-    khan_site_visits_actual = @site_visits.count do |visit|
-      visit[:url].match(/khanacademy/)
-    end
     khan_page_visits_actual = @page_visits.count do |visit|
       visit[:url].match(/khanacademy/) && (visit[:date_visited] > Time.now - User::DEFAULT_VISIT_TIME_FRAME)
     end
-    assert_equal khan_site_visits_actual, 2
-    assert_equal khan_page_visits_actual, 3
+    #TODO:  This test can be improved with checking site visit durations
+    assert_equal 3, khan_page_visits_actual
     assert_equal 1, section_found
     assert_equal 1, joe_smith_found
     assert_equal 2, students_in_section_count
-    assert_equal 1, khan_site_visit_count
     assert_equal 2, each_page_visited_list.uniq.size
     # loop through every page visited and make sure it's
     # in the list of @page_visits we expected

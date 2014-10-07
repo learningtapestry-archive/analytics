@@ -164,13 +164,6 @@ ActiveRecord::Schema.define(version: 20140902210605) do
     t.datetime "updated_at"
   end
 
-  create_table "site_visits", force: true do |t|
-    t.datetime "date_visited"
-    t.string   "time_active",  limit: nil
-    t.integer  "user_id"
-    t.integer  "site_id"
-  end
-
   create_table "sites", force: true do |t|
     t.string "url",            limit: 4096, null: false
     t.string "display_name"

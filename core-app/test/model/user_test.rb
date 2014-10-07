@@ -36,23 +36,6 @@ class UserSecurityTest < Minitest::Test
 end
 
 class UserModelTest < Minitest::Test
-  def setup
-    # set database transaction, so we can revert seeds
-    DatabaseCleaner.start
-
-    @username = "testuser"
-    @password = "testpass"
-    @first_name = "Test"
-    @last_name = "User"
-    @user_json_string = <<-json
-    {
-      "username": "#{@username}",
-      "password": "#{@password}",
-      "first_name": "#{@first_name}",
-      "last_name": "#{@last_name}" 
-    }
-    json
-  end
 
   def test_create_user
     user_data = {:username=>@username,:password=> @password, 
@@ -132,11 +115,12 @@ class UserModelTest < Minitest::Test
 
     joe_smith = User.find_by_username([@joe_smith[:username]])
     refute_nil joe_smith
-
-    sites_visited = joe_smith.get_site_visits(begin_date: 14.days.ago.strftime("%Y-%m-%d 00:00:00"), end_date: Time.now.strftime("%Y-%m-%d 23:59:59") )
-
+    begin_date = 14.days.ago
+    end_date = Time.now
+    sites_visited = joe_smith.get_site_visits(begin_date: begin_date, end_date: end_date)
     refute_nil sites_visited
-    assert_equal 2, sites_visited.count
+    # Nb: normally use "size" to get counts - length here works b/c AR associations are weird I think
+    assert_equal 2, sites_visited.length 
   end
 
   @first_run
@@ -146,6 +130,25 @@ class UserModelTest < Minitest::Test
       DatabaseCleaner[:redis].strategy = :truncation
     end
     @first_run = true
+  end
+
+  def setup
+    before_suite
+    # set database transaction, so we can revert seeds
+    DatabaseCleaner.start
+
+    @username = "testuser"
+    @password = "testpass"
+    @first_name = "Test"
+    @last_name = "User"
+    @user_json_string = <<-json
+    {
+      "username": "#{@username}",
+      "password": "#{@password}",
+      "first_name": "#{@first_name}",
+      "last_name": "#{@last_name}" 
+    }
+    json
   end
 
   def teardown

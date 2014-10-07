@@ -28,6 +28,7 @@ class User < ActiveRecord::Base
 
   def each_site_visit(opts={})
     time_frame = opts[:time_frame] || DEFAULT_VISIT_TIME_FRAME
+    # BUG TODO 7.days below should be "time_frame" or maybe ChronicDuration.parse(time_frame)
     retval = self.site_visits
       .select("sum(site_visits.time_active) as time_active, \
         max(site_visits.date_visited) as date_visited, \
@@ -49,19 +50,23 @@ class User < ActiveRecord::Base
 
   end
 
+  # returns aggregate site visits for this user as a user object
   def get_site_visits(opts={})
     begin_date = opts[:begin_date] || Time::now
     end_date = opts[:end_date] || Time::now
-
     site_visits = Site
-      .select("sites.display_name, sites.url, sum(page_visits.time_active) as time_active_sum")
-      .joins(:pages)
-      .joins("INNER JOIN page_visits on page_visits.id = pages.id")
-      .joins("INNER JOIN users on page_visits.user_id = users.id")
-      .where(["date_visited >= ? and date_visited <= ? and users.id = ?", begin_date, end_date, self.id])
-      .group("sites.display_name, sites.url")
-      .as_json(only: [ :display_name, :url, :time_active_sum ])
-
+      .select(Site.arel_table[:id])
+      .select(Site.arel_table[:display_name])
+      .select(Site.arel_table[:url])
+      .select(PageVisit.arel_table[:time_active].sum.as("time_active"))
+      .joins("JOIN pages ON pages.site_id = sites.id")
+      .joins("JOIN page_visits ON page_visits.page_id = pages.id")
+      .joins("JOIN users ON users.id = page_visits.user_id")
+      .where(["page_visits.date_visited BETWEEN SYMMETRIC ? and ?", begin_date, end_date])
+      .where(["users.id = ?", self.id])
+      .group(Site.arel_table[:id])
+      .group(Site.arel_table[:display_name])
+      .group(Site.arel_table[:url])
     site_visits
   end
 

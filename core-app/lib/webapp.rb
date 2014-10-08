@@ -3,6 +3,7 @@ require 'sinatra/base'
 require 'sinatra/reloader'
 require 'sinatra/cookies'
 require 'json'
+require 'chronic'
 require File::join(LT::lib_path, 'util', 'session_manager.rb')
 require File::join(LT::lib_path, 'util', 'redis_server.rb')
 
@@ -25,6 +26,8 @@ module LT
     end
     if LT::development? then
       register Sinatra::Reloader
+      enable :reloader
+      also_reload './lib/views/*.erb'
       # set this to prevent reloading of specific files
       # dont_reload '/path/to/other/file'
     end

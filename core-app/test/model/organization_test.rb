@@ -51,6 +51,7 @@ class OrganizationTest < Minitest::Test
     if !@first_run
       DatabaseCleaner[:active_record].strategy = :transaction
       DatabaseCleaner[:redis].strategy = :truncation
+      LT::RedisServer::clear_all_test_lists
     end
     @first_run = true
   end

@@ -29,7 +29,7 @@ class WebAppJSTest < Minitest::Test
   # If it finds failing tests it will fail the test run w/a message.
   # It will also save a screenshot of the failing qUnit test results page (to LT::tmp_dir)
   # It will try to open that screenshot in chrome
-  def test_js_collector
+  def test_js_collector_via_qunit
     # set up data to make collector test work
     joe_smith_username=CGI::escape(@joe_smith[:username])
     acme_org_api_key = CGI::escape(@acme_org[:org_api_key])
@@ -71,26 +71,91 @@ class WebAppJSTest < Minitest::Test
        "Google Chrome should now have a window open to this file."
       assert_equal "0", num_failures, fail_message
     end
-    # Sanity: make sure that we have run some tests in this method
+    # Sanity: make sure that we have run some tests in QUnit
     assert self.assertions >= 2, "An unknown failure has caused JS tests to not run. Results XML:\n"\
       "#{resultsXML.to_s}"
+    # show that an initial "on page load" click message has been sent
+    message = JSON.parse(LT::RedisServer.raw_message_pop)
+    assert_equal RawMessage::Verbs::CLICKED, message["verb"]
 
+  end # test_js_collector_qunit
+
+  # collector.js unit and functional tests
+  def test_js_collector_directly
+    joe_smith_username=CGI::escape(@joe_smith[:username])
+    acme_org_api_key = CGI::escape(@acme_org[:org_api_key])
+
+    collector_test_url = "/assets/tests/js-collector-test.html?username=#{joe_smith_username}&org_api_key=#{acme_org_api_key}"
+    visit(collector_test_url)
+    sleep 0.1
+    # clear raw messages queue (there's a clicked message that comes on page load)
+    LT::RedisServer::raw_messages_queue_clear
     # validate that window.ltG.fSendMsg sends a message that is received by redis
-    time_on_site = '10M8S'
-    page_title = 'Foobar title'
-    page_url = 'http://foo.bar.com/foobity'
-    pageViewScript = "window.ltG.fSendPageView('#{page_url}','#{page_title}','#{time_on_site}');"
-    LT::RedisServer.api_key_set('abc123','does not matter')
+    page_url = page.evaluate_script("window.ltG.priv.fGetCurURL();")
+    page_title = page.evaluate_script("window.ltG.priv.fGetCurPageTitle();")
+
+    pageViewScript = "window.ltG.fSendPageViewMsg();"
     page.execute_script(pageViewScript)
     # we need to wait for the ajax call to complete
     sleep 0.1
     message = LT::RedisServer.raw_message_pop
     refute_nil message, "No Redis message received from Ajax call via assert api."
     message = JSON.parse(message)
-    assert_equal time_on_site, message["action"]["time"]
+    assert_equal "0S", message["action"]["time"]
     assert_equal RawMessage::Verbs::VIEWED, message["verb"]
-    assert_equal page_title, message["page_title"]
+    assert_match page_title, message["page_title"]
     assert_equal page_url, message["url"]
+
+    #validate url function
+    page_url = page.evaluate_script("window.ltG.priv.fGetCurURL();")
+    test_uri = URI::parse(page_url)
+    valid_uri = URI::parse(collector_test_url)
+    assert_equal valid_uri.path, test_uri.path
+    assert_equal valid_uri.query, test_uri.query
+
+    # show that fSendClickMsg works
+    assert !LT::RedisServer.raw_message_pop
+    pageViewScript = "window.ltG.fSendClickMsg();"
+    page.execute_script(pageViewScript)
+    sleep 0.1
+    message = LT::RedisServer.raw_message_pop
+    message = JSON.parse(message)
+    assert_equal RawMessage::Verbs::CLICKED, message["verb"]
+    assert_match page_title, message["page_title"]
+    assert_equal page_url, message["url"]
+
+    # TODO TEST WARNING: I cannot determine how to simulate a window close event in phantomjs
+    #  This means that we cannot programmatically verify that closing a window
+    #  will trigger the a "viewed" event with a correct "time on page" duration
+    #  Manual test: The way I am manually testing this feature currently is:
+    #    Run Sinatra in development mode
+    #    Run LT:console at terminal
+    #      Execute: LT::Scenarios::Students::create_joe_smith_scenario
+    #      Execute: Organization.first.org_api_key
+    #      Note the api-key uuid and paste it in the url below
+    #    Visit the following URL in a browser
+    #      http://localhost:8080/assets/tests/sandbox-test.html?username=joesmith@foo.com&org_api_key=[api_key]
+    #    Load RedisDesktopManager
+    #      View the dev raw messages queue
+    #      TEST: Verify there is one raw message corresponding to our page open ("clicked") event
+    #    Close the browser tab
+    #      TEST: Verify there are now two raw messages - the second with "viewed" and 
+    #        with the correct time shown in the data structure:
+    #        action: time: {"NNS"}
+
+
+    # we don't seem to be able to blur or close windows
+    # and generate associated events in phantomjs
+    # page.execute_script("window.blur();")
+    # page.execute_script("window.focus();")
+    # page.driver.browser.window_handles.each do |handle|
+    #   page.driver.browser.switch_to.window(handle)
+    #   page.execute_script "window.close();"
+
+    # end
+
+    #page.execute_script("window.close();")
+
   end
 
   @first_run

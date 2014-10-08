@@ -28,15 +28,14 @@ gem 'rerun' # process reload agent, helpful for sinatra development
 gem 'bcrypt', '>= 3.1.7'
 gem 'chronic', '>= 0.10.2'
 gem 'chronic_duration', '>= 0.10.6'
-gem 'pry', '>=0.10.1'
-gem 'pry-debugger', '>=0.2.3'
-gem 'pry-stack_explorer', '>=0.4.9.1'
 # public suffix is a project that helps decompose web hosts into their
 # meaningful parts (e.g. to figure out google.co.uk and google.com both are "google")
 # Possibly useful in the future so documenting here
 # gem 'public_suffix'
 # squasher - used in development to compress migration files
-group :test do
+
+# gems for use only in non-production environments
+group :dev_test do
   gem 'minitest', '>= 5.4.0'
   gem 'database_cleaner', '>= 1.3.0'
   gem 'debugger'
@@ -44,4 +43,7 @@ group :test do
   # sudo apt-get install phantomjs
   gem 'poltergeist'
   gem 'capybara'
+  gem 'pry', '>=0.10.1'
+  gem 'pry-debugger', '>=0.2.3'
+  gem 'pry-stack_explorer', '>=0.4.9.1'
 end

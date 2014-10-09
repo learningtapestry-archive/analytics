@@ -105,7 +105,7 @@ class UserModelTest < LTDBTestBase
     refute_nil joe_smith
     begin_date = 14.days.ago
     end_date = Time.now
-    sites_visited = joe_smith.site_visits(begin_date: begin_date, end_date: end_date)
+    sites_visited = joe_smith.site_visits_summary(begin_date: begin_date, end_date: end_date)
     refute_nil sites_visited
     # Nb: normally use "size" to get counts - length here works b/c AR associations are weird I think
     assert_equal 2, sites_visited.length 

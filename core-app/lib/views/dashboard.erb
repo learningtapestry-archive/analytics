@@ -11,7 +11,14 @@
 
 Nb. Time on site/page is for what time frame by default? (7 days?)
 -->
-
+<style>
+td.visits {
+  text-size: 1.1em; font-weight: bold;
+}
+td.visits a {
+  color: white;
+}
+</style>
 <%user.sections.each do |section|%>
 <h3>  Section: <%=section.display_name%></h3>
 
@@ -23,18 +30,25 @@ Nb. Time on site/page is for what time frame by default? (7 days?)
     <div class="box-body no-padding">
         <table class="table table-condensed">
             <tbody><tr>
-                <th>Site</th>
-                <th>Timed Visited</th>
-                <th style="width: 40px">Label</th>
+                <th style="width: 15%">Site</th>
+                <th style="width: 70%">Page</th>
+                <th style="width: 15%">Timed Visited</th>
             </tr>
 
-  <%student.site_visits(begin_date: 4.days.ago) do |site_visit|%>
-            <tr>
-                <td><%=site_visit.display_name%></td>
-                <td><%=site_visit.time_active%></td>
-                <td><span class="badge bg-red">55%</span></td>
+            <%student.site_visits_summary(begin_date: 4.days.ago).each do |site_visit|%>
+            <tr class="bg-light-blue">
+                <td colspan=2 class="visits"><a href="<%=site_visit.url%>" target="_blank"><%=site_visit.display_name%></a></td>
+                <td class="visits"><%=site_visit.time_active%></td>
             </tr>
-  <% end #student.each_site_visited %>
+
+              <%student.page_visits_summary(site: site_visit, begin_date: 4.days.ago).each do |page_visit|%>
+              <tr>
+                  <td>&nbsp;</td>
+                  <td><a href="<%=page_visit.url%>" target="_blank"><%=page_visit.display_name%></a></td>
+                  <td><%=page_visit.time_active%></td>
+              </tr>
+              <% end #student.page_visits %>
+            <% end #student.site_visits %>
 
         </tbody></table>
     </div><!-- /.box-body -->
@@ -43,10 +57,3 @@ Nb. Time on site/page is for what time frame by default? (7 days?)
   end #user.section
 %>
 <br/><br/>
-
-
-<!--
-<##student.each_page_visit(site: site_visit) do |page_visit|##>
-<##=page_visit.display_name##>
-<##=page_visit.time_active_words##>
--->

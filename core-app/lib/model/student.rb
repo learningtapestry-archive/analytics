@@ -10,8 +10,8 @@ class Student < ActiveRecord::Base
   delegate :last_name, :to => :user
   delegate :username, :to => :user
   delegate :email, :to => :user
-  delegate :each_site_visit, :to => :user
-  delegate :each_page_visit, :to => :user
+  delegate :site_visits_summary, :to => :user
+  delegate :page_visits_summary, :to => :user
 
   ### Class methods
 

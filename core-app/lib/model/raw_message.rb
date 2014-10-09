@@ -2,6 +2,7 @@ class RawMessage < ActiveRecord::Base
   has_many :raw_message_logs
   module Verbs
     VIEWED = 'viewed'
+    CLICKED = 'clicked'
   end
 
   def self.create_from_json(raw_json_msg)

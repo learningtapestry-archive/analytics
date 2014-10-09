@@ -5,6 +5,7 @@ Below is provided as reference for the JSON messages the Extractor is currently 
 
 ## Page View Event
 
+```javascript
 {
   api_key: "5bdde140-4f60-11e4-916c-0800200c9a66",
   username: 123,
@@ -18,9 +19,11 @@ Below is provided as reference for the JSON messages the Extractor is currently 
   page_title: "Math Lesson 101",
   captured_at: "2014-09-08T23:05:50-04:00"
 };
+```
 
 ## Click Event
 
+```javascript
 {
   api_key: "5bdde140-4f60-11e4-916c-0800200c9a66",
   username: 123,
@@ -32,9 +35,11 @@ Below is provided as reference for the JSON messages the Extractor is currently 
   url: "http://learning.null/math-lesson-101",
   captured_at: "2014-09-08T23:05:50-04:00"
 };
+```
 
 ## Extract Event
 
+```javascript
 {
   api_key: "5bdde140-4f60-11e4-916c-0800200c9a66",
   username: 123,
@@ -46,7 +51,7 @@ Below is provided as reference for the JSON messages the Extractor is currently 
   url: "http://learning.null/math-lesson-101",
   captured_at: "2014-09-08T23:05:50-04:00"
 };
-
+```
 
 --------------
 

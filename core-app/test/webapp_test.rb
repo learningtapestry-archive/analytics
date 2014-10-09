@@ -32,7 +32,7 @@ class WebAppTest < Minitest::Test
 
     response_html =  Nokogiri.parse(last_response.body)
     page_title = response_html.css("title").text
-    assert_equal "Learntaculous - Your Dashboard", page_title
+    assert_equal "Learning Tapestry - Your Dashboard", page_title
     
     teacher_name = response_html.css("div.user-panel > div.info > p:first-child").text
     assert_equal "Hello, #{teacher.first_name}", teacher_name
@@ -42,7 +42,7 @@ class WebAppTest < Minitest::Test
     assert_equal 200, last_response.status, last_response.body
     html = Nokogiri.parse(last_response.body)
     title = html.css('head>title').text
-    assert_equal "Learntaculous - Your Dashboard", title
+    assert_equal "Learning Tapestry - Your Dashboard", title
 
     # verify teacher's name is printed on the page
     teacher_name = html.css('p.teacher_name').text

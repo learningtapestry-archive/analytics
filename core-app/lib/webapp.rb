@@ -10,7 +10,7 @@ require File::join(LT::lib_path, 'util', 'redis_server.rb')
 module LT
   module WebAppHelper
     def set_title(title)
-      @layout[:title] = "Learntaculous - #{title}"
+      @layout[:title] = "Learning Tapestry - #{title}"
     end
   end # WebAppHelper
   class WebApp < Sinatra::Base

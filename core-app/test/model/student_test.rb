@@ -60,8 +60,8 @@ class StudentModelTest < Minitest::Test
         students_in_section_count += 1
         if student.username == @joe_smith[:username] then
           joe_smith_found += 1
-          student.site_visits(begin_date: 14.days.ago).each do |site|
-            student.each_page_visit(site: site) do |page_visit|
+          student.site_visits_summary(begin_date: 14.days.ago).each do |site|
+            student.page_visits_summary(site: site, begin_date: 14.days.ago).each do |page_visit|
               if site.url == @sites.first[:url] then
                 each_page_visited_list << page_visit
               end # if site.url

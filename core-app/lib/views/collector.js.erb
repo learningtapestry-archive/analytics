@@ -1,7 +1,7 @@
 /*
  * collector.js
  *
- * Copyright 2014 Learntaculous, Inc.
+ * Copyright 2014 Learning Tapestry, Inc.
  * All rights reserved
  *
 */
@@ -14,6 +14,8 @@
   script.src = "//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js";
   script.onload = function () {
     window.ltG = {};
+    // private functions (in name only - just namespaced to make clear they are internal)
+    window.ltG.priv = {};
     window.lt$ = jQuery.noConflict( true );
     window.ltG.orgApiKey = "<%=org_api_key%>";
     window.ltG.userId = "<%=user_id%>";
@@ -38,18 +40,83 @@
     };
     // Generate a PageView message suitable for sending via fSendMsg
     window.ltG.fGenPageViewMsg = function(uRL, pageTitle, timeOnPage) {
-      action = {
-        time: timeOnPage,
-        page_title: pageTitle
-      };
-      return window.ltG.priv.fGenRawMsg(uRL, pageTitle, 'viewed', action);
+      var verb = 'viewed';
+      action = window.ltG.priv.fGenActionBaseMsg(pageTitle, verb);
+      action["time"] = timeOnPage;
+      return window.ltG.priv.fGenRawMsg(uRL, pageTitle, verb, action);
     };
-    window.ltG.fSendPageView = function(uRL, pageTitle, timeOnPage) {
+
+    window.ltG.fGenClickMsg = function(uRL, pageTitle) {
+      var verb = 'clicked';
+      action = window.ltG.priv.fGenActionBaseMsg(pageTitle, verb);
+      return window.ltG.priv.fGenRawMsg(uRL, pageTitle, verb, action);
+    }
+
+    // generate a PageView message and send to server
+    window.ltG.fSendPageViewMsg = function() {
+      var timeOnPage = window.ltG.fGetResetTimeOnPage();
+      var uRL = window.ltG.priv.fGetCurURL();
+      var pageTitle = window.ltG.priv.fGetCurPageTitle();
       var msg = window.ltG.fGenPageViewMsg(uRL, pageTitle, timeOnPage);
       window.ltG.priv.fSendMsg(msg);
     };
+
+    // generate a Click message and send to server
+    window.ltG.fSendClickMsg = function() {
+      var uRL = window.ltG.priv.fGetCurURL();
+      var pageTitle = window.ltG.priv.fGetCurPageTitle();
+      var msg = window.ltG.fGenClickMsg(uRL, pageTitle);
+      window.ltG.priv.fSendMsg(msg);
+    };
     
-    window.ltG.priv = {};
+    window.ltG.fStartPageTimer = function() {
+      window.ltG.priv.timerStartDate = new Date();
+    };
+
+    window.ltG.fPausePageTimer = function() {
+      //window.ltG.timerPauseDate = new Date();
+      // not yet implemented
+    };
+
+    window.ltG.fUnPausePageTimer = function () {
+      //not yet implemented
+    }
+
+    // returns duration since timer start and restarts timer at 0
+    // see fCalcDateDifference for return value format (e.g. "129S")
+    window.ltG.fGetResetTimeOnPage = function () {
+      var currentDate = new Date();    
+      var startDate = window.ltG.priv.timerStartDate;
+      var retVal = window.ltG.fCalcDateDifference(currentDate, startDate);
+      window.ltG.fStartPageTimer();
+      return retVal;
+    };
+
+    // returns a string with interval difference between two dates in seconds
+    // format: NNNS e.g., "129S"
+    window.ltG.fCalcDateDifference = function(curDate, oldDate) {
+      return (Math.floor((curDate - oldDate)/1000) + "S")
+    };
+
+    // ### private/utility functions ###
+
+    window.ltG.priv.fGenActionBaseMsg = function(pageTitle, verb) {
+      return {
+        id: "verbs/"+verb,
+        display: {"en-US": verb},
+        page_title: pageTitle,
+        user_agent: navigator.userAgent
+      };
+    };
+
+    window.ltG.priv.fGetCurURL = function(){
+      return window.location.href
+    }
+
+    window.ltG.priv.fGetCurPageTitle = function(){
+      return lt$(document).find("title").text();
+    }
+
     window.ltG.priv.fSendMsg = function(msg){
       window.lt$.ajax({
         url: window.ltG.assert_end_point,
@@ -58,7 +125,7 @@
         headers: {"X_LT_ORG_API_KEY": msg.org_api_key},
         contentType:"application/json; charset=utf-8",
         success: function(){
-          //
+          //nothing at this time on success
         },
         error: function(jqxhr,error){
           console.log("fSendMsg JS failed.");
@@ -135,13 +202,29 @@
 
           return str;
       }
+    // ***********************
     // main event handler code
+    // ***********************
     window.lt$( document ).ready(function() {
-      //send message that page was loaded: "click" event
+      window.ltG.fSendClickMsg();
+      window.ltG.fStartPageTimer();
       //start timer that we are on page
       //hook document focus/blur events to manage timer
+      lt$(function() {
+          lt$(window).focus(function() {
+              console.log('Focus');
+          });
+
+          lt$(window).blur(function() {
+              console.log('Blur');
+          });
+      });
       //hook document unload event to send timer data: "pageview" event
-    });
+      lt$( window ).unload(function() {
+        console.log("Unload");
+        window.ltG.fSendPageViewMsg();
+      });
+    }); // document.ready
   };
   document.getElementsByTagName('head')[0].appendChild(script);
 })();

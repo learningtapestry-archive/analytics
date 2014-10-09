@@ -2,6 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <!--Don't change the page title without editing page title test in webapp_js_test.rb-->
   <title>LT JS Collector Tests</title>
   <link rel="stylesheet" href="qunit-1.15.0.css">
   <script src="qunit-1.15.0.js"></script>
@@ -56,6 +57,17 @@ QUnit.test("ltG vars and methods tests", function(assert){
   assert.equal(msg.action.time, timeOnPage);
   assert.equal(msg.action.page_title, pageTitle);
   assert.equal(msg.verb, "viewed");
+  var testPageTitle = window.ltG.priv.fGetCurPageTitle();
+  var validPageTitle = "LT JS Collector Tests";
+  assert.equal(validPageTitle, testPageTitle);
+
+  // verify date diff function works
+  curDate = new Date();
+  oldDate = curDate - 400000;
+  var diff = window.ltG.fCalcDateDifference(curDate, oldDate);
+  assert.equal("400S", diff);
+
+
 });
 
 //we write the results of our tests to xml in this document

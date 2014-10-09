@@ -240,7 +240,9 @@ module LT
     end; end #Students
     module RawMessages class << self
       def raw_messages_scenario_data
+        new_student_username = "newuser@novel.com"
         scenario = {
+          new_student: {username: new_student_username},
           students: [
             Students::joe_smith_data,
             Students::bob_newhart_data
@@ -307,6 +309,7 @@ module LT
             url: Pages::khanacademy_data[0][:url]
             }, 
             { # This is an org_api_key raw_message to validate that janitor handles both
+              # this message refers to a known user
             username: Students::joe_smith_data[:username],
             verb: "viewed",
             action:
@@ -316,6 +319,19 @@ module LT
               value: {time: "12M24S"}
               },
             captured_at: 4.days.ago.iso8601,
+            org_api_key: Organizations::acme_organization_data[:org_api_key],
+            url: Pages::khanacademy_data[0][:url]
+            },
+            {  # this message refers to a new user
+            username: new_student_username,
+            verb: "viewed",
+            action:
+              {
+              id: "verbs/viewed",
+              display: {:"en-US" => "viewed"},
+              value: {time: "12M24S"}
+              },
+            captured_at: 4.5.days.ago.iso8601,
             org_api_key: Organizations::acme_organization_data[:org_api_key],
             url: Pages::khanacademy_data[0][:url]
             }
@@ -336,7 +352,10 @@ module LT
         end
         scenario[:raw_messages].each do |raw_message|
           # delete username and swap in the user_id
-          raw_message[:user_id]=usernames_ids[raw_message.delete(:username)]
+          # except for the org_api_key record which is supposed to have username
+          if raw_message[:org_api_key].nil? then
+            raw_message[:user_id]=usernames_ids[raw_message.delete(:username)]
+          end
           if raw_message[:user_id].nil? && raw_message[:org_api_key].nil? then
             raise StandardError
           end

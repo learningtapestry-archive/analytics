@@ -1,9 +1,7 @@
-gem "minitest"
-require 'minitest/autorun'
-require 'database_cleaner'
-require 'debugger'
+test_helper_file = File::expand_path(File::join(LT::test_path,'test_helper.rb'))
+require test_helper_file
 
-class OrganizationTest < Minitest::Test
+class OrganizationTest < LTDBTestBase
   def test_create_simple
     # show that we can create an org with a predefined key
     # and that is the key that will be persisted
@@ -46,21 +44,10 @@ class OrganizationTest < Minitest::Test
     assert_equal nil, LT::RedisServer::org_api_key_get("foobar")
   end
 
-  @first_run
-  def before_suite
-    if !@first_run
-      DatabaseCleaner[:active_record].strategy = :transaction
-      DatabaseCleaner[:redis].strategy = :truncation
-      LT::RedisServer::clear_all_test_lists
-    end
-    @first_run = true
-  end
   def setup
-    before_suite
-    # set database transaction, so we can revert seeds
-    DatabaseCleaner.start
+    super
   end
   def teardown
-    DatabaseCleaner.clean # cleanup of the database
+    super
   end
 end

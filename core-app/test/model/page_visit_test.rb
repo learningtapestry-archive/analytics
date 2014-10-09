@@ -1,14 +1,11 @@
-gem "minitest"
-require 'minitest/autorun'
-require 'database_cleaner'
-require 'debugger'
+test_helper_file = File::expand_path(File::join(LT::test_path,'test_helper.rb'))
+require test_helper_file
+
 require File::join(LT::janitor_path,'redis_postgres_extract.rb')
 
-class PageVisitModelTest < Minitest::Test
+class PageVisitModelTest < LTDBTestBase
   def setup
-    before_suite
-    # set database transaction, so we can revert seeds
-    DatabaseCleaner.start
+    super
     LT::Seeds::seed!
   end
 
@@ -26,18 +23,8 @@ class PageVisitModelTest < Minitest::Test
   end
 
 
-  @first_run
-  def before_suite
-    if !@first_run
-      DatabaseCleaner[:active_record].strategy = :transaction
-      DatabaseCleaner[:redis].strategy = :truncation
-      DatabaseCleaner[:redis, {connection: LT::RedisServer.connection_string}]
-    end
-    @first_run = true
-  end
-
   def teardown
-    DatabaseCleaner.clean # cleanup of the database
+    super
   end
 end
 

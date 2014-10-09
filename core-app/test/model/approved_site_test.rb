@@ -1,17 +1,7 @@
-gem "minitest"
-require 'minitest/autorun'
-require 'database_cleaner'
+test_helper_file = File::expand_path(File::join(LT::test_path,'test_helper.rb'))
+require test_helper_file
 
-class ApprovedSiteActionTest < Minitest::Test
-  def setup
-    before_suite
-    DatabaseCleaner.start
-    @scenario = LT::Scenarios::Students::create_joe_smith_scenario
-    @school = @scenario[:school]
-    @sites = @scenario[:sites]
-    @site_actions = @scenario[:site_actions]
-    @approved_sites = @scenario[:approved_sites]
-  end
+class ApprovedSiteActionTest < LTDBTestBase
 
   def test_get_with_actions_by_school
     school = School.find_by_name(@school[:name])
@@ -63,17 +53,16 @@ class ApprovedSiteActionTest < Minitest::Test
     assert_equal true, codeacad_action_found
   end
 
-  @first_run
-  def before_suite
-    if !@first_run
-      DatabaseCleaner[:active_record].strategy = :transaction
-      DatabaseCleaner[:redis].strategy = :truncation
-      DatabaseCleaner[:redis, {connection: LT::RedisServer.connection_string}]
-    end
-    @first_run = true
+  def setup
+    super
+    @scenario = LT::Scenarios::Students::create_joe_smith_scenario
+    @school = @scenario[:school]
+    @sites = @scenario[:sites]
+    @site_actions = @scenario[:site_actions]
+    @approved_sites = @scenario[:approved_sites]
   end
 
   def teardown
-    DatabaseCleaner.clean # cleanup of the database
+    super
   end
 end

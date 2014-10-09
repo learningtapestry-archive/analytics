@@ -1,9 +1,8 @@
-gem "minitest"
-require 'minitest/autorun'
-require 'database_cleaner'
-require 'debugger'
+test_helper_file = File::expand_path(File::join(LT::test_path,'test_helper.rb'))
+require test_helper_file
 
-class UserSecurityTest < Minitest::Test
+class UserSecurityTest < LTDBTestBase
+
   def test_password_hashing_validation
     password = 'xyzabc'
     username = 'foobar-user'
@@ -16,27 +15,15 @@ class UserSecurityTest < Minitest::Test
     assert user.authenticate(password)
   end
 
-  @first_run
-  def before_suite
-    if !@first_run
-      DatabaseCleaner[:active_record].strategy = :transaction
-      DatabaseCleaner[:redis].strategy = :truncation
-      DatabaseCleaner[:redis, {connection: LT::RedisServer.connection_string}]
-    end
-    @first_run = true
-  end
-
   def setup
-    before_suite
-    # set database transaction, so we can revert seeds
-    DatabaseCleaner.start
+    super
   end
   def teardown
-    DatabaseCleaner.clean # cleanup of the database
+    super
   end
 end
 
-class UserModelTest < Minitest::Test
+class UserModelTest < LTDBTestBase
 
   def test_create_user
     user_data = {:username=>@username,:password=> @password, 
@@ -124,19 +111,8 @@ class UserModelTest < Minitest::Test
     assert_equal 2, sites_visited.length 
   end
 
-  @first_run
-  def before_suite
-    if !@first_run
-      DatabaseCleaner[:active_record].strategy = :transaction
-      DatabaseCleaner[:redis].strategy = :truncation
-    end
-    @first_run = true
-  end
-
   def setup
-    before_suite
-    # set database transaction, so we can revert seeds
-    DatabaseCleaner.start
+    super
 
     @username = "testuser"
     @password = "testpass"
@@ -153,6 +129,6 @@ class UserModelTest < Minitest::Test
   end
 
   def teardown
-    DatabaseCleaner.clean # cleanup of the database
+    super
   end
 end

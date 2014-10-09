@@ -4,6 +4,8 @@ require 'irb'
 require 'pry'
 require 'pry-debugger'
 require 'pry-stack_explorer'
+require 'term/ansicolor'
+include Term::ANSIColor
 
 ## AR 4: The following section allows us to run AR w/out Rails
 # Overwrite the already existing Rake task "load_config"
@@ -49,13 +51,6 @@ end
 
 namespace :lt do
   namespace :webapp do
-    desc "Run WebApp tests"
-    task :run_tests do
-      ENV['RAILS_ENV'] = 'test'
-      LT::setup_environment(File::dirname(__FILE__))
-      LT::boot_db(File::expand_path('./db/config.yml'))
-      LT::run_test('webapp_test.rb', File::expand_path('./test'))
-    end
     desc "Boot WebApp environment"
     task :boot do
       Rake::Task[:'lt:boot'].invoke
@@ -179,6 +174,41 @@ namespace :lt do
         Rake::Task[:'db:migrate'].invoke
       end
     end
+    desc "Monitor files for changes and run a single test when a change is detected"
+    task :monitor => [:'lt:test:boot', :'lt:test:db:migrate_tables'] do |t, args|
+      keep_running = true
+      while keep_running do
+        # Loop until interrupted by ctrl-c
+        trap("INT") { puts "\nExiting"; keep_running = false; exit;}
+        test_list = FileList['test/**/*_test.rb']
+        orig_dates = {}
+        test_list.each do |file|
+          orig_dates[file] = File.stat(file).mtime
+        end
+        # loop through test_list looking for date changes
+        test_file = ""
+        keep_searching = true
+        while keep_searching && keep_running do
+          print "\r**** Waiting for test file changes. (#{Time::now.strftime('%b %d %I:%M %p')}), ctrl-c exits"
+          Kernel::sleep(0.3) # wait 3/10 second between searches for changed files
+          test_list.each do |file|
+            Kernel::sleep(0.05) # keep the cpu from maxing out
+            if orig_dates[file] != File.stat(file).mtime
+              print "\n",red,"  File change detected: ", bold,"./#{file}",reset,"\n"
+              puts "  Time is: #{Time::now}"
+              keep_searching = false
+              test_file = file
+            end
+          end
+          if !test_file.blank? && keep_running
+            full_test_file = File::expand_path(File::join('.',test_file))
+            # invoke the test b/c the file has changed
+            puts "Running test suite..."
+            system("rake lt:test:run_test[#{full_test_file}]")
+          end
+        end # while keep_searching... -- change detection loop
+      end # while keep_running do -- main loop
+    end # task :monitor
   end # test namesapce
 end # lt namespace
 

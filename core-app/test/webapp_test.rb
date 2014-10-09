@@ -1,20 +1,9 @@
-gem "minitest"
-require 'minitest/autorun'
-require 'rack/test'
-require 'nokogiri'
-require 'debugger'
-#require 'fileutils'
-#require 'tempfile'
-#require 'nokogiri'
-#require 'chronic'
-#require 'timecop'
-#require 'uri'
-require 'database_cleaner'
+test_helper_file = File::expand_path(File::join(LT::test_path,'test_helper.rb'))
+require test_helper_file
 
-require File::join(LT::lib_path, 'webapp.rb')
 
-class WebAppTest < Minitest::Test
-  include Rack::Test::Methods
+class WebAppTest < WebAppTestBase
+
   def test_homepage
     get "/"
     assert_equal 200, last_response.status, last_response.body
@@ -78,20 +67,8 @@ class WebAppTest < Minitest::Test
     assert_equal true, codeacad_found
   end
 
-  @first_run
-  def before_suite
-    if !@first_run
-      DatabaseCleaner[:active_record].strategy = :transaction
-      DatabaseCleaner[:redis].strategy = :truncation
-      DatabaseCleaner[:redis, {connection: LT::RedisServer.connection_string}]
-    end
-    @first_run = true
-  end
-
   def setup
-    before_suite
-    # set database transaction, so we can revert seeds
-    DatabaseCleaner.start
+    super
     LT::Seeds::seed!
     @scenario = LT::Scenarios::Students::create_joe_smith_scenario
     @joe_smith = @scenario[:student]
@@ -103,9 +80,6 @@ class WebAppTest < Minitest::Test
     @pages = @scenario[:pages]
   end
   def teardown
-    DatabaseCleaner.clean # cleanup of the database
-  end
-  def app
-    LT::WebApp
+    super
   end
 end

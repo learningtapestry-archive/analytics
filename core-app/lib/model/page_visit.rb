@@ -40,6 +40,11 @@ class PageVisit < ActiveRecord::Base
     end
     pv_data[:date_visited] = raw_message["captured_at"]
     pv_data[:user_id] = raw_message["user_id"]
+    # handle cases where user_id is missing but username is present
+    # we will create a new user based on username if necessary
+    if pv_data[:user_id].nil? then
+      pv_data[:user_id] = User.find_or_create_by(username: raw_message[:username]).id
+    end
     pv_data[:page] = {
       display_name: raw_message["page_title"],
       url: raw_message["url"]

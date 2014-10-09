@@ -40,15 +40,24 @@
     };
     // Generate a PageView message suitable for sending via fSendMsg
     window.ltG.fGenPageViewMsg = function(uRL, pageTitle, timeOnPage) {
+      var verb = 'viewed';
       action = {
+        id: "verbs/"+verb,
+        display: {"en-US": verb},
         time: timeOnPage,
         page_title: pageTitle
       };
-      return window.ltG.priv.fGenRawMsg(uRL, pageTitle, 'viewed', action);
+      return window.ltG.priv.fGenRawMsg(uRL, pageTitle, verb, action);
     };
 
     window.ltG.fGenClickMsg = function(uRL, pageTitle) {
-      return window.ltG.priv.fGenRawMsg(uRL, pageTitle, 'clicked', {});
+      var verb = 'clicked';
+      action = {
+        id: "verbs/"+verb,
+        display: {"en-US": verb},
+        page_title: pageTitle
+      };
+      return window.ltG.priv.fGenRawMsg(uRL, pageTitle, verb, action);
     }
 
     // generate a PageView message and send to server

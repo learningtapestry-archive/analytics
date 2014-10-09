@@ -118,7 +118,8 @@ module LT
       ApprovedSite.get_all_with_actions.to_json
     end # '/api/v1/approved_sites
 
-
+    # This route handles org_api_key assert messages
+    # e.g., /api/v1/assert-org
     post ORG_API_KEY_ASSERT_ROUTE do
       org_api_key = request.env["HTTP_X_LT_ORG_API_KEY"]
       if !org_api_key.nil? && LT::RedisServer::has_org_api_key?(org_api_key)

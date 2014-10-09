@@ -41,22 +41,14 @@
     // Generate a PageView message suitable for sending via fSendMsg
     window.ltG.fGenPageViewMsg = function(uRL, pageTitle, timeOnPage) {
       var verb = 'viewed';
-      action = {
-        id: "verbs/"+verb,
-        display: {"en-US": verb},
-        time: timeOnPage,
-        page_title: pageTitle
-      };
+      action = window.ltG.priv.fGenActionBaseMsg(pageTitle, verb);
+      action["time"] = timeOnPage;
       return window.ltG.priv.fGenRawMsg(uRL, pageTitle, verb, action);
     };
 
     window.ltG.fGenClickMsg = function(uRL, pageTitle) {
       var verb = 'clicked';
-      action = {
-        id: "verbs/"+verb,
-        display: {"en-US": verb},
-        page_title: pageTitle
-      };
+      action = window.ltG.priv.fGenActionBaseMsg(pageTitle, verb);
       return window.ltG.priv.fGenRawMsg(uRL, pageTitle, verb, action);
     }
 
@@ -107,6 +99,15 @@
     };
 
     // ### private/utility functions ###
+
+    window.ltG.priv.fGenActionBaseMsg = function(pageTitle, verb) {
+      return {
+        id: "verbs/"+verb,
+        display: {"en-US": verb},
+        page_title: pageTitle,
+        user_agent: navigator.userAgent
+      };
+    };
 
     window.ltG.priv.fGetCurURL = function(){
       return window.location.href

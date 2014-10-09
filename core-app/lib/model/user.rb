@@ -26,7 +26,7 @@ class User < ActiveRecord::Base
   end
 
   # returns aggregate site visits for this user as a user object
-  def site_visits(opts={})
+  def site_visits_summary(opts={})
     begin_date = opts[:begin_date] || Time::now
     end_date = opts[:end_date] || Time::now
     site_visits = Site
@@ -42,13 +42,14 @@ class User < ActiveRecord::Base
       .group(Site.arel_table[:id])
       .group(Site.arel_table[:display_name])
       .group(Site.arel_table[:url])
+      .order("time_active DESC")
     site_visits
   end
 
-  # required parameters: 
-  #   :site => Site or SiteVisit model instance
-  #      Serves to indicate which site we're pulling page_visits for
-  def each_page_visit(opts={})
+  # returns aggregate site visits for this user as a user object
+  def page_visits_summary(opts={})
+    begin_date = opts[:begin_date] || Time::now
+    end_date = opts[:end_date] || Time::now
     site = opts.fetch(:site)
     site_id = if site.kind_of?(Site) then
       site.id
@@ -57,17 +58,22 @@ class User < ActiveRecord::Base
     else
       raise LT::InvalidParameter.new("Bad Site parameter in each_page_visit")
     end
-    time_frame = opts[:time_frame] || DEFAULT_VISIT_TIME_FRAME
-    retval = self.page_visits
-      .select("sum(time_active) as time_active, \
-        max(date_visited) as date_visited, user_id, page_id")
-      .joins(:page,:user)
-      .where(["date_visited between ? and ?", Time::now-time_frame, Time::now])
-      .where(["site_id = ?",site_id])
-      .group("user_id, page_id")
-    retval.each do |page_visit|
-      yield page_visit
-    end
+    page_visits = Page
+      .select(Page.arel_table[:id])
+      .select(Page.arel_table[:display_name])
+      .select(Page.arel_table[:url])
+      .select(PageVisit.arel_table[:time_active].sum.as("time_active"))
+      .joins("JOIN sites ON sites.id = pages.site_id")
+      .joins("JOIN page_visits ON page_visits.page_id = pages.id")
+      .joins("JOIN users ON users.id = page_visits.user_id")
+      .where(["page_visits.date_visited BETWEEN SYMMETRIC ? and ?", begin_date, end_date])
+      .where(["sites.id = ?", site_id])
+      .where(["users.id = ?", self.id])
+      .group(Page.arel_table[:id])
+      .group(Page.arel_table[:display_name])
+      .group(Page.arel_table[:url])
+      .order("time_active DESC")
+    page_visits
   end
 
   # Class methods

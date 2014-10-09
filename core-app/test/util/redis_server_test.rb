@@ -1,12 +1,12 @@
-gem "minitest"
-require 'minitest/autorun'
-require 'debugger'
-require 'database_cleaner'
-require File::join(LT::lib_path, 'util', 'redis_server.rb')
+test_helper_file = File::expand_path(File::join(LT::test_path,'test_helper.rb'))
+require test_helper_file
 
-class RedisConfigurationTest < Minitest::Test
+class RedisConfigurationTest < LTDBTestBase
   def setup
-    LT::RedisServer::boot_redis(File::expand_path('./db/redis.yml'))
+    super
+  end
+  def teardown
+    super
   end
 
   def test_RawMessageQueue

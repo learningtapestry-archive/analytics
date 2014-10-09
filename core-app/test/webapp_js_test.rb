@@ -1,18 +1,7 @@
-gem "minitest"
-require 'minitest/autorun'
-require 'rack/test'
-require 'nokogiri'
-require 'debugger'
-require 'database_cleaner'
-require 'capybara'
-require 'capybara/poltergeist'
-require 'benchmark'
+test_helper_file = File::expand_path(File::join(LT::test_path,'test_helper.rb'))
+require test_helper_file
 
-require File::join(LT::lib_path, 'webapp.rb')
-
-class WebAppJSTest < Minitest::Test
-  include Rack::Test::Methods
-  include Capybara::DSL
+class WebAppJSTest < WebAppJSTestBase
 
   def save_load_screenshot(page)
     file_screenshot = File::expand_path(File::join(LT::tmp_path, "collector_errors.png"))
@@ -161,37 +150,8 @@ class WebAppJSTest < Minitest::Test
 
   end
 
-  @first_run
-  def before_suite
-    if !@first_run
-      LT::RedisServer::clear_all_test_lists
-      DatabaseCleaner[:active_record].strategy = :transaction
-      DatabaseCleaner[:redis].strategy = :truncation
-      Capybara.app = LT::WebApp
-      Capybara.current_driver = :poltergeist
-      Capybara.javascript_driver = :poltergeist
-      # debug mode
-      Capybara.register_driver :poltergeist_debug do |app|
-        Capybara::Poltergeist::Driver.new(app, {:inspector => true, :timeout=>999})
-      end
-      # comment these lines out to use regular/non-debug webkit mode (probably faster)
-      Capybara.current_driver = :poltergeist_debug
-      Capybara.javascript_driver = :poltergeist_debug
-      # To use the debugger add "page.driver.debug" in this file, *before* the JS code call you want to debug
-      # When you run your test, you'll get a new window in chrome. Click the second link on that page
-      # This is your code - select the JS file from the upper left pull-down
-      # Set a breakpoint where you want to intercept the code
-      # Press enter in the terminal console where your test is running
-      # You'll see the code in the browser stopped on the line you breakpointed.
-      # more info here: http://www.jonathanleighton.com/articles/2012/poltergeist-0-6-0/
-    end
-    @first_run = true
-  end
-
   def setup
-    before_suite
-    # set database transaction, so we can revert seeds
-    DatabaseCleaner.start
+    super
     LT::Seeds::seed!
     @scenario = LT::Scenarios::Students::create_joe_smith_scenario
     @joe_smith = @scenario[:student]
@@ -204,11 +164,7 @@ class WebAppJSTest < Minitest::Test
     @acme_org = @scenario[:organizations].first
   end
   def teardown
-    DatabaseCleaner.clean # cleanup of the database
-    Capybara.reset_sessions!
-    Capybara.use_default_driver
+    super
   end
-  def app
-    LT::WebApp
-  end
+
 end

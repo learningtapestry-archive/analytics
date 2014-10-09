@@ -97,9 +97,11 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   end
 
   create_table "pages", force: true do |t|
-    t.string  "url",          limit: 4096, null: false
-    t.string  "display_name"
-    t.integer "site_id"
+    t.string   "url",          limit: 4096, null: false
+    t.string   "display_name"
+    t.integer  "site_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "pages", ["url"], name: "index_pages_on_url", unique: true, using: :btree
@@ -169,11 +171,13 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   end
 
   create_table "sites", force: true do |t|
-    t.string "url",            limit: 4096, null: false
-    t.string "display_name"
-    t.uuid   "site_uuid",                   null: false
-    t.string "logo_url_small", limit: 4096
-    t.string "logo_url_large", limit: 4096
+    t.string   "url",            limit: 4096, null: false
+    t.string   "display_name"
+    t.uuid     "site_uuid",                   null: false
+    t.string   "logo_url_small", limit: 4096
+    t.string   "logo_url_large", limit: 4096
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "sites", ["url"], name: "index_sites_on_url", unique: true, using: :btree
@@ -199,9 +203,9 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   end
 
   create_table "users", force: true do |t|
-    t.string   "first_name",      null: false
+    t.string   "first_name"
     t.string   "middle_name"
-    t.string   "last_name",       null: false
+    t.string   "last_name"
     t.string   "gender"
     t.string   "username",        null: false
     t.string   "password_digest"

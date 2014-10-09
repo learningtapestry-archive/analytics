@@ -44,6 +44,7 @@ class InitSchema < ActiveRecord::Migration
       t.uuid     "site_uuid",       :null => false
       t.string   "logo_url_small",  :limit => 4096
       t.string   "logo_url_large",  :limit => 4096
+      t.timestamps
     end
 
     add_index :sites, :url, :unique => true
@@ -73,6 +74,7 @@ class InitSchema < ActiveRecord::Migration
       t.string   "url",         :null => false, :limit => 4096
       t.string   "display_name"
       t.belongs_to :site
+      t.timestamps
     end
 
     add_index :pages, :url, :unique => true
@@ -166,9 +168,9 @@ class InitSchema < ActiveRecord::Migration
     ### Begin User Tables
 
     create_table "users", :force => true do |t|
-      t.string   "first_name",    :null => false
+      t.string   "first_name"
       t.string   "middle_name"
-      t.string   "last_name",     :null => false
+      t.string   "last_name"
       t.string   "gender"
       t.string   "username",     :null => false
       t.string   "password_digest"

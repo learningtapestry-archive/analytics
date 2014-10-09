@@ -124,6 +124,9 @@ class WebAppJSTest < Minitest::Test
     assert_match page_title, message["page_title"]
     assert_equal page_url, message["url"]
 
+    # verify that this message has a user_agent value in action
+    assert_match /^Mozilla\/5.0.*PhantomJS/, message["action"]["user_agent"]
+
     # TODO TEST WARNING: I cannot determine how to simulate a window close event in phantomjs
     #  This means that we cannot programmatically verify that closing a window
     #  will trigger the a "viewed" event with a correct "time on page" duration

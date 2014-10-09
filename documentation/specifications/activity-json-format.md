@@ -57,6 +57,6 @@ Below is provided as reference for the JSON messages the Extractor is currently 
 
 ## Planned Changes
 
-1.)  Change "username" to "user_id" in all message payloads.
-2.)  Remove duplicate page title out of page view event.
-3.)  Verify all changes and format from Redis queue, actual JSON messages.
+1.  Change "username" to "user_id" in all message payloads.
+2.  Remove duplicate page title out of page view event.
+3.  Verify all changes and format from Redis queue, actual JSON messages.

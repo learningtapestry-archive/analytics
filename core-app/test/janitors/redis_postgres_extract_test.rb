@@ -1,12 +1,10 @@
-gem "minitest"
-require 'minitest/autorun'
-require 'debugger'
-require 'database_cleaner'
+test_helper_file = File::expand_path(File::join(LT::test_path,'test_helper.rb'))
+require test_helper_file
+
 require 'date'
-require 'benchmark'
 require File::join(LT::janitor_path,'redis_postgres_extract.rb')
 
-class RedisPostgresExtractTest < Minitest::Test
+class RedisPostgresExtractTest < LTDBTestBase
 
   def test_extract_from_redis_to_pg_scenario
     # basic setup checking that data are ready for export in redis
@@ -112,23 +110,10 @@ class RedisPostgresExtractTest < Minitest::Test
   end
 
   def teardown
-    DatabaseCleaner.clean # cleanup of the database
+    super
   end
-
-  @first_run
-  def before_suite
-    if !@first_run
-      DatabaseCleaner[:active_record].strategy = :transaction
-      DatabaseCleaner[:redis].strategy = :truncation
-      DatabaseCleaner[:redis, {connection: LT::RedisServer.connection_string}]
-    end
-    @first_run = true
-  end
-
   def setup
-    before_suite
-    # set database transaction, so we can revert seeds
-    DatabaseCleaner.start
+    super
   end
 
 

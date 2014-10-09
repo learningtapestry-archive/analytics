@@ -1,26 +1,13 @@
-gem "minitest"
-require 'minitest/autorun'
-require 'database_cleaner'
+test_helper_file = File::expand_path(File::join(LT::test_path,'test_helper.rb'))
+require test_helper_file
 
-class ApiKeyModelTest < Minitest::Test
-
-  @first_run
-  def before_suite
-    if !@first_run
-      DatabaseCleaner[:active_record].strategy = :transaction
-      DatabaseCleaner[:redis].strategy = :truncation
-      DatabaseCleaner[:redis, {connection: LT::RedisServer.connection_string}]
-    end
-    @first_run = true
-  end
+class ApiKeyModelTest < LTDBTestBase
 
   def setup
-    before_suite
-    # set database transaction, so we can revert seeds
-    DatabaseCleaner.start
+    super
   end
   def teardown
-    DatabaseCleaner.clean # cleanup of the database
+    super
   end
 
   def test_create_api_key_invalid_user_id

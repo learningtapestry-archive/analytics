@@ -1,13 +1,9 @@
-gem "minitest"
-require 'minitest/autorun'
-require 'database_cleaner'
-require 'debugger'
+test_helper_file = File::expand_path(File::join(LT::test_path,'test_helper.rb'))
+require test_helper_file
 
-class StudentModelTest < Minitest::Test
+class StudentModelTest < LTDBTestBase
   def setup
-    before_suite
-    # set database transaction, so we can revert seeds
-    DatabaseCleaner.start
+    super
     LT::Seeds::seed!
     @scenario = LT::Scenarios::Students::create_joe_smith_scenario
     @joe_smith = @scenario[:student]
@@ -90,18 +86,8 @@ class StudentModelTest < Minitest::Test
     assert_equal 0, each_page_visited_list.size
   end
 
-  @first_run
-  def before_suite
-    if !@first_run
-      DatabaseCleaner[:active_record].strategy = :transaction
-      DatabaseCleaner[:redis].strategy = :truncation
-      DatabaseCleaner[:redis, {connection: LT::RedisServer.connection_string}]
-    end
-    @first_run = true
-  end
-
   def teardown
-    DatabaseCleaner.clean # cleanup of the database
+    super
   end
 end
 

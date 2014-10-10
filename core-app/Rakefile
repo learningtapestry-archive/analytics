@@ -5,6 +5,7 @@ require 'pry'
 require 'pry-debugger'
 require 'pry-stack_explorer'
 require 'term/ansicolor'
+require 'open3'
 include Term::ANSIColor
 
 ## AR 4: The following section allows us to run AR w/out Rails
@@ -181,20 +182,22 @@ namespace :lt do
         # Loop until interrupted by ctrl-c
         trap("INT") { puts "\nExiting"; keep_running = false; exit;}
         test_list = FileList['test/**/*_test.rb']
-        orig_dates = {}
+        code_list = FileList['lib/**/*.rb']
+        orig_test_dates = {}
         test_list.each do |file|
-          orig_dates[file] = File.stat(file).mtime
+          orig_test_dates[file] = File.stat(file).mtime
         end
         # loop through test_list looking for date changes
         test_file = ""
         keep_searching = true
         while keep_searching && keep_running do
-          print "\r**** Waiting for test file changes. (#{Time::now.strftime('%b %d %I:%M %p')}), ctrl-c exits"
+          dot = (dot == ".") ? " " : "."
+          print "\r#{white}****#{reset} Waiting for test file changes. (#{Time::now.strftime('%b %d %I:%M %p')}), ctrl-c exits#{dot}"
           Kernel::sleep(0.3) # wait 3/10 second between searches for changed files
           test_list.each do |file|
             Kernel::sleep(0.05) # keep the cpu from maxing out
-            if orig_dates[file] != File.stat(file).mtime
-              print "\n",red,"  File change detected: ", bold,"./#{file}",reset,"\n"
+            if orig_test_dates[file] != File.stat(file).mtime
+              print "\n",white,"  File change detected: ", bold,"./#{file}",reset,"\n"
               puts "  Time is: #{Time::now}"
               keep_searching = false
               test_file = file
@@ -204,7 +207,18 @@ namespace :lt do
             full_test_file = File::expand_path(File::join('.',test_file))
             # invoke the test b/c the file has changed
             puts "Running test suite..."
-            system("rake lt:test:run_test[#{full_test_file}]")
+            # we capture the output
+            output = `rake lt:test:run_test[#{full_test_file}]`
+            output.each_line do |result_line|
+              if result_line.match(/^ +[0-9]+\) Error:/) then
+                puts red+result_line+reset+yellow
+              elsif result_line.match(/runs, [0-9]+ assertions, [0-9]+ failures/)
+                puts reset+result_line
+              else
+                puts result_line
+              end
+            end
+            print reset
           end
         end # while keep_searching... -- change detection loop
       end # while keep_running do -- main loop

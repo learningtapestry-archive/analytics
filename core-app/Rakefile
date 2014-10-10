@@ -32,9 +32,9 @@ end
 ## End AR 4 installation
 
 
-desc 'Default does nothing at the moment - just used to check if rake compiles'
+desc 'Print all rake tasks'
 task :default do
-  puts "Default task does nothing at this time."
+  system "rake --tasks"
 end
 
 task :full_tests do
@@ -104,8 +104,9 @@ namespace :lt do
     IRB.irb nil, self
   end
 
+  desc "Boot up a console with alternative ruby interactive 'pry'"
   task :console_pry do
-    LT::boot_all(File::dirname(__FILE__))
+    Rake::Task[:'lt:boot'].invoke
     binding.pry
   end
 

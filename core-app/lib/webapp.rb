@@ -1,5 +1,6 @@
 require 'sinatra/base'
 #require 'sinatra/contrib'
+require 'sinatra/multi_route'
 require 'sinatra/reloader'
 require 'sinatra/cookies'
 require 'json'
@@ -66,7 +67,6 @@ module LT
         # If the source is the extension, then set a cookie for the extension long-lived session  
         if params[:src] == "ext" then
           user = user_retval[:user]
-          binding.pry
           api_key = ApiKey.create_api_key(user.id)
           response.set_cookie('api_key', httponly: true, value: "#{api_key}.#{user.id}.#{user.first_name}")
         end
@@ -75,12 +75,17 @@ module LT
       end
     end
 
-    get "/dashboard" do
+    dashboard = lambda do
       if !session || !session[:user_id] then redirect '/' end
       set_title("Your Dashboard")
       user = User.find(session[:user_id])
-      erb :dashboard, locals: { page_title: "Dashboard", user: user }
+      begin_date = params[:begin_date] || Time.now.strftime("%D")
+      end_date = params[:end_date] || Time.now.strftime("%D")
+      erb :dashboard, locals: { page_title: "Dashboard", user: user, begin_date: begin_date, end_date: end_date }
     end
+
+    get "/dashboard", &dashboard
+    post "/dashboard", &dashboard
 
     get "/welcome" do
       erb :welcome, locals: { page_title: "Welcome!" }, layout: :layout_noauth

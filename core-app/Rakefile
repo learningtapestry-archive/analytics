@@ -225,10 +225,18 @@ namespace :lt do
             # we capture the output
             output = `rake lt:test:run_test[#{full_test_file}]`
             output.each_line do |result_line|
-              if result_line.match(/^ +[0-9]+\) Error:/) then
+              failure_error = result_line.match(/^\s+[0-9]+\) Error:/) || result_line.match(/^\s+[0-9]+\) Failure:/)
+              asserts_failed = result_line.match(/runs, ([0-9]+) assertions, ([0-9]+) failures/)
+              if failure_error then
                 puts red+result_line+reset+yellow
-              elsif result_line.match(/runs, [0-9]+ assertions, [0-9]+ failures/)
-                puts reset+result_line
+              elsif asserts_failed
+                asserts = asserts_failed[1]
+                failures = asserts_failed[2]
+                if failures == "0" then
+                  puts reset+green+result_line+reset
+                else
+                  puts reset+result_line
+                end
               else
                 puts result_line
               end

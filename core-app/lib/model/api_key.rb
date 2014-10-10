@@ -13,7 +13,7 @@ class ApiKey < ActiveRecord::Base
       api_key.user_id = user_id
       api_key.key = SecureRandom.uuid
       api_key.save
-      LT::RedisServer.api_key_set(api_key, LT::get_db_name)
+      LT::RedisServer.api_key_set(api_key.key, LT::get_db_name)
       return api_key.key
     end
   end

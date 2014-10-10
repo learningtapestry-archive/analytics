@@ -47,7 +47,6 @@ class UserModelTest < LTDBTestBase
     assert_raises TypeError do
       User.create_user_from_json({})
     end
-
     # Missing password
     assert_raises KeyError do
       json_string = '{ "username": "testuser" }'

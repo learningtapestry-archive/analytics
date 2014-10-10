@@ -140,8 +140,14 @@ namespace :lt do
     desc "Run single test file"
     task :run_test, [:testfile] => [:'lt:test:boot', 
       :'lt:test:db:migrate_tables'] do |t, args|
-      filename = args[:testfile]
-      LT::run_test(filename, LT::test_path)
+      arg_filename = args[:testfile]
+      # if we are given a file with no path, search test folder for the file to run
+      if arg_filename == File::basename(arg_filename) then
+        filename = Dir::glob("test/**/#{arg_filename}*").first
+      else
+        filename = arg_filename
+      end
+      LT::run_test(File::expand_path(filename), LT::test_path)
     end
 
     task :boot do

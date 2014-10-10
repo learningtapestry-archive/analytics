@@ -53,6 +53,9 @@ Server Configuration
     * nmcli con down id lt-dev01
     * Set virtualbox network adapter to NAT
 
+* To mess with the CI server go to this folder for the code:
+`/home/learntac/.cruise/projects/core-app`
+
 * byobu: multi-terminal window manager
   * byobu-enable/disable: turn this service on/off
   * ctrl-a: screen manager

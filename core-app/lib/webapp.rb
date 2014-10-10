@@ -4,6 +4,7 @@ require 'sinatra/reloader'
 require 'sinatra/cookies'
 require 'json'
 require 'chronic'
+require 'pry'
 require File::join(LT::lib_path, 'util', 'session_manager.rb')
 require File::join(LT::lib_path, 'util', 'redis_server.rb')
 
@@ -65,7 +66,9 @@ module LT
         # If the source is the extension, then set a cookie for the extension long-lived session  
         if params[:src] == "ext" then
           user = user_retval[:user]
-          response.set_cookie('api_key', httponly: true, value: "#{ApiKey.create_api_key(user.id)}.#{user.id}.#{user.first_name}")
+          binding.pry
+          api_key = ApiKey.create_api_key(user.id)
+          response.set_cookie('api_key', httponly: true, value: "#{api_key}.#{user.id}.#{user.first_name}")
         end
 
         redirect '/dashboard'

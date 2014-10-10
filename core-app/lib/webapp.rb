@@ -99,6 +99,10 @@ module LT
       mime_type :javascript, 'application/javascript'
     end
 
+    get '/api/v1/common.js' do
+      erb :"common.js", :layout=>false
+    end
+
     ORG_API_KEY_ASSERT_ROUTE = "/api/v1/assert-org"
     # this is a dynamically rendered js file
     get '/api/v1/collector.js' do

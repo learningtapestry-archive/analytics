@@ -69,6 +69,58 @@ class WebAppJSTest < WebAppJSTestBase
 
   end # test_js_collector_qunit
 
+  def test_js_display_via_qunit
+    # set up data to make collector test work
+    joe_smith_username=CGI::escape(@joe_smith[:username])
+    acme_org_api_key = CGI::escape(@acme_org[:org_api_key])
+    display_test_url = "/assets/tests/js-display-test.html?username=#{joe_smith_username}&org_api_key=#{acme_org_api_key}"
+    collector_js_url = "/api/v1/collector.js?username=#{joe_smith_username}&org_api_key=#{acme_org_api_key}"
+    # verify that we can get to the collector.js file itself without errors
+    get(collector_js_url)
+    assert_equal 200, last_response.status
+    # after confirming that the collector.js file is obtainable
+    # we can make the full headless browser call to the test file
+    visit(display_test_url)
+    i = 0
+    # wait for qunit tests to execute in phantomjs
+    # we are waiting for this element to appear on the page: <div id="qunit">
+    sleep 0.1
+    html = Nokogiri::HTML.parse(page.html)
+    while !html.at_css('div#qunit').child do 
+      # wait up to 2 seconds for page to fully load (including javascript)
+      i+=1
+      if i > 20 then
+        assert false, "Failed to find QUnit test results before timeout." 
+        break
+      end
+      sleep 0.1
+      html = Nokogiri.parse(page.html)
+    end
+    # loop through xml test case data and make sure there were no errors
+    resultsXML = Nokogiri::XML(html.css("span#xmlTestResults").inner_html.to_s)
+    resultsXML.css("testsuites>testsuite>testcase").each do |suite|
+      num_failures = suite.attribute("failures").to_s
+      testcase_name = suite.attribute("name").to_s
+      test_failed = false
+      # take a screenshot of qunit results, if there are errors
+      if num_failures!="0" then
+        file_screenshot = save_load_screenshot(page)
+      end
+      fail_message = "QUnit Javascript testcase named \"#{testcase_name}\" had #{num_failures} failures.\n"\
+       "Screenshot of testrun failures at #{file_screenshot}.\n"\
+       "Google Chrome should now have a window open to this file."
+      assert_equal "0", num_failures, fail_message
+    end
+    # Sanity: make sure that we have run some tests in QUnit
+    assert self.assertions >= 2, "An unknown failure has caused JS QUnit for Display tests to not run. Results XML:\n"\
+      "#{resultsXML.to_s}"
+    # show that an initial "on page load" click message has been sent
+    message = JSON.parse(LT::RedisServer.raw_message_pop)
+    assert_equal RawMessage::Verbs::CLICKED, message["verb"]
+
+  end # test_js_collector_qunit
+
+
   # collector.js unit and functional tests
   def test_js_collector_directly
     joe_smith_username=CGI::escape(@joe_smith[:username])
@@ -76,7 +128,7 @@ class WebAppJSTest < WebAppJSTestBase
 
     collector_test_url = "/assets/tests/js-collector-test.html?username=#{joe_smith_username}&org_api_key=#{acme_org_api_key}"
     visit(collector_test_url)
-    sleep 0.1
+    sleep 0.2
     # clear raw messages queue (there's a clicked message that comes on page load)
     LT::RedisServer::raw_messages_queue_clear
     # validate that window.ltG.fSendMsg sends a message that is received by redis
@@ -94,7 +146,6 @@ class WebAppJSTest < WebAppJSTestBase
     assert_equal RawMessage::Verbs::VIEWED, message["verb"]
     assert_match page_title, message["page_title"]
     assert_equal page_url, message["url"]
-
     #validate url function
     page_url = page.evaluate_script("window.ltG.priv.fGetCurURL();")
     test_uri = URI::parse(page_url)
@@ -148,6 +199,7 @@ class WebAppJSTest < WebAppJSTestBase
 
     #page.execute_script("window.close();")
 
+    # Use page.driver.debug to debug JS in Chrome
   end
 
   def setup

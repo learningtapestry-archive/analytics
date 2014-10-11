@@ -11,7 +11,7 @@
 # If you want to manage different ruby installations with different gemsets for different projects
 # Consider installing RVM to help manage that.
 source 'https://rubygems.org'
-gem 'logger'
+gem 'log4r', '>= 1.1.10'
 gem 'rake'
 gem 'pg', '>= 0.17.1'
 gem 'actionpack', '>=4.1.6'

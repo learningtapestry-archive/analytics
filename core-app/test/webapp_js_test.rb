@@ -70,6 +70,7 @@ class WebAppJSTest < WebAppJSTestBase
   end # test_js_collector_qunit
 
   def test_js_display_via_qunit
+
     # set up data to make collector test work
     joe_smith_username=CGI::escape(@joe_smith[:username])
     acme_org_api_key = CGI::escape(@acme_org[:org_api_key])
@@ -96,6 +97,9 @@ class WebAppJSTest < WebAppJSTestBase
       sleep 0.1
       html = Nokogiri.parse(page.html)
     end
+
+
+
     # loop through xml test case data and make sure there were no errors
     resultsXML = Nokogiri::XML(html.css("span#xmlTestResults").inner_html.to_s)
     resultsXML.css("testsuites>testsuite>testcase").each do |suite|

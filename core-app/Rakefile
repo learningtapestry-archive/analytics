@@ -6,7 +6,12 @@ require 'pry-debugger'
 require 'pry-stack_explorer'
 require 'term/ansicolor'
 require 'open3'
-include Term::ANSIColor
+
+module LT
+  module Term class << self
+    include ::Term::ANSIColor
+  end; end
+end
 
 ## AR 4: The following section allows us to run AR w/out Rails
 # Overwrite the already existing Rake task "load_config"
@@ -207,12 +212,12 @@ namespace :lt do
         keep_searching = true
         while keep_searching && keep_running do
           dot = (dot == ".") ? " " : "."
-          print "\r#{white}***#{reset} Waiting for file changes. (#{Time::now.strftime('%I:%M %p')}), ctrl-z: re-run last, ctrl-c: exit#{dot}"
+          print "\r#{LT::Term::white}***#{LT::Term::reset} Waiting for file changes. (#{Time::now.strftime('%I:%M %p')}), ctrl-z: re-run last, ctrl-c: exit#{dot}"
           Kernel::sleep(0.3) # wait 3/10 second between searches for changed files
           test_list.each do |file|
             Kernel::sleep(0.05) # keep the cpu from maxing out
             if orig_test_dates[file] != File.stat(file).mtime
-              print "\n",white,"  File change detected: ", bold,"./#{file}",reset,"\n"
+              print "\n",LT::Term::white,"  File change detected: ", LT::Term::bold,"./#{file}",LT::Term::reset,"\n"
               puts "  Time is: #{Time::now}"
               keep_searching = false
               test_file = file
@@ -229,20 +234,20 @@ namespace :lt do
               failure_error = result_line.match(/^\s+[0-9]+\) Error:/) || result_line.match(/^\s+[0-9]+\) Failure:/)
               asserts_failed = result_line.match(/runs, ([0-9]+) assertions, ([0-9]+) failures/)
               if failure_error then
-                puts red+result_line+reset+yellow
+                puts LT::Term::red+result_line+LT::Term::reset+LT::Term::yellow
               elsif asserts_failed
                 asserts = asserts_failed[1]
                 failures = asserts_failed[2]
                 if failures == "0" then
-                  puts reset+green+result_line+reset
+                  puts LT::Term::reset+LT::Term::green+result_line+LT::Term::reset
                 else
-                  puts reset+result_line
+                  puts LT::Term::reset+result_line
                 end
               else
                 puts result_line
               end
             end
-            print reset
+            print LT::Term::reset
             test_file = ""
           end
         end # while keep_searching... -- change detection loop

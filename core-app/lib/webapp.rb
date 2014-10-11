@@ -1,13 +1,9 @@
 require 'sinatra/base'
-#require 'sinatra/contrib'
 require 'sinatra/multi_route'
 require 'sinatra/reloader'
 require 'sinatra/cookies'
 require 'json'
 require 'chronic'
-require 'pry'
-require File::join(LT::lib_path, 'util', 'session_manager.rb')
-require File::join(LT::lib_path, 'util', 'redis_server.rb')
 
 module LT
   module WebAppHelper
@@ -75,6 +71,7 @@ module LT
       end
     end
 
+    # Routes for dashboard defined as GET and POST below
     dashboard = lambda do
       if !session || !session[:user_id] then redirect '/' end
       set_title("Your Dashboard")

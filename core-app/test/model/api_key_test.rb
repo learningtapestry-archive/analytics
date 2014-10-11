@@ -25,8 +25,12 @@ class ApiKeyModelTest < LTDBTestBase
   def test_create_valid_api_key
     api_key = ApiKey.create_api_key(1)
     # Check we have a GUID formatted api key
-    match = /^[A-Za-z0-9]{8}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{12}$/.match(api_key)    
+    match = /^[A-Za-z0-9]{8}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{12}$/.match(api_key)
     refute_nil match
+
+    # Check API key is in Redis
+    redis_key = LT::RedisServer.api_key_get(api_key)
+    refute_nil redis_key
  end
 
 end

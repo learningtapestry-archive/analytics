@@ -49,6 +49,13 @@ QUnit.test("ltG vars and methods tests", function(assert){
   assert.ok(true, "Test should always pass");
 });
 
+//we write the results of our tests to xml in this document
+QUnit.jUnitReport = function(report) {
+    window.lt$("#xmlTestResults").append(report.xml);
+};
+
+</script>
+
 <!--Mock up of a data table where we fill in specific cells --> 
 <span class="table-add-cells">
 <span class="col1-header">Col1</span><span class="col2-header">Col2</span>
@@ -65,14 +72,8 @@ QUnit.test("ltG vars and methods tests", function(assert){
 </span><!--table-->
 
 
-//we write the results of our tests to xml in this document
-QUnit.jUnitReport = function(report) {
-    window.lt$("#xmlTestResults").append(report.xml);
-};
 
-</script>
 <span id="xmlTestResults">
-
 </span>
 </body>
 </html>

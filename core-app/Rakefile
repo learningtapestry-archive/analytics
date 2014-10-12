@@ -105,14 +105,14 @@ namespace :lt do
     desc "Loads a single CSV file into the corresponding database table"
     task :load_file, [:csvfile] do |t,args|
       Rake::Task[:'lt:boot'].invoke
-      require './lib/util/csv_loader.rb'
+      require './lib/util/csv_database_loader.rb'
       LT::Utilities::CsvDatabaseUtility.load_file(args[:csvfile])
     end
 
     desc "Loads all CSV files within a path into the corresponding database tables"
     task :load_all, [:csvpath] do |t,args|
       Rake::Task[:'lt:boot'].invoke
-      require './lib/util/csv_loader.rb'
+      require './lib/util/csv_database_loader.rb'
       LT::Utilities::CsvDatabaseUtility.load_file(args[:csvpath])
     end
   end

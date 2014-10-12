@@ -5,6 +5,7 @@
 config.json
 config.yml
 database.yml
+log4r.yml
 /.config
 /coverage/
 /InstalledFiles

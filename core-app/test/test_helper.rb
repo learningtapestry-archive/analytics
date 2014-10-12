@@ -38,6 +38,8 @@ class WebAppTestBase < LTDBTestBase
   end
 end
 
+# this test class is used to drive a headless phantomJS/webkit browser
+# for full front-end testing, including javascript
 class WebAppJSTestBase < WebAppTestBase
   include Capybara::DSL
 
@@ -53,7 +55,8 @@ class WebAppJSTestBase < WebAppTestBase
     # comment these lines out to use regular/non-debug webkit mode (probably faster)
     Capybara.current_driver = :poltergeist_debug
     Capybara.javascript_driver = :poltergeist_debug
-    # To use the debugger add "page.driver.debug" in this file, *before* the JS code call you want to debug
+    # To use the javascript debugger add "page.driver.debug" in this file, 
+    # *before* the JS code call you want to debug
     # When you run your test, you'll get a new window in chrome. Click the second link on that page
     # This is your code - select the JS file from the upper left pull-down
     # Set a breakpoint where you want to intercept the code

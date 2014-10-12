@@ -27,8 +27,8 @@ class RedisPostgresExtractTest < LTDBTestBase
       .where(:verb => 'viewed')
     test_msg = test_msgs.first
     # spot check in raw_messages table that the records imported correctly
-    assert_equal scenario[:raw_messages][0][:action][:value][:time], test_msg.action["value"]["time"]
-    assert !test_msg.action["value"]["time"].nil?
+    assert_equal scenario[:raw_messages][0][:action][:time], test_msg.action["time"]
+    assert !test_msg.action["time"].nil?
     # verify that raw_message_logs table entries were created as well
     logs = test_msg.raw_message_logs
     assert_equal RawMessageLog::Actions::FROM_REDIS, logs.first.action
@@ -62,7 +62,7 @@ class RedisPostgresExtractTest < LTDBTestBase
     assert_equal scenario[:raw_messages].size, PageVisit.count
     # spot check data
     # verify that the correct user was attached to a page_visit record
-    duration = ChronicDuration.parse(scenario[:raw_messages][0][:action][:value][:time])
+    duration = ChronicDuration.parse(scenario[:raw_messages][0][:action][:time])
     pvs = PageVisit
       .joins(:page)
       .joins(:user)

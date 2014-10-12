@@ -34,8 +34,8 @@ class PageVisit < ActiveRecord::Base
       return retval
     end
     pv_data = {}
-    if raw_message["action"] && raw_message["action"]["value"] then
-      time_active = raw_message["action"]["value"]["time"]
+    if raw_message["action"] && raw_message["action"]["time"] then
+      time_active = raw_message["action"]["time"]
       pv_data[:time_active] = ChronicDuration.parse(time_active) if time_active.kind_of?(String)
     end
     pv_data[:date_visited] = raw_message["captured_at"]

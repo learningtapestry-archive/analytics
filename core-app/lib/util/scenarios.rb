@@ -256,11 +256,7 @@ module LT
             site_uuid: Sites::khanacademy_data[:site_uuid],
             verb: "viewed",
             action:
-              {
-              id: "verbs/viewed",
-              display: {:"en-US" => "viewed"},
-              value: {time: "8M21S"}
-              },
+              { time: "8M21S" },
             captured_at: 8.days.ago.iso8601,
             api_key: "2866b962-a7be-44f8-9a0c-66502fba7d31",
             url: Pages::khanacademy_data[0][:url]
@@ -271,11 +267,7 @@ module LT
             verb: "viewed",
             page_title: Pages::khanacademy_data[0][:display_name],
             action:
-              {
-              id: "verbs/viewed",
-              display: {:"en-US" => "viewed"},
-              value: {time: "12M1S"}
-              },
+              { time: "12M1S" },
             captured_at: 2.days.ago.iso8601,
             api_key: "2866b962-a7be-44f8-9a0c-66502fba7d31",
             url: Pages::khanacademy_data[0][:url]
@@ -285,11 +277,7 @@ module LT
             site_uuid: Sites::khanacademy_data[:site_uuid],
             verb: "viewed",
             action:
-              {
-              id: "verbs/viewed",
-              display: {:"en-US" => "viewed"}
-              # note - we don't provide value/time key for this record
-              },
+              {}, # note - we don't provide value/time key for this record
             captured_at: 1.day.ago.iso8601,
             api_key: "2866b962-a7be-44f8-9a0c-66502fba7d31",
             url: Pages::khanacademy_data[1][:url]
@@ -299,11 +287,7 @@ module LT
             site_uuid: Sites::khanacademy_data[:site_uuid],
             verb: "viewed",
             action:
-              {
-              id: "verbs/viewed",
-              display: {:"en-US" => "viewed"},
-              value: {time: "2M1S"}
-              },
+              { time: "2M1S" },
             captured_at: 2.days.ago.iso8601,
             api_key: "2866b962-a7be-44f8-9a0c-66502fba7d31",
             url: Pages::khanacademy_data[0][:url]
@@ -313,11 +297,7 @@ module LT
             username: Students::joe_smith_data[:username],
             verb: "viewed",
             action:
-              {
-              id: "verbs/viewed",
-              display: {:"en-US" => "viewed"},
-              value: {time: "12M24S"}
-              },
+              { time: "12M24S" },
             captured_at: 4.days.ago.iso8601,
             org_api_key: Organizations::acme_organization_data[:org_api_key],
             url: Pages::khanacademy_data[0][:url]
@@ -326,11 +306,7 @@ module LT
             username: new_student_username,
             verb: "viewed",
             action:
-              {
-              id: "verbs/viewed",
-              display: {:"en-US" => "viewed"},
-              value: {time: "12M24S"}
-              },
+              { time: "12M24S" },
             captured_at: 4.5.days.ago.iso8601,
             org_api_key: Organizations::acme_organization_data[:org_api_key],
             url: Pages::khanacademy_data[0][:url]

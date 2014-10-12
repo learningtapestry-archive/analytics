@@ -8,7 +8,8 @@ module LT
         raise LT::FileNotFound, "File not found: #{filename}" if !File.exist?(filename)
         csv_file = SmarterCSV.process(filename)
         if csv_file.length > 0 then
-          model_name = ActiveSupport::Inflector::classify(File.basename(filename, ".csv"))
+          table_name = File.basename(filename, ".csv")
+          model_name = ActiveSupport::Inflector::classify(table_name)
           begin
             model = eval(model_name).new
           rescue Exception => e
@@ -32,19 +33,29 @@ module LT
                 model.save
               end # csv_file.each
             end # ActiveRecord::Base.transaction
+            ActiveRecord::Base.connection.reset_pk_sequence!(table_name) # Reset the sequence to highest after import
           else # all_attributes
             raise LT::InvalidFileFormat, "Invalid file format, file: #{filename} does not match model: #{model_name}"
           end # all_attributes
         end # if csv_file.length > 0 then
-      end
+      end # load_file
 
-      def load_all(path)
+      def load_directory(path)
         raise LT::PathNotFound, "Path not found: #{path}" if !File.directory?(path)
 
+        success = 0; fail = 0
         Dir.glob(File.join(path, "*.csv")) do |filename|
-          self.load_file(filename)
-        end
-      end
+          begin
+            self.load_file(filename)
+            LT::logger.debug "CsvDatabaseLoader: successfully imported #{filename}"
+            success += 1
+          rescue Exception => e
+            LT::logger.error "CsvDatabaseLoader: cannot load #{filename}\n  #{e.message}"
+            fail += 1
+          end #begin
+        end # Dir.glob
+        LT::logger.info "CsvDatabaseLoader: #{success} successful, #{fail} failed."
+      end #load_all
     end ; end # CsvDatabaseUtility and class
   end # LT::Utilities
 end # LT

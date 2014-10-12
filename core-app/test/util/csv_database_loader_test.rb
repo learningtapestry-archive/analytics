@@ -49,13 +49,13 @@ class CsvDatabaseLoaderTest < LTDBTestBase
 
   def test_InvalidCSVPath
     assert_raises LT::PathNotFound do
-      LT::Utilities::CsvDatabaseLoader.load_all(File::expand_path(File::join(LT::db_path, '/invalid_path'))) 
+      LT::Utilities::CsvDatabaseLoader.load_directory(File::expand_path(File::join(LT::db_path, '/invalid_path'))) 
     end
   end
 
   def test_CSVLoadFiles
     file_path = File::expand_path(File::join(LT::db_path, '/csv/test'))
-    LT::Utilities::CsvDatabaseLoader.load_all(file_path)
+    LT::Utilities::CsvDatabaseLoader.load_directory(file_path)
     
     assert_equal 1, District.all.length
     assert_equal 2, School.all.length

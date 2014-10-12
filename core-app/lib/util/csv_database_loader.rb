@@ -13,6 +13,7 @@ module LT
           begin
             model = eval(model_name).new
           rescue Exception => e
+            LT::logger.error("CsvDatabaseLoader: Model not found for #{table_name}, exception: #{e.message}")
             raise LT::ModelNotFound
           end
 
@@ -24,6 +25,8 @@ module LT
 
           if all_attributes then
             # Start a transaction for all inserts
+
+            num_inserts = 0;
             ActiveRecord::Base.transaction do
               csv_file.each do |csv_line|
                 model = eval(model_name).new
@@ -31,10 +34,14 @@ module LT
                   model[key] = value
                 end # csv_line.each
                 model.save
+                num_inserts += 1
+                LT::logger.debug("CsvDatabaseLoader: Saved record type of #{model_name}, record id: #{model.id}")
               end # csv_file.each
             end # ActiveRecord::Base.transaction
-            ActiveRecord::Base.connection.reset_pk_sequence!(table_name) # Reset the sequence to highest after import
+            ActiveRecord::Base.connection.reset_pk_sequence!(table_name) # Reset the sequence to highest after import, necessary for PG
+            LT::logger.info("CsvDatabaseLoader: Successfully saved #{num_inserts} of record type of #{model_name}")            
           else # all_attributes
+            LT::logger.error("CsvDatabaseLoader: Invalid file format, file: #{filename} does not match model: #{model_name}")
             raise LT::InvalidFileFormat, "Invalid file format, file: #{filename} does not match model: #{model_name}"
           end # all_attributes
         end # if csv_file.length > 0 then

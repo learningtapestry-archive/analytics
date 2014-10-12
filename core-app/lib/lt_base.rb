@@ -20,6 +20,10 @@ module LT
   class LoginError < BaseException;end;
   class UserNotFound < LoginError;end;
   class PasswordInvalid < LoginError;end;
+  class FileNotFound < BaseException;end;
+  class PathNotFound < BaseException;end;
+  class ModelNotFound < BaseException;end;
+  class InvalidFileFormat < BaseException;end;
 
   class << self
     def testing?

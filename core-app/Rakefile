@@ -6,7 +6,7 @@ require 'pry-debugger'
 require 'pry-stack_explorer'
 require 'term/ansicolor'
 require 'open3'
-#include Term::ANSIColor
+include Term::ANSIColor
 
 ## AR 4: The following section allows us to run AR w/out Rails
 # Overwrite the already existing Rake task "load_config"
@@ -95,6 +95,22 @@ namespace :lt do
       LT::Janitors::RawMessagesExtract.raw_messages_to_page_visits
     end
   end # namespace :janitors
+
+  namespace :utility do
+    desc "Loads a single CSV file into the corresponding database table"
+    task :load_file, [:csvfile] do |t,args|
+      Rake::Task[:'lt:boot'].invoke
+      require './lib/util/csv_loader.rb'
+      LT::Utilities::CsvDatabaseUtility.load_file(args[:csvfile])
+    end
+
+    desc "Loads all CSV files within a path into the corresponding database tables"
+    task :load_all, [:csvpath] do |t,args|
+      Rake::Task[:'lt:boot'].invoke
+      require './lib/util/csv_loader.rb'
+      LT::Utilities::CsvDatabaseUtility.load_file(args[:csvpath])
+    end
+  end
 
   desc "Boot up a console with required context"
   task :console => [:boot] do

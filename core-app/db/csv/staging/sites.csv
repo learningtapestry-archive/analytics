@@ -1,0 +1,12 @@
+id,url,display_name,site_uuid,logo_url_small,logo_url_large,created_at,updated_at
+1,http://slashdot.org,Slashdot,27c74d4d-a078-9bd3-557b-0a82aea8c759,,,09/17/14 20:47:00,09/17/14 20:47:00
+2,http://techcrunch.com,TechCrunch,8c63e4e9-beb9-0b0a-9ca9-2e896be646da,,,09/17/14 20:47:00,09/17/14 20:47:00
+3,http://gizmodo.com,Gizmodo,42e735bb-fcc0-0757-ceb0-3b632000a02a,,,09/17/14 20:47:00,09/17/14 20:47:00
+4,http://npr.org,NPR,9688ad74-6cea-4c43-7212-d0ac2754e787,,,09/17/14 20:47:00,09/17/14 20:47:00
+5,http://nytimes.com,New York Times,4fe2a48a-3c9c-ca2f-7aac-bc429d084754,,,09/17/14 20:47:00,09/17/14 20:47:00
+6,http://arstechnica.com/,Ars Technica,52a7dafb-049f-85c0-4789-2807e1f51a1a,,,09/17/14 20:47:00,09/17/14 20:47:00
+7,http://theverge.com,The Verge,b49cf44e-0129-3649-82a8-e98a54067539,,,09/17/14 20:47:00,09/17/14 20:47:00
+8,http://gigaom.com,Gigaom,6656dd67-a96a-23bd-7e2e-508e30e9705b,,,09/17/14 20:47:00,09/17/14 20:47:00
+9,http://boingboing.net,Boing Boing,2c314552-cef2-88e2-1cbd-3f1490016b62,,,09/17/14 20:47:00,09/17/14 20:47:00
+10,http://washingtonpost.com,Washington Post,2c9f88c0-4887-0e83-7bc3-ec1e5090419d,,,09/17/14 20:47:00,09/17/14 20:47:00
+11,http://stackoverflow.com,Stack Overflow,4f5978b7-2bf7-f778-6298-86a575375ba6,,,09/17/14 20:47:00,09/17/14 20:47:00

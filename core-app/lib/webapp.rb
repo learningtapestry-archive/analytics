@@ -13,7 +13,7 @@ module LT
   end # WebAppHelper
   class WebApp < Sinatra::Base
     helpers Sinatra::Cookies
-    use Rack::Session::Cookie, :key => "rack.session"
+    use Rack::Session::Cookie, key: "rack.session", secret: "I3p3AIXG4ELYC77k"
 
     # TODO this is ugly - not sure how to get non-html exceptions raised in testing otherwise
     # There should be a way to get the config object from Sinatra/WebApp and configure that with these values

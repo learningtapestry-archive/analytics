@@ -24,13 +24,7 @@ Server Configuration
 
 ### To Dos
 
-* Change Chrome extension to submit using HTTPS.  Disable port 80 and enable 443 on this machine.  Buy cheap, browser accepted cert for this machine ($10).
-
-* Install OpenVPN for private dev access.
-
 * Improvement:  git can't pull down just sub-folders, so CCrb uses ./core-app/run-tests.rb to trigger builds.  Because not a sub-folder, builds will trigger on any LT git check-in.
-
-* Improvement:  figure out how to properly handle bundle install updates for learntac wo/ sudo access if can be avoided.
 
 * Improvement:  Start CCrb in a process monitor for better durability.
 
@@ -68,7 +62,7 @@ Server Configuration
   * /home/learntac/Projects
     * ./cruisecontrol.rb: code for cruisecontrol
       * /home/learntac/.cruise: CI build of code
-    * learntaculous: web server build of code
+  * /var/www/learntaculous/core-app: web server build of code
   * /etc/thin/webapp.yml: config for thin
     * sudo service thin restart: reboot thin
     /home/learntac/core-app/log: thin logs

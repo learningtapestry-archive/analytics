@@ -11,7 +11,7 @@
 # If you want to manage different ruby installations with different gemsets for different projects
 # Consider installing RVM to help manage that.
 source 'https://rubygems.org'
-gem 'logger'
+gem 'log4r', '>= 1.1.10'
 gem 'rake'
 gem 'pg', '>= 0.17.1'
 gem 'actionpack', '>=4.1.6'
@@ -23,11 +23,12 @@ gem 'nokogiri', '>= 1.6.3.1'
 gem 'redis', '>= 3.1.0'
 gem 'sinatra', '>= 1.4.5'
 gem 'sinatra-contrib', '>= 1.4.2'
-gem 'thin', '>= 1.6.2' # development, maybe production
+gem 'thin', '>= 1.6.3' # development, maybe production
 gem 'rerun' # process reload agent, helpful for sinatra development
 gem 'bcrypt', '>= 3.1.7'
 gem 'chronic', '>= 0.10.2'
 gem 'chronic_duration', '>= 0.10.6'
+gem 'smarter_csv', '>= 1.0.17'
 # allows printing with colors to terminal
 gem 'term-ansicolor', '>= 1.3.0'
 # public suffix is a project that helps decompose web hosts into their

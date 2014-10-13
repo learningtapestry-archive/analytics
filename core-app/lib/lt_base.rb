@@ -5,7 +5,8 @@ require 'active_support'
 require 'active_support/inflector'
 require 'action_view'
 require 'bcrypt' # required by various models/modules
-require 'logger'
+require 'log4r'
+require 'log4r/yamlconfigurator'
 require 'pg'
 require './lib/util/redis_server.rb'
 require './lib/util/scenarios.rb'
@@ -19,6 +20,10 @@ module LT
   class LoginError < BaseException;end;
   class UserNotFound < LoginError;end;
   class PasswordInvalid < LoginError;end;
+  class FileNotFound < BaseException;end;
+  class PathNotFound < BaseException;end;
+  class ModelNotFound < BaseException;end;
+  class InvalidFileFormat < BaseException;end;
 
   class << self
     def testing?
@@ -142,9 +147,20 @@ module LT
     def init_logger
       # prevent us from re-initializing the logger if it's already created
       return if self.logger.kind_of?(Logger)
-      self.logger = Logger.new(File::join(LT::tmp_path,'lt_application.log'), 'daily')
-      self.logger.formatter = Logger::Formatter.new
-      self.logger.info("LT::logger initialized")
+
+      # Attempt to load configuration file, if doesn't exist, use standard output
+      log4r_config_file = File.expand_path(LT::db_path + "/log4r.yml")
+      if File.exist?(log4r_config_file) then
+        log4r_config = YAML.load(ERB.new(File.read(log4r_config_file)).result)
+        Log4r::YamlConfigurator.decode_yaml(log4r_config['log4r_config'])
+        self.logger = Log4r::Logger[LT::run_env]
+      else
+        self.logger = Log4r::Logger.new(LT::run_env)
+        self.logger.level = Log4r::DEBUG
+        self.logger.add Log4r::Outputter.stdout
+        self.logger.warn "Log4r configuration file not found, attempted: #{LT::db_path + "/log4r.yml"}"
+        self.logger.info "Log4r outputting to stdout with DEBUG level."
+      end
     end
   end # class << self (LT)
   # postgres specific utilities

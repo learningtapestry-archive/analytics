@@ -101,6 +101,22 @@ namespace :lt do
     end
   end # namespace :janitors
 
+  namespace :utility do
+    desc "Loads a single CSV file into the corresponding database table"
+    task :load_file, [:csvfile] do |t,args|
+      Rake::Task[:'lt:boot'].invoke
+      require './lib/util/csv_database_loader.rb'
+      LT::Utilities::CsvDatabaseLoader.load_file(args[:csvfile])
+    end
+
+    desc "Loads all CSV files within a path into the corresponding database tables"
+    task :load_dir, [:csvpath] do |t,args|
+      Rake::Task[:'lt:boot'].invoke
+      require './lib/util/csv_database_loader.rb'
+      LT::Utilities::CsvDatabaseLoader.load_directory(args[:csvpath])
+    end
+  end
+
   desc "Boot up a console with required context"
   task :console => [:boot] do
     IRB.setup nil
@@ -123,7 +139,7 @@ namespace :lt do
   desc "Install all gems via bundle"
   task :bundle_install => [:'lt:boot'] do
     output = `bundle install`
-    LT::logger.info(output)
+    LT::logger.debug(output)
   end
 
   desc "Seed environment db with data (generally speaking, don't do this in testing env)"

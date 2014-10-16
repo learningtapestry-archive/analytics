@@ -1,11 +1,9 @@
 require 'sinatra/base'
-#require 'sinatra/contrib'
+require 'sinatra/multi_route'
 require 'sinatra/reloader'
 require 'sinatra/cookies'
 require 'json'
 require 'chronic'
-require File::join(LT::lib_path, 'util', 'session_manager.rb')
-require File::join(LT::lib_path, 'util', 'redis_server.rb')
 
 module LT
   module WebAppHelper
@@ -15,7 +13,7 @@ module LT
   end # WebAppHelper
   class WebApp < Sinatra::Base
     helpers Sinatra::Cookies
-    enable :sessions
+    use Rack::Session::Cookie, key: "rack.session", secret: "I3p3AIXG4ELYC77k"
 
     # TODO this is ugly - not sure how to get non-html exceptions raised in testing otherwise
     # There should be a way to get the config object from Sinatra/WebApp and configure that with these values
@@ -65,19 +63,26 @@ module LT
         # If the source is the extension, then set a cookie for the extension long-lived session  
         if params[:src] == "ext" then
           user = user_retval[:user]
-          response.set_cookie('api_key', httponly: true, value: "#{ApiKey.create_api_key(user.id)}.#{user.id}.#{user.first_name}")
+          api_key = ApiKey.create_api_key(user.id)
+          response.set_cookie('api_key', httponly: true, value: "#{api_key}.#{user.id}.#{user.first_name}")
         end
 
         redirect '/dashboard'
       end
     end
 
-    get "/dashboard" do
+    # Routes for dashboard defined as GET and POST below
+    dashboard = lambda do
       if !session || !session[:user_id] then redirect '/' end
       set_title("Your Dashboard")
       user = User.find(session[:user_id])
-      erb :dashboard, locals: { page_title: "Dashboard", user: user }
+      begin_date = params[:begin_date] || Time.now.strftime("%D")
+      end_date = params[:end_date] || Time.now.strftime("%D")
+      erb :dashboard, locals: { page_title: "Dashboard", user: user, begin_date: begin_date, end_date: end_date }
     end
+
+    get "/dashboard", &dashboard
+    post "/dashboard", &dashboard
 
     get "/welcome" do
       erb :welcome, locals: { page_title: "Welcome!" }, layout: :layout_noauth
@@ -94,6 +99,10 @@ module LT
     ### START API
     configure do
       mime_type :javascript, 'application/javascript'
+    end
+
+    get '/api/v1/common.js' do
+      erb :"common.js", :layout=>false
     end
 
     ORG_API_KEY_ASSERT_ROUTE = "/api/v1/assert-org"

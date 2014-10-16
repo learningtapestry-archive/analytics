@@ -14,14 +14,15 @@ class Page < ActiveRecord::Base
   def self.find_or_create_by_url(data)
     url = Page::url_to_canonical(data[:url])
     page = self.find_by_url(url)
+    if page.nil?
+      page = Page.new(data)
+    end
     # if we don't have a display_name
     # and a new record comes with one, use it
     if !data[:display_name].nil? && page.display_name.nil? then
       page.display_name = data[:display_name]
     end
-    if page.nil?
-      page = Page.new(data)
-    end
+
     # check if we need to create a new site
     # or associate ourselves with an existing one
     if !data[:site_id] && page.site_id.nil?

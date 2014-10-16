@@ -1,0 +1,14 @@
+104.131.113.46 # temporary lt-dev02
+
+# host groups for future usage
+# [webservers]
+# [dbservers]
+# [ciservers]
+# [taskservers]
+
+# example:  www[01:50].example.com  
+# example:  db[01:03].example.com
+
+
+#### When ready for production
+#### 104.131.236.66 # switch to: lt-dev01.learningtapestry.com

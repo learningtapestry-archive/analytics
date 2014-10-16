@@ -1,0 +1,10 @@
+---
+- name: General | Install required packages
+  #apt: pkg={{ item }} state=installed update_cache=true
+  action: apt pkg={{ item }} state=installed update_cache=true
+  with_items:
+    - build-essential
+    - unzip
+    - ufw
+    - byobu
+    - ruby1.9.1 # which is Ruby 1.9.3p484

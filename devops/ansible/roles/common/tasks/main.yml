@@ -8,3 +8,4 @@
     - ufw
     - byobu
     - ruby1.9.1 # which is Ruby 1.9.3p484
+    - git

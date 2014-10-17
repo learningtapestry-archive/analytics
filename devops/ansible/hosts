@@ -1,5 +1,12 @@
 104.131.113.46 # temporary lt-dev02
 
+[webservers]
+104.131.113.46
+
+[dbservers]
+104.131.113.46
+
+
 # host groups for future usage
 # [webservers]
 # [dbservers]

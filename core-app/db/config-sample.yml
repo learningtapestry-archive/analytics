@@ -3,18 +3,41 @@ development:
   encoding: UTF8
   database: lt_dev_db
   pool: 5
-  host: 10.21.11.133
+  host: 127.0.0.1
   port: 5432
-  username: learntaculous
+  username: lt_dbo
   password: lt_dev_xyz_123
   tablespace: learntaculous_ts
 
-development-old:
+test:
   adapter: postgresql
-  encoding: unicode
-  database: development_database
+  encoding: UTF8
+  database: lt_test_db
   pool: 5
   host: 127.0.0.1
   port: 5432
-  username: development_dbo
-  password: development_pw
+  username: lt_dbo
+  password: lt_dev_xyz_123
+  tablespace: learntaculous_ts
+
+staging:
+  adapter: postgresql
+  encoding: UTF8
+  database: lt_staging_db
+  pool: 5
+  host: 127.0.0.1
+  port: 5432
+  username: lt_dbo
+  password: lt_dev_xyz_123
+  tablespace: learntaculous_ts
+
+production:
+  adapter: postgresql
+  encoding: UTF8
+  database: lt_prod_db
+  pool: 5
+  host: 127.0.0.1
+  port: 5432
+  username: lt_dbo
+  password: lt_dev_xyz_123
+  tablespace: learntaculous_ts

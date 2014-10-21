@@ -5,6 +5,14 @@ development:
   queue_raw_messages: queue-raw_messages-dev
   hashlist_api_keys: list-api_keys-dev
 test:
-  url: redis://127.0.0.1:6379/0
+  url: redis://127.0.0.1:6379/1
   queue_raw_messages: queue-raw_messages-test
   hashlist_api_keys: list-api_keys-test
+staging:
+  url: redis://127.0.0.1:6379/2
+  queue_raw_messages: queue-raw_messages-staging
+  hashlist_api_keys: list-api_keys-staging
+production:
+  url: redis://127.0.0.1:6379/3
+  queue_raw_messages: queue-raw_messages-prod
+  hashlist_api_keys: list-api_keys-prod

@@ -13,25 +13,30 @@ class CsvDatabaseLoaderTest < LTDBTestBase
 
   def test_InvalidCSVModelMatch
     csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/fail_cases/schools_invalid.csv'))
-
-    assert_raises LT::ModelNotFound do
-      LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name) 
+    suspend_log_level do
+      assert_raises LT::ModelNotFound do
+        LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name) 
+      end
     end
   end
 
   def test_InvalidFilename
     csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/fail_cases/schools_doesnotexist.csv'))
-
-    assert_raises LT::FileNotFound do
-      LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name) 
+    suspend_log_level do
+      assert_raises LT::FileNotFound do
+        LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name) 
+      end
     end
   end
+
 
   def test_InvalidCSVFile
     csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/fail_cases/page_visits.csv'))
 
-    assert_raises LT::InvalidFileFormat do
-      LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name) 
+    suspend_log_level do
+      assert_raises LT::InvalidFileFormat do
+        LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name) 
+      end
     end
   end
 
@@ -48,8 +53,10 @@ class CsvDatabaseLoaderTest < LTDBTestBase
   end
 
   def test_InvalidCSVPath
-    assert_raises LT::PathNotFound do
-      LT::Utilities::CsvDatabaseLoader.load_directory(File::expand_path(File::join(LT::db_path, '/invalid_path'))) 
+    suspend_log_level do
+      assert_raises LT::PathNotFound do
+        LT::Utilities::CsvDatabaseLoader.load_directory(File::expand_path(File::join(LT::db_path, '/invalid_path'))) 
+      end
     end
   end
 

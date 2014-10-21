@@ -11,10 +11,17 @@ require 'benchmark'
 require File::join(LT::lib_path, 'webapp.rb')
 
 class LTTestBase < Minitest::Test
+  def suspend_log_level(new_level = Log4r::FATAL)
+    # set logging to critical to avoid reporting an error that is intended into the output
+    orig_log_level = LT::logger.level
+    LT::logger.level = new_level
+    yield
+    LT::logger.level = orig_log_level
+  end
 end
 
 # provides for transactional cleanup of activerecord activity
-class LTDBTestBase < Minitest::Test
+class LTDBTestBase < LTTestBase
   def setup
     super
     DatabaseCleaner[:active_record].strategy = :transaction

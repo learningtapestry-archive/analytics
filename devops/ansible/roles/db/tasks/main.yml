@@ -1,0 +1,7 @@
+---
+- name: Web | Install required packages
+  action: apt pkg={{ item }} state=installed update_cache=true
+  with_items:
+    - postgresql-9.3
+    - postgresql-common
+    - postgresql-server-dev-9.3

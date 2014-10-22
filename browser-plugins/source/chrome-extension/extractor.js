@@ -159,7 +159,7 @@ var Extractor = {
                 site_uuid: this.site_uuid,
                 t: s, 
                 id: document.location.href,
-                page_title: document.title
+                pt: document.title
             }
         });
     },

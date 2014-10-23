@@ -2,53 +2,47 @@ require 'open-uri'
 test_helper_file = File::expand_path(File::join(LT::test_path,'test_helper.rb'))
 require test_helper_file
 
+
 class WebAppJSTest < WebAppJSTestBase
 
-  def test_js_loader_collector_via_qunit
-    assert true
-Capybara.app_host = 'http://partner.lvh.me'
-Capybara.always_include_port = true
-sleep 0.1
-visit("/api/v1/server_port")
-sleep 0.1
-
-host = "http://partner.lvh.me"
-#Capybara.current_session.driver.reset!
-#Capybara.app_host = "http://partner.lvh.me"
-Capybara.app_host = host
-#Capybara.server_port = 8888
-Capybara.always_include_port = true
-#Capybara.run_server
-    visit("/api/v1/server_port")
-sleep 0.1
-
-#puts Capybara.current_session.methods.sort - Object.methods
-#puts Capybara.current_session.current_host
-#puts Capybara.current_session.current_url
-#puts Capybara.current_session.current_scope
-puts Capybara.current_session.server.port
-#puts Capybara.current_session.server.host
-puts Capybara.current_session.server.responsive?
-equal = /=/
-x = (Capybara.methods.sort - Object.methods).delete_if {|y| !y.match(equal)}
-#puts x
-puts Capybara.current_session.current_url
-body = ""
-open(host+":"+Capybara.current_session.server.port.to_s+"/api/v1/server_port") do |line|
-  body+=line.read
-end
-puts body[0..255]
-
-    # puts Capybara.default_host
-    # orig_app_host = Capybara.default_host
-    # Capybara.current_session.driver.reset!
-    # Capybara.default_host = 'partner.lvh.me'
-    # Capybara.server_port = 8483
-    # visit("/")
-    # Capybara.current_session.driver.reset!
-    # Capybara.default_host = orig_app_host
-    # Capybara.server_port = 8483
+  def set_server(host, options ={})
+    orig_app_host = Capybara.app_host
+    protocol = options[:protocol] || "http"
+    Capybara.app_host = "#{protocol}://#{host}"
+    Capybara.always_include_port = true
+    yield
+    Capybara.app_host = orig_app_host
   end
+
+  def test_js_loader_collector_via_qunit
+
+    lt_host = "lt.test.learningtapestry.com"
+    partner_host = "partner.lt.betaspaces.com"
+    port = Capybara.current_session.server.port
+    # set up data to make collector test work
+    joe_smith_username=CGI::escape(@joe_smith[:username])
+    acme_org_api_key = CGI::escape(@acme_org[:org_api_key])
+
+    loader_test_url = "/assets/tests/js-loader-collector-test.html"
+    loader_test_params = "?username=#{joe_smith_username}&org_api_key=#{acme_org_api_key}"+
+     "&hostname=#{lt_host}:#{port}"
+    test_url = "#{loader_test_url}#{loader_test_params}"
+    set_server(partner_host) do 
+      visit(test_url)
+    end
+    # wait for qunit tests to execute in phantomjs
+    html = wait_for_qunit(page)
+    
+    sleep 0.1
+    # verify that the collector script has been loaded by the loader script
+    # ltG object is created by collector only and userId is a dynamic value inside it
+    username_actual = page.evaluate_script("window.ltG.userId")
+    assert_equal joe_smith_username, username_actual
+
+    # verify tests passed in qunit
+    verify_qunit_tests_passed(html)
+  end
+
 
   # this method is somewhat indirect
   # It calls an html test page via capybara/poltergeist/phantomjs
@@ -58,133 +52,132 @@ puts body[0..255]
   # If it finds failing tests it will fail the test run w/a message.
   # It will also save a screenshot of the failing qUnit test results page (to LT::tmp_dir)
   # It will try to open that screenshot in chrome
-  # def test_js_collector_via_qunit
-  #   # set up data to make collector test work
-  #   joe_smith_username=CGI::escape(@joe_smith[:username])
-  #   acme_org_api_key = CGI::escape(@acme_org[:org_api_key])
-  #   collector_test_url = "/assets/tests/js-collector-test.html?username=#{joe_smith_username}&org_api_key=#{acme_org_api_key}"
-  #   collector_js_url = "/api/v1/collector.js?username=#{joe_smith_username}&org_api_key=#{acme_org_api_key}"
-  #   # verify that we can get to the collector.js file itself without errors
-  #   get(collector_js_url)
-  #   assert_equal 200, last_response.status
-  #   # after confirming that the collector.js file is obtainable
-  #   # we can make the full headless browser call to the test file
-  #   visit(collector_test_url)
-  #   # wait for qunit tests to execute in phantomjs
-  #   html = wait_for_qunit(page)
-  #   # verify tests passed in qunit
-  #   verify_qunit_tests_passed(html)
+  def test_js_collector_via_qunit
+    # set up data to make collector test work
+    joe_smith_username=CGI::escape(@joe_smith[:username])
+    acme_org_api_key = CGI::escape(@acme_org[:org_api_key])
+    collector_test_url = "/assets/tests/js-collector-test.html?username=#{joe_smith_username}&org_api_key=#{acme_org_api_key}"
+    collector_js_url = "/api/v1/collector.js?username=#{joe_smith_username}&org_api_key=#{acme_org_api_key}"
+    # verify that we can get to the collector.js file itself without errors
+    get(collector_js_url)
+    assert_equal 200, last_response.status
+    # after confirming that the collector.js file is obtainable
+    # we can make the full headless browser call to the test file
+    visit(collector_test_url)
+    # wait for qunit tests to execute in phantomjs
+    html = wait_for_qunit(page)
+    # verify tests passed in qunit
+    verify_qunit_tests_passed(html)
 
-  #   # show that an initial "on page load" click message has been sent
-  #   message = JSON.parse(LT::RedisServer.raw_message_pop)
-  #   assert_equal RawMessage::Verbs::CLICKED, message["verb"]
+    # show that an initial "on page load" click message has been sent
+    message = JSON.parse(LT::RedisServer.raw_message_pop)
+    assert_equal RawMessage::Verbs::CLICKED, message["verb"]
 
-  # end # test_js_collector_qunit
+  end # test_js_collector_qunit
 
-  # def test_js_display_via_qunit
+  def test_js_display_via_qunit
+    # set up data to make collector test work
+    joe_smith_username=CGI::escape(@joe_smith[:username])
+    acme_org_api_key = CGI::escape(@acme_org[:org_api_key])
+    display_test_url = "/assets/tests/js-display-test.html?username=#{joe_smith_username}&org_api_key=#{acme_org_api_key}"
+    collector_js_url = "/api/v1/collector.js?username=#{joe_smith_username}&org_api_key=#{acme_org_api_key}"
+    # verify that we can get to the collector.js file itself without errors
+    get(collector_js_url)
+    assert_equal 200, last_response.status
+    # after confirming that the collector.js file is obtainable
+    # we can make the full headless browser call to the test file
+    visit(display_test_url)
+    # wait for qunit tests to execute in phantomjs
+    html = wait_for_qunit(page)
+    # verify tests passed in qunit
+    verify_qunit_tests_passed(html)
+    skip
+    message = JSON.parse(LT::RedisServer.raw_message_pop)
+    assert_equal RawMessage::Verbs::CLICKED, message["verb"]
 
-  #   # set up data to make collector test work
-  #   joe_smith_username=CGI::escape(@joe_smith[:username])
-  #   acme_org_api_key = CGI::escape(@acme_org[:org_api_key])
-  #   display_test_url = "/assets/tests/js-display-test.html?username=#{joe_smith_username}&org_api_key=#{acme_org_api_key}"
-  #   collector_js_url = "/api/v1/collector.js?username=#{joe_smith_username}&org_api_key=#{acme_org_api_key}"
-  #   # verify that we can get to the collector.js file itself without errors
-  #   get(collector_js_url)
-  #   assert_equal 200, last_response.status
-  #   # after confirming that the collector.js file is obtainable
-  #   # we can make the full headless browser call to the test file
-  #   visit(display_test_url)
-  #   # wait for qunit tests to execute in phantomjs
-  #   html = wait_for_qunit(page)
-  #   # verify tests passed in qunit
-  #   verify_qunit_tests_passed(html)
-  #   skip
-  #   message = JSON.parse(LT::RedisServer.raw_message_pop)
-  #   assert_equal RawMessage::Verbs::CLICKED, message["verb"]
-
-  # end # test_js_collector_qunit
-
-
-  # # collector.js unit and functional tests
-  # def test_js_collector_directly
-  #   joe_smith_username=CGI::escape(@joe_smith[:username])
-  #   acme_org_api_key = CGI::escape(@acme_org[:org_api_key])
-
-  #   collector_test_url = "/assets/tests/js-collector-test.html?username=#{joe_smith_username}&org_api_key=#{acme_org_api_key}"
-  #   visit(collector_test_url)
-  #   sleep 0.2
-  #   # clear raw messages queue (there's a clicked message that comes on page load)
-  #   LT::RedisServer::raw_messages_queue_clear
-  #   # validate that window.ltG.fSendMsg sends a message that is received by redis
-  #   page_url = page.evaluate_script("window.ltG.priv.fGetCurURL();")
-  #   page_title = page.evaluate_script("window.ltG.priv.fGetCurPageTitle();")
-
-  #   pageViewScript = "window.ltG.fSendPageViewMsg();"
-  #   page.execute_script(pageViewScript)
-  #   # we need to wait for the ajax call to complete
-  #   sleep 0.1
-  #   message = LT::RedisServer.raw_message_pop
-  #   refute_nil message, "No Redis message received from Ajax call via assert api."
-  #   message = JSON.parse(message)
-  #   assert_equal "0S", message["action"]["time"]
-  #   assert_equal RawMessage::Verbs::VIEWED, message["verb"]
-  #   assert_match page_title, message["page_title"]
-  #   assert_equal page_url, message["url"]
-  #   #validate url function
-  #   page_url = page.evaluate_script("window.ltG.priv.fGetCurURL();")
-  #   test_uri = URI::parse(page_url)
-  #   valid_uri = URI::parse(collector_test_url)
-  #   assert_equal valid_uri.path, test_uri.path
-  #   assert_equal valid_uri.query, test_uri.query
-
-  #   # show that fSendClickMsg works
-  #   assert !LT::RedisServer.raw_message_pop
-  #   pageViewScript = "window.ltG.fSendClickMsg();"
-  #   page.execute_script(pageViewScript)
-  #   sleep 0.1
-  #   message = LT::RedisServer.raw_message_pop
-  #   message = JSON.parse(message)
-  #   assert_equal RawMessage::Verbs::CLICKED, message["verb"]
-  #   assert_match page_title, message["page_title"]
-  #   assert_equal page_url, message["url"]
-
-  #   # verify that this message has a user_agent value in action
-  #   assert_match /^Mozilla\/5.0.*PhantomJS/, message["action"]["user_agent"]
-
-  #   # TODO TEST WARNING: I cannot determine how to simulate a window close event in phantomjs
-  #   #  This means that we cannot programmatically verify that closing a window
-  #   #  will trigger the a "viewed" event with a correct "time on page" duration
-  #   #  Manual test: The way I am manually testing this feature currently is:
-  #   #    Run Sinatra in development mode
-  #   #    Run LT:console at terminal
-  #   #      Execute: LT::Scenarios::Students::create_joe_smith_scenario
-  #   #      Execute: Organization.first.org_api_key
-  #   #      Note the api-key uuid and paste it in the url below
-  #   #    Visit the following URL in a browser
-  #   #      http://localhost:8080/assets/tests/sandbox-test.html?username=joesmith@foo.com&org_api_key=[api_key]
-  #   #    Load RedisDesktopManager
-  #   #      View the dev raw messages queue
-  #   #      TEST: Verify there is one raw message corresponding to our page open ("clicked") event
-  #   #    Close the browser tab
-  #   #      TEST: Verify there are now two raw messages - the second with "viewed" and 
-  #   #        with the correct time shown in the data structure:
-  #   #        action: time: {"NNS"}
+  end # test_js_collector_qunit
 
 
-  #   # we don't seem to be able to blur or close windows
-  #   # and generate associated events in phantomjs
-  #   # page.execute_script("window.blur();")
-  #   # page.execute_script("window.focus();")
-  #   # page.driver.browser.window_handles.each do |handle|
-  #   #   page.driver.browser.switch_to.window(handle)
-  #   #   page.execute_script "window.close();"
+  # collector.js unit and functional tests
+  def test_js_collector_directly
+    joe_smith_username=CGI::escape(@joe_smith[:username])
+    acme_org_api_key = CGI::escape(@acme_org[:org_api_key])
 
-  #   # end
+    collector_test_url = "/assets/tests/js-collector-test.html?username=#{joe_smith_username}&org_api_key=#{acme_org_api_key}"
+    visit(collector_test_url)
+    sleep 0.2
+    # clear raw messages queue (there's a clicked message that comes on page load)
+    LT::RedisServer::raw_messages_queue_clear
+    # validate that window.ltG.fSendMsg sends a message that is received by redis
+    page_url = page.evaluate_script("window.ltG.priv.fGetCurURL();")
+    page_title = page.evaluate_script("window.ltG.priv.fGetCurPageTitle();")
 
-  #   #page.execute_script("window.close();")
+    pageViewScript = "window.ltG.fSendPageViewMsg();"
+    page.execute_script(pageViewScript)
+    # we need to wait for the ajax call to complete
+    sleep 0.1
+    message = LT::RedisServer.raw_message_pop
+    refute_nil message, "No Redis message received from Ajax call via assert api."
+    message = JSON.parse(message)
+    assert_equal "0S", message["action"]["time"]
+    assert_equal RawMessage::Verbs::VIEWED, message["verb"]
+    assert_match page_title, message["page_title"]
+    assert_equal page_url, message["url"]
+    #validate url function
+    page_url = page.evaluate_script("window.ltG.priv.fGetCurURL();")
+    test_uri = URI::parse(page_url)
+    valid_uri = URI::parse(collector_test_url)
+    assert_equal valid_uri.path, test_uri.path
+    assert_equal valid_uri.query, test_uri.query
 
-  #   # Use page.driver.debug to debug JS in Chrome
-  # end
+    # show that fSendClickMsg works
+    assert !LT::RedisServer.raw_message_pop
+    pageViewScript = "window.ltG.fSendClickMsg();"
+    page.execute_script(pageViewScript)
+    sleep 0.1
+    message = LT::RedisServer.raw_message_pop
+    message = JSON.parse(message)
+    assert_equal RawMessage::Verbs::CLICKED, message["verb"]
+    assert_match page_title, message["page_title"]
+    assert_equal page_url, message["url"]
+
+    # verify that this message has a user_agent value in action
+    assert_match /Mozilla/, message["action"]["user_agent"]
+    # TODO TEST WARNING: I cannot determine how to simulate a window close event in phantomjs
+    #  This means that we cannot programmatically verify that closing a window
+    #  will trigger the a "viewed" event with a correct "time on page" duration
+    #  Manual test: The way I am manually testing this feature currently is:
+    #    Run Sinatra in development mode
+    #    Run LT:console at terminal
+    #      Execute: LT::Scenarios::Students::create_joe_smith_scenario
+    #      Execute: Organization.first.org_api_key
+    #      Note the api-key uuid and paste it in the url below
+    #    Visit the following URL in a browser
+    #      http://localhost:8080/assets/tests/sandbox-test.html?username=joesmith@foo.com&org_api_key=[api_key]
+    #    Load RedisDesktopManager
+    #      View the dev raw messages queue
+    #      TEST: Verify there is one raw message corresponding to our page open ("clicked") event
+    #    Close the browser tab
+    #      TEST: Verify there are now two raw messages - the second with "viewed" and 
+    #        with the correct time shown in the data structure:
+    #        action: time: {"NNS"}
+
+
+    # NOTE: try using Capybara's function to close window instead of inside JS
+    # we don't seem to be able to blur or close windows
+    # and generate associated events in phantomjs
+    # page.execute_script("window.blur();")
+    # page.execute_script("window.focus();")
+    # page.driver.browser.window_handles.each do |handle|
+    #   page.driver.browser.switch_to.window(handle)
+    #   page.execute_script "window.close();"
+
+    # end
+
+    #page.execute_script("window.close();")
+
+    # Use page.driver.debug to debug JS in Chrome
+  end
 
   def setup
     super

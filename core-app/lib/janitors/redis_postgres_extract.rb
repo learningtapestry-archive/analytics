@@ -13,7 +13,7 @@ module LT
 					RawMessage.find_new_page_visits.each do |raw_page_visit|
 						begin
 							PageVisit.create_from_raw_message(raw_page_visit)
-							LT::logger.debug("RawMessagesExtract: Successful extract PG raw message to page visit, raw msg ID: #{raw_page_visit.id}")
+							LT::logger.info("RawMessagesExtract: Successful extract PG raw message to page visit, raw msg ID: #{raw_page_visit.id}")
 						rescue Exception => e
 							LT::logger.error("RawMessagesExtract: Failed extract PG raw message to page visit, raw msg ID: #{raw_page_visit.id}, exception: #{e.message}")
 							num_failed += 1
@@ -37,7 +37,7 @@ module LT
 						break if total_msg_count > MAX_REDIS_RAW_MESSAGE_QUEUE
 						begin
 							raw_message = RawMessage.create_from_json(raw_json_msg)
-							LT::logger.debug("RawMessagesExtract: Successful extract Redis to PG raw message, raw msg ID: #{raw_message.id}")
+							LT::logger.info("RawMessagesExtract: Successful extract Redis to PG raw message, raw msg ID: #{raw_message.id}")
 						rescue Exception => e
 							LT::logger.error("RawMessagesExtract: Failed extract Redis to PG raw message, exception: #{e.message}")
 							total_msg_failed += 1						

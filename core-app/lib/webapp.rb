@@ -105,9 +105,12 @@ module LT
       erb :"common.js", :layout=>false
     end
 
+    # path to assert routes for org_api_key calls
     ORG_API_KEY_ASSERT_ROUTE = "/api/v1/assert-org"
-    # this is a dynamically rendered js file
-    get '/api/v1/collector.js' do
+
+    # Dynamically load js files based on parameter input
+    # Creates Javascript pages based on incoming parameter input
+    get '/api/v1/:page.js' do
       content_type :javascript
       username = params[:username]
       org_api_key = params[:org_api_key]
@@ -116,12 +119,39 @@ module LT
         status 401
         return
       else
+        # force https in production, otherwise mirror incoming request
+        if LT::production? then
+          scheme = "https"
+        else
+          scheme = request.scheme
+        end
         locals = {
-          org_api_key: org_api_key,
-          user_id: username,
-          assert_end_point: ORG_API_KEY_ASSERT_ROUTE
+          org_api_key: CGI::escape(org_api_key),
+          user_id: CGI::escape(username),
+          assert_end_point: ORG_API_KEY_ASSERT_ROUTE,
+          lt_api_server: "#{scheme}://#{request.host}:#{request.port.to_s}"
         }
-        erb :"collector.js", :layout => false, locals: locals
+        # main selector to determine which javascript page to generate/send
+        if params[:page] == 'collector' then
+          erb :"collector.js", :layout => false, locals: locals
+        elsif params[:page] == 'loader' then
+          # we are passed parameters to loader, asking which js pages
+          # the loader should load async once it's booted. We pass
+          # these files into the loader itself so that they will be loaded
+          case params[:load]
+            when "collector"
+              locals[:lt_api_libs] = ["collector"]
+            else
+              status 401
+              return
+          end
+          # instruct loader to auto-start if request asks for this
+          locals[:autostart] = true if params[:autostart] == "true"
+          erb :"loader.js", :layout => false, locals: locals
+        else
+          status 401
+          return
+        end
       end
     end
 
@@ -160,7 +190,7 @@ module LT
       end
     end
 
-    ### END API
+   ### END API
   end
 end
 

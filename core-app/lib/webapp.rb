@@ -143,7 +143,6 @@ module LT
 
     end
 
-
     post '/api/v1/assert' do
       begin
         api_key = request.env["HTTP_X_LT_API_KEY"] 
@@ -158,6 +157,10 @@ module LT
         LT::logger.error "Unknown error in /api/v1/assert: #{e.message}"
         API_ERROR_MESSAGE
       end
+    end
+
+    post '/api/v1/obtain' do
+
     end
 
     ### END API

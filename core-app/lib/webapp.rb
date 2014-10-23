@@ -190,7 +190,10 @@ module LT
       end
     end
 
+    post '/api/v1/obtain' do
+
+    end
+
    ### END API
   end
 end
-

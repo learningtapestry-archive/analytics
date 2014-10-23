@@ -15,6 +15,7 @@ log4r.yml
 /test/version_tmp/
 /tmp/
 log/
+.idea/
 
 ## Specific to RubyMotion:
 .dat*

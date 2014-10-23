@@ -1,0 +1,7 @@
+---
+- name: Web | Install required packages
+  action: apt pkg={{ item }} state=installed update_cache=true
+  with_items:
+    - nginx
+    - openssl
+    - postgresql-client-9.3

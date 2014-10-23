@@ -73,9 +73,9 @@ var ExtractorManager = {
     
     asites_url: 'asites.html',
     info_url: 'https://lt-dev01.learntaculo.us/privacy',
-    welcome_url: 'https://lt-dev01.learntaculo.us/welcome-install',
+    welcome_url: 'https://lt-dev01.learntaculo.us/welcome',
     login_url: 'https://lt-dev01.learntaculo.us/?src=ext',
-    sites_url: 'https://lt-dev01.learntaculo.us/api/v1/approved-sites-new',
+    sites_url: 'https://lt-dev01.learntaculo.us/api/v1/approved-sites',
     event_url: 'https://lt-dev01.learntaculo.us/api/v1/assert',
     
     active_icon: 'icon-active-128.png',
@@ -338,13 +338,13 @@ var ExtractorManager = {
                     b = '';
                     
                     for(var i=0; i<x.length; ++i) {
-                        p = {}, q = x[i].approved_site_actions;
+                        p = {}, q = x[i].site_actions;
                         for(var j=0; j<q.length; ++j) {
                             p[q[j].url_pattern] = p[q[j].url_pattern] || [];
                             p[q[j].url_pattern].push(j);
                         }
                         
-                        y.push({site_name: x[i].site_name, site_uuid: x[i].site_uuid, url: x[i].url});
+                        y.push({site_name: x[i].display_name, site_uuid: x[i].site_uuid, url: x[i].url});
                         
                         for(var k in p) {
                             if(Object.prototype.hasOwnProperty.call(p, k)) {
@@ -438,26 +438,25 @@ var ExtractorManager = {
             else if(e.t === 'page_view') {
                 u = {
                     api_key: this.api_key,
-                    username: this.user.id,
+                    user_id: this.user.id,
                     site_uuid: e.d.site_uuid,
                     verb: 'viewed',
                     action: {
-                        time: e.d.t,
-                        page_title: e.d.pt
+                        time: e.d.t
                     },
+                    page_title: e.d.pt,
                     url: e.d.id,
-                    page_title: e.d.page_title,
                     captured_at: _timestamp()
                 };
             }
             else if(e.t === 'click_event') {
                 u = {
                     api_key: this.api_key,
-                    username: this.user.id,
+                    user_id: this.user.id,
                     site_uuid: e.d.site_uuid,
                     verb: 'clicked',
                     action: {
-                            url: e.d.u
+                        url: e.d.u
                     },
                     url: e.d.id,
                     captured_at: _timestamp()
@@ -466,7 +465,7 @@ var ExtractorManager = {
             else if(e.t === 'extract_event') {
                 u = {
                     api_key: this.api_key,
-                    username: this.user.id,
+                    user_id: this.user.id,
                     site_uuid: e.d.site_uuid,
                     verb: 'extracted',
                     action: {

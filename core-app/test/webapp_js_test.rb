@@ -1,11 +1,48 @@
+require 'open-uri'
 test_helper_file = File::expand_path(File::join(LT::test_path,'test_helper.rb'))
 require test_helper_file
 
+
 class WebAppJSTest < WebAppJSTestBase
 
-  def test_js_loader_collector_via_qunit
-    assert true
+  def set_server(host, options ={})
+    orig_app_host = Capybara.app_host
+    protocol = options[:protocol] || "http"
+    Capybara.app_host = "#{protocol}://#{host}"
+    Capybara.always_include_port = true
+    yield
+    Capybara.app_host = orig_app_host
   end
+
+  def test_js_loader_collector_via_qunit
+
+    lt_host = "lt.test.learningtapestry.com"
+    partner_host = "partner.lt.betaspaces.com"
+    port = Capybara.current_session.server.port
+    # set up data to make collector test work
+    joe_smith_username=CGI::escape(@joe_smith[:username])
+    acme_org_api_key = CGI::escape(@acme_org[:org_api_key])
+
+    loader_test_url = "/assets/tests/js-loader-collector-test.html"
+    loader_test_params = "?username=#{joe_smith_username}&org_api_key=#{acme_org_api_key}"+
+     "&hostname=#{lt_host}:#{port}"
+    test_url = "#{loader_test_url}#{loader_test_params}"
+    set_server(partner_host) do 
+      visit(test_url)
+    end
+    # wait for qunit tests to execute in phantomjs
+    html = wait_for_qunit(page)
+    
+    sleep 0.1
+    # verify that the collector script has been loaded by the loader script
+    # ltG object is created by collector only and userId is a dynamic value inside it
+    username_actual = page.evaluate_script("window.ltG.userId")
+    assert_equal joe_smith_username, username_actual
+
+    # verify tests passed in qunit
+    verify_qunit_tests_passed(html)
+  end
+
 
   # this method is somewhat indirect
   # It calls an html test page via capybara/poltergeist/phantomjs
@@ -39,7 +76,6 @@ class WebAppJSTest < WebAppJSTestBase
   end # test_js_collector_qunit
 
   def test_js_display_via_qunit
-
     # set up data to make collector test work
     joe_smith_username=CGI::escape(@joe_smith[:username])
     acme_org_api_key = CGI::escape(@acme_org[:org_api_key])
@@ -106,8 +142,7 @@ class WebAppJSTest < WebAppJSTestBase
     assert_equal page_url, message["url"]
 
     # verify that this message has a user_agent value in action
-    assert_match /^Mozilla\/5.0.*PhantomJS/, message["action"]["user_agent"]
-
+    assert_match /Mozilla/, message["action"]["user_agent"]
     # TODO TEST WARNING: I cannot determine how to simulate a window close event in phantomjs
     #  This means that we cannot programmatically verify that closing a window
     #  will trigger the a "viewed" event with a correct "time on page" duration
@@ -128,6 +163,7 @@ class WebAppJSTest < WebAppJSTestBase
     #        action: time: {"NNS"}
 
 
+    # NOTE: try using Capybara's function to close window instead of inside JS
     # we don't seem to be able to blur or close windows
     # and generate associated events in phantomjs
     # page.execute_script("window.blur();")

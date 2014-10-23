@@ -26,13 +26,19 @@ module LT
   class InvalidFileFormat < BaseException;end;
 
   class << self
+    def env?(type)
+      (self.run_env == (type && ENV['RAILS_ENV'] = type))    
+    end
     def testing?
       # we are only in a testing environment if RAILS_ENV and run_env agree on it
-      (self.run_env == ('test' && ENV['RAILS_ENV'] = 'test'))
+      env?('test')
     end
     def development?
       # we are only in a development environment if RAILS_ENV and run_env agree on it
-      (self.run_env == ('development' && ENV['RAILS_ENV'] = 'development'))
+      env?('development')
+    end
+    def production?
+      env?('production')
     end
     # raise an exception if we are not in testing mode
     def testing!(msg="Expected to be in testing env, but was not.")

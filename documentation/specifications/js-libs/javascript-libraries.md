@@ -1,9 +1,9 @@
 #Javascript Libraries
 The javascript libraries consist of two main components:
-* JS collect
+* JS collector
 * JS display
 
-##JS Collect
+##JS Collector
 JS Collect library provides a simple mechanism to allow sites to collect data on their users. In order to function, the lib needs an organizational api_key and a username (or equiv user id).
 
 In the html of the page where the collector is to function, there are several methods for providing the collector the data it needs to function.
@@ -77,7 +77,33 @@ var username=<%=include[:username]%>;
 
 
 ## JS Display
+### Display code API strategies
 
+1. Partner code runs entirely on their server
+  * Integrates to LT via https/pre-shared secret
+  * Downside: Synchronous - delays partner page generation
+  * Downside: Have to implement libraries for major languages
+    * Have to implement display data access for each language
+  * Upside: Easy to write and test. Unlikely to break.
+
+2. HMAC/OAuth key generation entirely local to partner server
+  * LT JS lib uses HMAC key to gain access to user data in our api
+  * Downside: Have to maintain multi-platform codebases
+  * Downside: Have to implement tricky security code
+  * Downside: Have to author javascript display library
+  * Upside: No net access, very fast
+
+3. HMAC key generation provided as a service to partner server
+  * Partner server calls LT with pre-shared secret & username to hmac api endpoint
+  * LT responds with HMAC token valid for that user
+  * Downside: Synchronous - delays partner page generation
+  * Downside: Have to implement tricky security code
+  * Downside: Have to implement libraries for major languages (but library is simple)
+  * Downside: Have to author javascript display library
+  * Upside: Shorter network delay than Item 1 (prob 200ms vs 400ms for #1)
+
+
+### Semi-deprecated strategies
 Proposed technique is to use a single javascript include to specify the user and the api key.
 
 Then inside the html, by setting a particular class variable, data can be pulled into the page for a given user.
@@ -88,7 +114,7 @@ Then inside the html, by setting a particular class variable, data can be pulled
 
 <table>
 | Student name   | Grade  | Discussion | Comments | Total time this week |
-   xyz              xyz       xyz          xyz     <span class="totaltime-allpages-week">...</span>
+   xyz              xyz       xyz          xyz     <span class="lt-data" ltuser="public@misuse.org" ltdata="totaltime-allpages-week">...</span>
 
 </body>
 </html>

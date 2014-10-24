@@ -8,4 +8,4 @@ Learning Tapestry
 - zz-archives - Projects used to prototype, no longer in active use
 
 
-(c) 2014 - Learning Tapestry is a proprietary project and joined owned by Hoekstra/Midgley
+(c) 2014 - Learning Tapestry is a proprietary project and jointly owned by Hoekstra/Midgley

@@ -1,4 +1,4 @@
-id,first_name,middle_name,last_name,gender,username,password_digest,date_of_birth,school_id,created_at,updated_at
-1,Jason,,Hoekstra,,jason,$2a$10$IeZaG5lQ56q2IqTdcmba0.vny910JK8EXTexoJKM4nQO50s3KqJu2,,,,
-2,Steve,,Midgley,,stevemidgley,$2a$10$bEGzXak92.vMA0en7.Lq8eC4FfhDuO/K8XTaw2kvan.H0NslpWdUu,,,,
-3,Jane,,Jones,,janejones,$2a$10$IeZaG5lQ56q2IqTdcmba0.vny910JK8EXTexoJKM4nQO50s3KqJu2,,,,
+id,first_name,middle_name,last_name,gender,username,password_digest,date_of_birth,school_id,organization_id,created_at,updated_at
+1,Jason,,Hoekstra,,jason,$2a$10$IeZaG5lQ56q2IqTdcmba0.vny910JK8EXTexoJKM4nQO50s3KqJu2,,,1,10/23/2014 16:05:05,10/23/2014 16:05:05
+2,Steve,,Midgley,,stevemidgley,$2a$10$bEGzXak92.vMA0en7.Lq8eC4FfhDuO/K8XTaw2kvan.H0NslpWdUu,,,1,10/23/2014 16:05:05,10/23/2014 16:05:05
+3,Jane,,Jones,,janejones,$2a$10$IeZaG5lQ56q2IqTdcmba0.vny910JK8EXTexoJKM4nQO50s3KqJu2,,,1,10/23/2014 16:05:05,10/23/2014 16:05:05

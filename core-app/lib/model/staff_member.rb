@@ -1,6 +1,8 @@
 class StaffMember < ActiveRecord::Base
   belongs_to :user
   has_many :emails, through: :user
+  has_one :organization, through: :user
+  has_one :school, through: :user
   delegate :page_visits, :to => :user
   delegate :site_visits, :to => :user
   delegate :sections, :to => :user

@@ -10,6 +10,7 @@ class InitSchema < ActiveRecord::Migration
     end
 
     create_table "organizations", :force => true do |t|
+      t.string "name"
       t.string "org_api_key"
     end
 
@@ -176,6 +177,7 @@ class InitSchema < ActiveRecord::Migration
       t.string   "password_digest"
       t.date     "date_of_birth"
       t.belongs_to  :school
+      t.belongs_to  :organization
       t.timestamps
     end
 

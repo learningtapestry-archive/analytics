@@ -82,6 +82,7 @@ module LT
       def acme_organization_data
         @acme_org_api_key = SecureRandom.uuid if !@acme_org_api_key
         {
+          name: 'Acme Organization',
           org_api_key: @acme_org_api_key
         }
       end
@@ -183,6 +184,12 @@ module LT
         scenario[:organizations].each do |organization|
           Organization.create!(organization)
         end
+        organization = Organization.find_by_name(Organizations::acme_organization_data[:name])
+        student.organization = organization
+        student.save
+        student2.organization = organization
+        student2.save
+
         # we add all user activity data to two students
         # this is to make sure that we can find data associated with only student at a time
         [student, student2].each do |student|

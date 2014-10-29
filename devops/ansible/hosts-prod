@@ -1,23 +1,19 @@
-104.131.171.144 ansible_ssh_private_key_file=~/.ssh/id_learntap # temporary lt-test01
+web01.learningtapestry.com
+db01.learningtapestry.com
 
 [webservers]
-104.131.171.144
+web01.learningtapestry.com
+db01.learningtapestry.com
 
 [dbservers]
-104.131.171.144
+web01.learningtapestry.com
+db01.learningtapestry.com
+
+[all:vars]
+ansible_ssh_user=root
+# ideally, this lives in vars/main.yml, but can't get it to work now
 
 
-# host groups for future usage
-# [webservers]
-# [dbservers]
-# [ciservers]
-# [taskservers]
-
-
-
-
-#### When ready for production
-#### 104.131.236.66 # switch to: lt-dev01.learningtapestry.com
 
 # example:  www[01:50].example.com  
 # example:  db[01:03].example.com

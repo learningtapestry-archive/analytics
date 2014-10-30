@@ -6,6 +6,21 @@
     - build-essential
     - unzip
     - ufw
+    - unattended-upgrades
+    - postfix # used so boxes can send email
     - byobu
-    - ruby1.9.1 # which is Ruby 1.9.3p484
-    - git
+
+- name: Copy the unattended-upgrades file
+  copy: src=50unattended-upgrades dest=/etc/apt/apt.conf.d/50unattended-upgrades
+
+- name:  UFW - Allow port 22
+  ufw: rule=allow port=22 proto=tcp
+
+- name:  UFW - Deny all others by default
+  ufw: policy=deny direction=incoming
+
+- name:  UFW - Enable logging
+  ufw: logging=on
+
+- name:  UFW - enable, deny traffic by default
+  ufw: state=enabled

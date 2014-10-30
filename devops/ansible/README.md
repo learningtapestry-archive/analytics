@@ -23,7 +23,13 @@ Helpful references in designing playbooks:
 - https://github.com/ansible/ansible-examples
 - http://docs.ansible.com/modules_by_category.html
 
-### Commands
+### Learning Tapestry Operational Commands
+
+- ```ansible -i hosts-prod web01 -m service -a "name=nginx state=started"```  Check on web01 that nginx is started (```state=restarted``` to restart service)
+- 
+
+
+### General Commands
 
 - ```ansible -i [inventory/host file]``` - run with host file instead of the default /etc/ansible/hosts.  
 

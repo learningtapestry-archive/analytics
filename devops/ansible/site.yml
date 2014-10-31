@@ -8,18 +8,18 @@
     - 'vars/main.yml'
 
   roles:
-    - common
+    - { role: common, tags: [ 'common' ] }
 
 - name: configure and deploy the webservers and application code
   hosts: webservers
   remote_user: root
 
   roles:
-    - web
+    - { role: web, tags: [ 'web' ] }
 
 - name: deploy Postgres and configure the databases
   hosts: dbservers
   remote_user: root
 
   roles:
-    - db
+    - { role: db, tags: [ 'db' ] }

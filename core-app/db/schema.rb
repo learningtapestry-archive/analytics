@@ -79,6 +79,7 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   end
 
   create_table "organizations", force: true do |t|
+    t.string "name"
     t.string "org_api_key"
   end
 
@@ -211,6 +212,7 @@ ActiveRecord::Schema.define(version: 20140902210605) do
     t.string   "password_digest"
     t.date     "date_of_birth"
     t.integer  "school_id"
+    t.integer  "organization_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

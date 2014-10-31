@@ -1,44 +1,56 @@
 ### (C) 2014 Learning Tapestry (Hoekstra/Midgley) - All rights reserved.
 
-require 'net/http'  #open-uri only supports GET requests
+require 'net/http'
+require 'uri'
+require 'json'
 
 module LearningTapestry
   class Agent
+    attr_accessor :org_api_key, :api_base, :entity, :filters, :usernames
 
-    attr_accessor :api_key, :api_base, :entity, :filters
-    attr_reader :response, :status
-
-    # @filters = {} -- why doesn't this create a new hash here? same Hash.new
-    @api_base = LT_API_BASE = 'https://learningtapestry.com/api/v1'
-    LT_API_PATH_OBTAIN = '/obtain'
+    LT_API_BASE = 'https://api.learningtapestry.com'
+    LT_API_PATH_OBTAIN = '/api/v1/obtain'
 
     def initialize(params={})
+      @api_base = params[:api_base] ? params[:api_base] : LT_API_BASE
       @filters = {}
-      @api_key = params[:api_key] if params[:api_key]
+      @usernames = []
+      @org_api_key = params[:org_api_key] if params[:org_api_key]
       @api_base = params[:api_base] if params[:api_base]
       @entity = params[:entity] if params[:entity]
       @filters = params[:filters] if params[:filters]
+      @usernames = params[:usernames] if params[:usernames]
     end
 
-    def obtain(params={})
-      throw 'API key not provided or not valid' if !validate_api_key
+    def obtain
+      throw 'Organization API key not provided or not valid' if not validate_org_api_key
+      throw 'Username list not provided' if not @usernames
 
-      @entity = params[:entity] if params[:entity]
-      @filters = params[:filters] if params[:filters]
+      data = { org_api_key: @org_api_key, usernames: @usernames, filters: @filters }.to_json
 
       uri = URI("#{@api_base}#{LT_API_PATH_OBTAIN}")
-      results = Net::HTTP.post_form(uri, data)
+      header = { 'Content-Type' => 'application/json' }
+      http = Net::HTTP.new(uri.host, uri.port)
+      path = '/api/v1/obtain'
+      response = http.post path, data, header
 
-      @response = results.response
-      @status = results.code
+      retval = {}
+      retval[:status] = response.code.to_i
+      retval[:data] = JSON.parse(response.body, symbolize_names: true)
+
+      retval
     end
 
     def add_filter(key, value)
       @filters[key] = value
     end
 
-    def validate_api_key
-      !@api_key.nil? || @api_key == /[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}/
+    def add_username(username)
+      @usernames.push(username)
+    end
+
+    def validate_org_api_key
+      !@org_api_key.nil? || @org_api_key == /[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}/
     end
 
   end

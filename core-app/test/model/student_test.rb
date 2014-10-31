@@ -6,6 +6,7 @@ class StudentModelTest < LTDBTestBase
     super
     LT::Seeds::seed!
     @scenario = LT::Scenarios::Students::create_joe_smith_scenario
+    @acme_org = @scenario[:organizations][0]
     @joe_smith = @scenario[:student]
     @jane_doe = @scenario[:teacher]
     @section = @scenario[:section]
@@ -18,9 +19,11 @@ class StudentModelTest < LTDBTestBase
     # basic data relationships
     student = Student.find_by_username(@joe_smith[:username])
     teacher = StaffMember.find_by_username(@jane_doe[:username])
+    acme_org = Organization.find_by_name(@acme_org[:name])
     assert_equal @joe_smith[:username], student.username
     assert student.user
     assert_equal @joe_smith[:email], student.email
+    assert_equal student.organization, acme_org
     assert_equal @jane_doe[:username], teacher.username
     # teachers belong to sections
     section = teacher.sections.find_by_section_code(@section[:section_code])

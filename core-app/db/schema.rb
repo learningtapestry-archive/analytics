@@ -79,13 +79,16 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   end
 
   create_table "organizations", force: true do |t|
-    t.string "name"
-    t.string "org_api_key"
+    t.string  "name"
+    t.string  "org_api_key"
+    t.string  "org_secret_key"
+    t.integer "login_attempts"
+    t.boolean "locked"
   end
 
   create_table "page_clicks", force: true do |t|
     t.datetime "date_visited"
-    t.string   "url_visited",  limit: 4096
+    t.text     "url_visited"
     t.integer  "user_id"
     t.integer  "page_id"
   end
@@ -98,7 +101,7 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   end
 
   create_table "pages", force: true do |t|
-    t.string   "url",          limit: 4096, null: false
+    t.text     "url",          null: false
     t.string   "display_name"
     t.integer  "site_id"
     t.datetime "created_at"
@@ -123,7 +126,7 @@ ActiveRecord::Schema.define(version: 20140902210605) do
     t.uuid     "site_uuid"
     t.string   "verb"
     t.json     "action"
-    t.string   "url",         limit: 4096
+    t.text     "url"
     t.datetime "captured_at"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -163,8 +166,8 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   end
 
   create_table "site_actions", force: true do |t|
-    t.string   "action_type",               null: false
-    t.string   "url_pattern",  limit: 4096, null: false
+    t.string   "action_type",  null: false
+    t.text     "url_pattern",  null: false
     t.string   "css_selector"
     t.integer  "site_id"
     t.datetime "created_at"
@@ -172,11 +175,11 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   end
 
   create_table "sites", force: true do |t|
-    t.string   "url",            limit: 4096, null: false
+    t.text     "url",            null: false
     t.string   "display_name"
-    t.uuid     "site_uuid",                   null: false
-    t.string   "logo_url_small", limit: 4096
-    t.string   "logo_url_large", limit: 4096
+    t.uuid     "site_uuid",      null: false
+    t.text     "logo_url_small"
+    t.text     "logo_url_large"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -2,6 +2,7 @@ require 'sinatra/base'
 require 'sinatra/multi_route'
 require 'sinatra/reloader'
 require 'sinatra/cookies'
+require 'sinatra/json'
 require 'json'
 require 'chronic'
 
@@ -13,6 +14,7 @@ module LT
   end # WebAppHelper
   class WebApp < Sinatra::Base
     helpers Sinatra::Cookies
+    helpers Sinatra::JSON
     use Rack::Session::Cookie, key: "rack.session", secret: "I3p3AIXG4ELYC77k"
 
     # TODO this is ugly - not sure how to get non-html exceptions raised in testing otherwise
@@ -34,7 +36,7 @@ module LT
     
     include WebAppHelper
 
-    API_ERROR_MESSAGE ||= { :status => "unknown error" }.to_json
+    API_ERROR_MESSAGE ||= { status: 'unknown error' }.to_json
 
     # set up UI layout container
     # we need this container to set dynamic content in the layout template
@@ -105,9 +107,12 @@ module LT
       erb :"common.js", :layout=>false
     end
 
+    # path to assert routes for org_api_key calls
     ORG_API_KEY_ASSERT_ROUTE = "/api/v1/assert-org"
-    # this is a dynamically rendered js file
-    get '/api/v1/collector.js' do
+
+    # Dynamically load js files based on parameter input
+    # Creates Javascript pages based on incoming parameter input
+    get '/api/v1/:page.js' do
       content_type :javascript
       username = params[:username]
       org_api_key = params[:org_api_key]
@@ -116,12 +121,39 @@ module LT
         status 401
         return
       else
+        # force https in production, otherwise mirror incoming request
+        if LT::production? then
+          scheme = "https"
+        else
+          scheme = request.scheme
+        end
         locals = {
-          org_api_key: org_api_key,
-          user_id: username,
-          assert_end_point: ORG_API_KEY_ASSERT_ROUTE
+          org_api_key: CGI::escape(org_api_key),
+          user_id: CGI::escape(username),
+          assert_end_point: ORG_API_KEY_ASSERT_ROUTE,
+          lt_api_server: "#{scheme}://#{request.host}:#{request.port.to_s}"
         }
-        erb :"collector.js", :layout => false, locals: locals
+        # main selector to determine which javascript page to generate/send
+        if params[:page] == 'collector' then
+          erb :"collector.js", :layout => false, locals: locals
+        elsif params[:page] == 'loader' then
+          # we are passed parameters to loader, asking which js pages
+          # the loader should load async once it's booted. We pass
+          # these files into the loader itself so that they will be loaded
+          case params[:load]
+            when "collector"
+              locals[:lt_api_libs] = ["collector"]
+            else
+              status 401
+              return
+          end
+          # instruct loader to auto-start if request asks for this
+          locals[:autostart] = true if params[:autostart] == "true"
+          erb :"loader.js", :layout => false, locals: locals
+        else
+          status 401
+          return
+        end
       end
     end
 
@@ -160,7 +192,67 @@ module LT
       end
     end
 
-    ### END API
+    post '/api/v1/obtain' do
+      ##TODO:  Determine where to model this, I feel as if it is a query factory assembling dev-friendly JSON;
+      ##       Steve may want to include in model objects themselves.
+
+      ## Starter code below
+
+      body_params = JSON.parse request.body.read
+
+      if body_params['org_api_key'].nil? then
+        status 401 # = HTTP unauthorized
+        json status: 'Organization API key (org_api_key) not provided'
+      elsif body_params['usernames'].nil? or !body_params['usernames'].is_a?(Array) or body_params['usernames'].length == 0
+        status 400
+        json status: 'Username list (usernames) not provided'
+      else
+        org_api_key = body_params['org_api_key']
+        usernames = body_params['usernames']
+
+        if body_params['filters'] then
+          begin_date = body_params['filters']['begin_date'] ? body_params['filters']['begin_date'] : Time::now - 7.days  # default on returning last week's of data
+          end_date = body_params['filters']['end_date'] || Time::now
+        end
+
+        site_visits = Site
+        .select(User.arel_table[:username])
+        .select(Site.arel_table[:display_name])
+        .select(Site.arel_table[:url])
+        .select(PageVisit.arel_table[:time_active].sum.as('time_active'))
+        .joins('JOIN pages ON pages.site_id = sites.id')
+        .joins('JOIN page_visits ON page_visits.page_id = pages.id')
+        .joins('JOIN users ON users.id = page_visits.user_id')
+        .joins('JOIN organizations ON organizations.id = users.organization_id')
+        .where(['page_visits.date_visited BETWEEN SYMMETRIC ? and ?', begin_date, end_date])
+        .where(User.arel_table[:username].in(usernames))
+        .where(['organizations.org_api_key = ?', org_api_key])
+        .group(User.arel_table[:username])
+        .group(Site.arel_table[:display_name])
+        .group(Site.arel_table[:url])
+        .order(User.arel_table[:username])
+
+        retval = { results: [] }
+        username = nil
+        username_count = -1
+        ## Create a JSON structure organized by username with each site visit
+        site_visits.each do |site_visit|
+          if username != site_visit[:username] then
+            username = site_visit[:username]
+            username_count += 1
+            retval[:results].push({ username: username })
+            retval[:results][username_count][:site_visits] = []
+          end
+          array = []
+          retval[:results][username_count][:site_visits].push(
+              {display_name: site_visit[:display_name],
+              url: site_visit[:url],
+              time_active: site_visit[:time_active]})
+        end
+        json retval
+      end
+    end
+
+   ### END API
   end
 end
-

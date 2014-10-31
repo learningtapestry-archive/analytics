@@ -1,10 +1,11 @@
 class Student < ActiveRecord::Base
   belongs_to :user
   has_many :emails, through: :user
+  has_one :organization, through: :user
+  has_one :school, through: :user
   delegate :page_visits, :to => :user
   delegate :site_visits, :to => :user
   delegate :sections, :to => :user
-  delegate :school, :to => :user
   delegate :full_name, :to => :user
   delegate :first_name, :to => :user
   delegate :last_name, :to => :user

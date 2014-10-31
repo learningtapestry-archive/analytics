@@ -72,12 +72,11 @@ QUnit.test("ltG vars and methods tests", function(assert){
 
 //we write the results of our tests to xml in this document
 QUnit.jUnitReport = function(report) {
-    window.lt$("#xmlTestResults").append(report.xml);
+  var xmlOutput = '<span id="xmlTestResults">'+report.xml+'</span>';
+  document.body.innerHTML += xmlOutput;
 };
 
 </script>
-<span id="xmlTestResults">
 
-</span>
 </body>
 </html>

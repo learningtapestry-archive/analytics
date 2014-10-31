@@ -26,13 +26,19 @@ module LT
   class InvalidFileFormat < BaseException;end;
 
   class << self
+    def env?(type)
+      (self.run_env == (type && ENV['RAILS_ENV'] = type))    
+    end
     def testing?
       # we are only in a testing environment if RAILS_ENV and run_env agree on it
-      (self.run_env == ('test' && ENV['RAILS_ENV'] = 'test'))
+      env?('test')
     end
     def development?
       # we are only in a development environment if RAILS_ENV and run_env agree on it
-      (self.run_env == ('development' && ENV['RAILS_ENV'] = 'development'))
+      env?('development')
+    end
+    def production?
+      env?('production')
     end
     # raise an exception if we are not in testing mode
     def testing!(msg="Expected to be in testing env, but was not.")
@@ -47,7 +53,7 @@ module LT
     # test_path holds folder where the tests are stored
     attr_accessor :run_env,:logger, :root_dir, :model_path, 
       :test_path, :seed_path, :lib_path, :db_path, :tmp_path, 
-      :message_path, :janitor_path, :web_root_path, :web_asset_path
+      :message_path, :janitor_path, :web_root_path, :web_asset_path, :partner_lib_path
 
     def boot_all(app_root_dir = File::join(File::dirname(__FILE__),'..'))
       LT::setup_environment(app_root_dir)
@@ -79,6 +85,7 @@ module LT
       LT::janitor_path = File::expand_path(File::join(LT::lib_path,'/janitors'))
       LT::web_root_path = File::expand_path(File::join(LT::root_dir, '/web-public'))
       LT::web_asset_path = File::expand_path(File::join(LT::web_root_path, '/assets'))
+      LT::partner_lib_path = File::expand_path(File::join(LT::root_dir, '/partner-lib/lib'))
       LT::tmp_path = Dir::tmpdir
 
       LT::message_path = File::expand_path(File::join(LT::root_dir, '/log/messages'))

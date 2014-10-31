@@ -1,0 +1,27 @@
+---
+- name: Web | Install required packages
+  action: apt pkg={{ item }} state=installed update_cache=true
+  with_items:
+    - nginx
+    - openssl
+    - postgresql-client-9.3
+    - libpq-dev
+    - redis-server
+    - ruby1.9.1 # which is Ruby 1.9.3p484
+    - ruby1.9.1-dev
+    - git
+
+- user: name=ltwebadmin comment="LT Web Admin" shell=/bin/bash group=sudo ssh_key_file=~/.ssh/id_learntap.pub password="$1$1t5s@1t$OSvZtoB0KwOqgjAfK1/vZ/"
+# To generate:  openssl passwd -salt '1t5s@1t' -1 'password'
+
+- name:  Allow port 443 with UFW
+  ufw: rule=allow port=443 proto=tcp
+
+- name: Copy Nginx configuration for Unicorn proxy
+  copy: src=nginx.conf dest=/etc/nginx/nginx.conf owner=root group=root
+
+- name: Install Bundler
+  gem: name=bundler state=present user_install=no
+
+- name: Install Unicorn
+  gem: name=unicorn state=present user_install=no

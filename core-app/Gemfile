@@ -49,4 +49,6 @@ group :dev_test do
   gem 'pry', '>=0.10.1'
   gem 'pry-debugger', '>=0.2.3'
   gem 'pry-stack_explorer', '>=0.4.9.1'
+  gem 'launchy' # required by capybara to open web browser automatically
+  gem 'selenium-webdriver'
 end

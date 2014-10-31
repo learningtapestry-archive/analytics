@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <!--Don't change the page title without editing page title test in webapp_js_test.rb-->
+  <title>LT JS Collector/Loader Tests</title>
+  <link rel="stylesheet" href="qunit-1.15.0.css">
+  <script src="qunit-1.15.0.js"></script>
+  <script src="qunit-reporter-junit.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script>
+    // internal testing function to get the parameters of the page
+    window.getUrlParameter = function(sParam){
+      var sPageURL = window.location.search.substring(1);
+      var sURLVariables = sPageURL.split('&');
+      for (var i = 0; i < sURLVariables.length; i++){
+          var sParameterName = sURLVariables[i].split('=');
+          if (sParameterName[0] == sParam){
+              return sParameterName[1];
+          }
+      }
+    };
+  </script>
+  <script>
+    // set up testing variables 
+    var ltTestOrgApiKey = window.getUrlParameter('org_api_key');
+    var ltTestUsername = window.getUrlParameter('username');
+    var ltHostName = window.getUrlParameter('hostname');
+    // include the collector javascript loader to kick off the
+    // page collection simulation
+    ltCollectorScriptTag = '<scr'+'ipt src="//'+ltHostName+'/api/v1/loader.js?username='+ltTestUsername+'&org_api_key='+ltTestOrgApiKey+'&load=collector&autostart=true"></scr'+'ipt>';
+    document.write(ltCollectorScriptTag);
+  </script>
+</head>
+<body>
+  <div id="qunit"></div>
+  <div id="qunit-fixture"></div>
+<script>
+
+QUnit.test("Collector javascript setup test", function( assert){
+  assert.ok(true, "Test should always pass");
+});
+
+//we write the results of our tests to xml in this document
+QUnit.jUnitReport = function(report) {
+  var xmlOutput = '<span id="xmlTestResults">'+report.xml+'</span>';
+  document.body.innerHTML += xmlOutput;
+};
+
+</script>
+
+</body>
+</html>

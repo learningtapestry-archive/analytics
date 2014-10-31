@@ -46,7 +46,6 @@ module LT
     end
 
     ### START Dashboard
-
     get "/" do
       set_title("Knowledge for Learning")
       erb :home, locals: { page_title: "Welcome", extension_login: (params[:src] == "ext") }, layout: :layout_noauth
@@ -94,6 +93,11 @@ module LT
       erb :privacy, locals: { page_title: "Privacy" }, layout: :layout_noauth
     end
 
+    # This is used by js-collector testing to pull known page/data from server
+    get "/test.html" do
+      erb :test, layout: :layout_noauth
+    end
+
     ### END Dashboard
 
     # TODO make '/assets/tests/' only work dev/test environment?
@@ -112,6 +116,7 @@ module LT
 
     # Dynamically load js files based on parameter input
     # Creates Javascript pages based on incoming parameter input
+    # TODO add /js/ into the path
     get '/api/v1/:page.js' do
       content_type :javascript
       username = params[:username]
@@ -127,11 +132,12 @@ module LT
         else
           scheme = request.scheme
         end
+        lt_api_server = "#{scheme}://#{request.host}:#{request.port.to_s}"
         locals = {
           org_api_key: CGI::escape(org_api_key),
           user_id: CGI::escape(username),
-          assert_end_point: ORG_API_KEY_ASSERT_ROUTE,
-          lt_api_server: "#{scheme}://#{request.host}:#{request.port.to_s}"
+          assert_end_point: "#{lt_api_server}#{ORG_API_KEY_ASSERT_ROUTE}",
+          lt_api_server: lt_api_server
         }
         # main selector to determine which javascript page to generate/send
         if params[:page] == 'collector' then
@@ -163,12 +169,14 @@ module LT
     end # '/api/v1/approved_sites
 
     # This route handles org_api_key assert messages
-    # e.g., /api/v1/assert-org
-    post ORG_API_KEY_ASSERT_ROUTE do
-      org_api_key = request.env["HTTP_X_LT_ORG_API_KEY"]
+        "/api/v1/assert-org"
+    get ORG_API_KEY_ASSERT_ROUTE do
+      org_api_key = params[:oak]
       if !org_api_key.nil? && LT::RedisServer::has_org_api_key?(org_api_key)
-        LT::RedisServer.raw_message_push(request.body.read)
+        msg_string = params[:msg]
+        LT::RedisServer.raw_message_push(msg_string.to_json)
         status 200
+        return " "
       else
         status 401 
       end

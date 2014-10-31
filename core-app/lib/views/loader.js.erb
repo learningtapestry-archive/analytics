@@ -10,6 +10,15 @@
 // synchronously by the calling page with a simple script tag
 // This file will load additional javascript library files as needed asynchronously
 
+// calling parameters: it is expected that this library will be called with URL parameters
+//   username: identifier to the user
+//   org_api_key: identifier provided by Learning Tapestry
+//   load: the library this autoloader should load (usually "collector")
+//   autostart: "true" will autoboot this library
+//     If autostart is not true, you can manually boot loader by calling
+//       window.lt.init(function(){//code to run when init is finished});
+//     Generally you would skip autostart if you need a callback when init is loaded
+
 // javascript sdk
 (function(window, undefined) {
   if (window.lt) {

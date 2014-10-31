@@ -215,6 +215,9 @@ module LT
           end_date = body_params['filters']['end_date'] || Time::now
         end
 
+        ## if entity = site_visits
+        ##   if usernames provided then
+
         site_visits = Site
         .select(User.arel_table[:username])
         .select(Site.arel_table[:display_name])

@@ -6,6 +6,7 @@ require 'debugger'
 require 'database_cleaner'
 require 'capybara'
 require 'capybara/poltergeist'
+require 'capybara/webkit'
 require 'benchmark'
 
 require File::join(LT::lib_path, 'webapp.rb')
@@ -55,10 +56,17 @@ class WebAppJSTestBase < WebAppTestBase
 
   def use_selenium
     Capybara.default_driver = :selenium
+    Capybara.reset_sessions!
+    Capybara.current_session.driver.reset!
+    Capybara.use_default_driver
   end
   def use_poltergeist
     Capybara.current_driver = :poltergeist
     Capybara.javascript_driver = :poltergeist
+    Capybara.default_driver = :poltergeist
+    Capybara.reset_sessions!
+    Capybara.current_session.driver.reset!
+    Capybara.use_default_driver
   end
 
   # To use the poltergeist javascript debugger add "page.driver.debug" 
@@ -73,7 +81,21 @@ class WebAppJSTestBase < WebAppTestBase
   def use_poltergeist_debug
     Capybara.current_driver = :poltergeist_debug
     Capybara.javascript_driver = :poltergeist_debug
+    Capybara.default_driver = :poltergeist_debug
+    Capybara.reset_sessions!
+    Capybara.current_session.driver.reset!
+    Capybara.use_default_driver
   end
+
+  def use_webkit
+    Capybara.javascript_driver = :webkit
+    Capybara.current_driver = :webkit
+    Capybara.default_driver = :webkit
+    Capybara.reset_sessions!
+    Capybara.current_session.driver.reset!
+    Capybara.use_default_driver
+  end
+
 
   def setup
     super

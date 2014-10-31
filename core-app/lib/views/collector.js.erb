@@ -20,6 +20,7 @@
     window.ltG.orgApiKey = "<%=org_api_key%>";
     window.ltG.userId = "<%=user_id%>";
     window.ltG.assert_end_point = "<%=assert_end_point%>";
+    window.ltG.lt_api_server = "<%=lt_api_server%>";
 
     window.ltG.toISOString = function(dateObj) {
       function pad(number) {
@@ -120,17 +121,14 @@
     window.ltG.priv.fSendMsg = function(msg){
       window.lt$.ajax({
         url: window.ltG.assert_end_point,
-        type: "POST",
-        data: JSON.stringify(msg),
-        headers: {"X_LT_ORG_API_KEY": msg.org_api_key},
-        contentType:"application/json; charset=utf-8",
+        crossDomain: true,
+        dataType: "jsonp",
+        data: {
+          oak: msg.org_api_key,
+          msg: msg
+        },
         success: function(){
           //nothing at this time on success
-        },
-        error: function(jqxhr,error){
-          console.log("fSendMsg JS failed.");
-          console.log(jqxhr.responseText);
-          console.log(jqxhr.statusText)
         }
       });
     };
@@ -221,7 +219,6 @@
       });
       //hook document unload event to send timer data: "pageview" event
       lt$( window ).unload(function() {
-        console.log("Unload");
         window.ltG.fSendPageViewMsg();
       });
     }); // document.ready

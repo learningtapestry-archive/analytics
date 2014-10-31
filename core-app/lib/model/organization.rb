@@ -13,6 +13,13 @@ class Organization < ActiveRecord::Base
     return true
   end
 
+  # resets all the org api keys in redis
+  def self.update_all_org_api_keys
+    Organization.all.each do |org|
+      org.update_redis_org_api_key
+    end
+  end
+
   def update_redis_org_api_key
     # remove existing key from redis (we grab the old field value using "_was")
     LT::RedisServer::org_api_key_remove(self.org_api_key_was)

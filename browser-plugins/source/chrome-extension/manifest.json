@@ -1,20 +1,20 @@
 {
 	"manifest_version": 2,
-	"name": "Learntaculous",
+	"name": "Learning Tapestry",
 	"version": "0.1.2.0",
-	"description": "Learntaculous blended learning aggregator.",
+	"description": "Learning Tapestry",
 
 	"default_locale": "en",
 
     "icons": {
-        "16": "icon-off-16.png",
-        "48": "icon-off-48.png",
-        "128": "icon-off-128.png"
+        "16": "icons/icon-off-16.png",
+        "48": "icons/icon-off-48.png",
+        "128": "icons/icon-off-128.png"
     },
     
     "browser_action": {
-        "default_title": "Learntaculous",
-        "default_icon": "icon-off-48.png",
+        "default_title": "Learning Tapestry",
+        "default_icon": "icons/icon-off-48.png",
         "default_popup": "popup.html"
     },
     

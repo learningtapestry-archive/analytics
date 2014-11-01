@@ -45,6 +45,9 @@ class APIDataFactoryTest < LTDBTestBase
 
     org = user1.organization
     params = {}
+
+    ## Test with one user (Joe)
+
     params[:org_api_key] = org.org_api_key
     params[:usernames] = [ user1.username ]
     params[:date_begin] = '10/01/2014'
@@ -52,22 +55,42 @@ class APIDataFactoryTest < LTDBTestBase
     resultset = LT::Utilities::APIDataFactory.site_visits(params)
 
     assert resultset
-    assert_equal 'site_visits', resultset[:entity_type]
+    assert_equal 'site_visits', resultset[:entity]
     assert_equal 1, resultset[:results].length
-    assert_equal 'joesmith@foo.com', resultset[:results][0][:username]
-    assert_equal 5, resultset[:results][0][:site_visits].length
 
-    site = find_site_visit_by_url 'stackoverflow.com', resultset[:results][0][:site_visits]
+    joe_visits = find_username('joesmith@foo.com', resultset[:results])
+    assert_equal 'joesmith@foo.com', joe_visits[:username]
+    assert_equal 5, joe_visits[:site_visits].length
+
+    site = find_site_visit_by_url('stackoverflow.com', joe_visits[:site_visits])
     assert_equal 'Stack Overflow', site[:display_name]
     assert_equal '23:26:05', site[:time_active]
 
+    ## Test again one user, one domain
+
+    params[:site_domains] = [ 'slashdot.org' ] # Apply site domain filter
+    resultset = LT::Utilities::APIDataFactory.site_visits(params)
+
+    joe_visits = find_username('joesmith@foo.com', resultset[:results])
+    assert_equal 'joesmith@foo.com', joe_visits[:username]
+    assert_equal 1, joe_visits[:site_visits].length
+
+    site = find_site_visit_by_url('slashdot.org', joe_visits[:site_visits])
+    assert site
+    assert_equal 'Slashdot', site[:display_name]
+    assert_equal '00:00:05', site[:time_active]
+
+    ## Test with two users (Joe and Bob)
+
+    params = {}
+    params[:org_api_key] = org.org_api_key
     params[:usernames] = [ user1.username, user2.username ]
     params[:date_begin] = '10/11/2014 08:00:00'
     params[:date_end] = '10/21/2014 23:00:00'
     resultset = LT::Utilities::APIDataFactory.site_visits(params)
 
     assert resultset
-    assert_equal 'site_visits', resultset[:entity_type]
+    assert_equal 'site_visits', resultset[:entity]
     assert_equal 2, resultset[:results].length
 
     bob_visits = find_username('bob@foo.com', resultset[:results])
@@ -81,7 +104,19 @@ class APIDataFactoryTest < LTDBTestBase
     site = find_site_visit_by_url('slashdot.org', joe_visits[:site_visits])
     assert site
     assert_equal '00:00:05', site[:time_active]
+    assert_nil site[:date_visited]
 
+    ## Test with two users (Joe and Bob) with date details
+
+    params[:type] = 'detail'
+    resultset = LT::Utilities::APIDataFactory.site_visits(params)
+
+    assert resultset
+    joe_visits = find_username('joesmith@foo.com', resultset[:results])
+    assert joe_visits
+    site = find_site_visit_by_url('slashdot.org', joe_visits[:site_visits])
+    assert site
+    assert site[:date_visited]
   end
 
 
@@ -89,12 +124,14 @@ class APIDataFactoryTest < LTDBTestBase
     items.each do |item|
         return item if item[:url] == url
     end
+    nil
   end
 
   def find_username(username, items)
     items.each do |item|
       return item if item[:username] == username
     end
+    nil
   end
 
 end

@@ -18,7 +18,7 @@ module LT
         throw ParameterMissing, 'Must have :usernames' if !params[:usernames] # Add user_ids, section_ids, teacher_id
 
         params[:date_begin] = Time.now - 7.days if !params[:date_begin]
-        params[:date_end] = Time.now
+        params[:date_end] = Time.now if !params[:date_end]
 
         params[:limit] = 250 if !params[:limit] or !params[:limit].is_a? Integer
         params[:limit] = 1000 if params[:limit] > 1000
@@ -44,7 +44,7 @@ module LT
         retval[:entity_type] = 'site_visits'
         username = nil
         username_count = -1
-        ## Create a JSON structure organized by username with each site visit
+        ## Create a hash organized by username with each site visit
         site_visits.each do |site_visit|
           if username != site_visit[:username] then
             username = site_visit[:username]

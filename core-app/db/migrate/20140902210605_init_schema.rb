@@ -15,6 +15,7 @@ class InitSchema < ActiveRecord::Migration
       t.string        'org_secret_key'
       t.integer       'login_attempts'
       t.boolean       'locked'
+      t.timestamps
     end
 
     create_table 'raw_messages', force: true do |t|
@@ -88,6 +89,7 @@ class InitSchema < ActiveRecord::Migration
       t.column        'time_active',  :interval
       t.belongs_to    :user
       t.belongs_to    :page
+      t.timestamps
     end
 
     create_table 'page_clicks', force: true do |t|
@@ -95,6 +97,7 @@ class InitSchema < ActiveRecord::Migration
       t.text          'url_visited'
       t.belongs_to    :user
       t.belongs_to    :page  # In future, this will belong to page_visits once relationships figured out
+      t.timestamps
     end
 
     ### End Collected Data Semantic Tables
@@ -165,6 +168,7 @@ class InitSchema < ActiveRecord::Migration
       t.string        'user_type' # defines type of relationship user has to section (e.g.: 'teacher' 'student' 'TA' 'auditing')
       t.belongs_to    :section
       t.belongs_to    :user
+      t.timestamps
     end
 
     ### End Education Organization and Course Tables
@@ -190,6 +194,7 @@ class InitSchema < ActiveRecord::Migration
       t.string        'email'
       t.boolean       'primary'
       t.belongs_to    :user
+      t.timestamps
     end
 
     create_table 'students', force: true do |t|

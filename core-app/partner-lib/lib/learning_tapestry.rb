@@ -1,4 +1,4 @@
-### (C) 2014 Learning Tapestry (Hoekstra/Midgley) - All rights reserved.
+### (C) 2014 Learning Tapestry, Inc. - All rights reserved.
 
 require 'net/http'
 require 'uri'
@@ -10,6 +10,8 @@ module LearningTapestry
 
     LT_API_BASE = 'https://api.learningtapestry.com'
     LT_API_PATH_OBTAIN = '/api/v1/obtain'
+
+    #TODO: Add query token for async callers to reference their calls
 
     def initialize(params={})
       @api_base = params[:api_base] ? params[:api_base] : LT_API_BASE

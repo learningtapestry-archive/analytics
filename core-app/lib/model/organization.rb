@@ -4,7 +4,8 @@ class Organization < ActiveRecord::Base
   after_save :update_redis_org_api_key
   before_validation :set_defaults, on: :create
   # make sure that we have an org_api_key in proper format before saving
-  validates :org_api_key, format: {with: /[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}/i}
+  # Please note, this is Version 4 of UUID scheme, notice the 3rd segment must begin with "4" and 4th 8,9,a,b
+  validates :org_api_key, format: {with: /[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}/i}
 
   def set_defaults
     if self.org_api_key.nil? then

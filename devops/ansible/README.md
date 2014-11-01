@@ -26,7 +26,7 @@ Helpful references in designing playbooks:
 ### Learning Tapestry Operational Commands
 
 - ```ansible -i hosts-prod web01 -m service -a "name=nginx state=started"```  Check on web01 that nginx is started (```state=restarted``` to restart service)
-- 
+- ```ansible-playbook -i hosts-prod site.yml --tags "web"``` Push a playbook for site configuration for the roles tagged "web" only (will not run "common")
 
 
 ### General Commands

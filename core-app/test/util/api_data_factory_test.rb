@@ -204,7 +204,18 @@ class APIDataFactoryTest < LTDBTestBase
       end
     end
 
-    ##TODO:  Test page visits by specific site domains
+    params[:page_urls] = nil
+    params[:date_begin] = '2014-10-01'
+    params[:date_end] = '2014-10-31'
+    params[:site_domains] = 'arstechnica.com'
+    resultset = LT::Utilities::APIDataFactory.page_visits(params)
+
+    assert resultset
+    joe_visits = find_username('joesmith@foo.com', resultset[:results])
+    joe_visits[:page_visits].each do |page_visit|
+      assert 'arstechnica.com', page_visit[:site_domain]
+    end
+
   end
 
 

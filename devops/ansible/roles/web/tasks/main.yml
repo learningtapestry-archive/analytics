@@ -20,6 +20,9 @@
 - name: Copy Nginx configuration for Unicorn proxy
   copy: src=nginx.conf dest=/etc/nginx/nginx.conf owner=root group=root
 
+- name: Copy Unicorn init.d startup script
+  copy: src=unicorn.initd dest=/etc/init.d/unicorn owner=root group=root
+
 - name: Install Bundler
   gem: name=bundler state=present user_install=no
 

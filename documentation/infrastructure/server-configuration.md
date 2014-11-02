@@ -28,23 +28,30 @@ sudo more /etc/nginx/nginx.conf
 ```
 sudo nginx -s reload
 ```
-1. Restart unicorn
+1. Managing Unicorn
 ```
-ps -A | grep unicorn
-sudo kill [first pid] 
-# that should kill all pids?
 sudo service unicorn start
+sudo service unicorn stop
+sudo service unicorn restart
+```
+1. Restart server
+```
+sudo reboot now
 ```
 
+
+
 1. Interact with application code:
-  1. cd /opt/learningtapestry/core-app
-  1. rake lt:console
+```
+cd /opt/learningtapestry/core-app
+rake lt:console
+```
 1. Create a new Organization
   1. From lt:console:
 ```
 o = Organization.create(name: 'Learning Tapestry', org_api_key: SecureRandom.uuid)
 ```
-1. Client configuration script tag:
+1. Sample client configuration script tag (for Learning Tapestry org in prod):
 ```
 <script src="https://api.learningtapestry.com/api/v1/loader.js?username=stevemidgley&org_api_key=5eb4766f-34db-41d5-a1a4-29dc73ac99e2&load=collector&autostart=true"></script>
 ```

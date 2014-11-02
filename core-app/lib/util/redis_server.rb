@@ -1,5 +1,4 @@
 require 'redis'
-require 'debugger'
 module LT
   module RedisServer
     class << self

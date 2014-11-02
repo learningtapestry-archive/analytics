@@ -50,8 +50,8 @@ class APIDataFactoryTest < LTDBTestBase
 
     params[:org_api_key] = org.org_api_key
     params[:usernames] = [ user1.username ]
-    params[:date_begin] = '10/01/2014'
-    params[:date_end] = '10/31/2014'
+    params[:date_begin] = '2014-10-01'
+    params[:date_end] = '2014-10-31'
     resultset = LT::Utilities::APIDataFactory.site_visits(params)
 
     assert resultset
@@ -63,8 +63,9 @@ class APIDataFactoryTest < LTDBTestBase
     assert_equal 5, joe_visits[:site_visits].length
 
     site = find_site_visit_by_url('stackoverflow.com', joe_visits[:site_visits])
-    assert_equal 'Stack Overflow', site[:display_name]
-    assert_equal '23:26:05', site[:time_active]
+    assert_equal 'Stack Overflow', site[:site_name]
+    assert_equal 'stackoverflow.com', site[:site_domain]
+    assert_equal '23:36:24', site[:time_active]
 
     ## Test again one user, one domain
 
@@ -77,7 +78,7 @@ class APIDataFactoryTest < LTDBTestBase
 
     site = find_site_visit_by_url('slashdot.org', joe_visits[:site_visits])
     assert site
-    assert_equal 'Slashdot', site[:display_name]
+    assert_equal 'Slashdot', site[:site_name]
     assert_equal '00:00:05', site[:time_active]
 
     ## Test with two users (Joe and Bob)
@@ -85,8 +86,8 @@ class APIDataFactoryTest < LTDBTestBase
     params = {}
     params[:org_api_key] = org.org_api_key
     params[:usernames] = [ user1.username, user2.username ]
-    params[:date_begin] = '10/11/2014 08:00:00'
-    params[:date_end] = '10/21/2014 23:00:00'
+    params[:date_begin] = '2014-10-11T08:00:00'
+    params[:date_end] = '2014-10-21T23:00:00'
     resultset = LT::Utilities::APIDataFactory.site_visits(params)
 
     assert resultset
@@ -119,10 +120,97 @@ class APIDataFactoryTest < LTDBTestBase
     assert site[:date_visited]
   end
 
+  def test_page_visits_by_usernames
+
+    user1 = User.find_by_username 'joesmith@foo.com'
+    assert user1
+    user2 = User.find_by_username 'bob@foo.com'
+    assert user2
+
+    org = user1.organization
+    params = {}
+
+    ## Test with one user (Joe) summary (default) view
+
+    params[:org_api_key] = org.org_api_key
+    params[:usernames] = [ user1.username ]
+    params[:date_begin] = '2014-10-11'
+    params[:date_end] = '2014-10-12'
+    resultset = LT::Utilities::APIDataFactory.page_visits(params)
+
+    assert_equal 'page_visits', resultset[:entity]
+    assert_equal DateTime.parse('2014-10-11'), resultset[:date_range][:date_begin]
+    assert_equal DateTime.parse('2014-10-12T23:59:59'), resultset[:date_range][:date_end]
+    assert_equal 1, resultset[:results].length
+
+    joe_visits = find_username('joesmith@foo.com', resultset[:results])
+    assert_equal 'joesmith@foo.com', joe_visits[:username]
+    assert_equal 19, joe_visits[:page_visits].length
+
+    assert joe_visits[:page_visits][0][:site_name]
+    assert joe_visits[:page_visits][0][:site_domain]
+    assert joe_visits[:page_visits][0][:page_name]
+    assert joe_visits[:page_visits][0][:page_url]
+    assert joe_visits[:page_visits][0][:time_active]
+    assert_nil joe_visits[:page_visits][0][:date_visited]
+
+    ## Test again with one user (Joe) detail view
+
+    params[:type] = 'detail'
+    resultset = LT::Utilities::APIDataFactory.page_visits(params)
+
+    joe_visits = find_username('joesmith@foo.com', resultset[:results])
+    assert_equal 'joesmith@foo.com', joe_visits[:username]
+    assert_equal 30, joe_visits[:page_visits].length
+    assert joe_visits[:page_visits][0][:page_name]
+    assert joe_visits[:page_visits][0][:date_visited]
+
+    ## Test with two users (Joe and Bob) detail view
+
+    params[:usernames] = [ user1.username, user2.username ]
+    params[:type] = 'detail'
+    params[:date_begin] = '2014-10-13'
+    params[:date_end] = '2014-10-14'
+
+    resultset = LT::Utilities::APIDataFactory.page_visits(params)
+
+    assert_equal 'page_visits', resultset[:entity]
+    assert_equal 2, resultset[:results].length
+    joe_visits = find_username('joesmith@foo.com', resultset[:results])
+    bob_visits = find_username('bob@foo.com', resultset[:results])
+    assert_equal 26, joe_visits[:page_visits].length
+    assert_equal 28, bob_visits[:page_visits].length
+    assert joe_visits[:page_visits][0][:page_name]
+    assert joe_visits[:page_visits][0][:date_visited]
+    assert bob_visits[:page_visits][0][:page_name]
+    assert bob_visits[:page_visits][0][:date_visited]
+
+    ## Test with two users (Joe and Bob) detail view, two specific pages
+
+    page_urls = [ 'http://stackoverflow.com/questions/17333994/how-to-copy-one-column-of-a-table-into-another-tables-column-in-postgresql-comp', 'http://stackoverflow.com/questions/17877220/how-should-hateoas-style-links-be-implemented-for-restful-json-collections' ]
+
+    params[:date_begin] = '2014-10-01'
+    params[:date_end] = '2014-10-31'
+    params[:page_urls] = [ page_urls ]
+    resultset = LT::Utilities::APIDataFactory.page_visits(params)
+
+    joe_visits = find_username('joesmith@foo.com', resultset[:results])
+    bob_visits = find_username('bob@foo.com', resultset[:results])
+
+    [joe_visits, bob_visits].each do |visit|
+      visit[:page_visits].each do |page_visit|
+        assert page_visit[:page_url]
+        assert (page_visit[:page_url] == page_urls[0] or page_visit[:page_url] == page_urls[1])
+      end
+    end
+
+    ##TODO:  Test page visits by specific site domains
+  end
+
 
   def find_site_visit_by_url(url, items)
     items.each do |item|
-        return item if item[:url] == url
+        return item if item[:site_domain] == url
     end
     nil
   end

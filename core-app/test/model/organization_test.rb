@@ -44,6 +44,27 @@ class OrganizationTest < LTDBTestBase
     assert_equal nil, LT::RedisServer::org_api_key_get("foobar")
   end
 
+  def test_locked_account
+    org = Organization.new
+    org.org_api_key = '00000000-1111-4222-8333-444444444444'
+    org.org_secret_key = '$hared$ecret'
+    org.save
+    assert_equal 0, org.invalid_logins
+    refute org.locked
+    success = org.verify_secret 'wrong$ecret'
+    refute success
+    assert_equal 1, org.invalid_logins
+    refute org.locked
+
+    ## Send the wrong secret to the account 3 times to lock out account
+    3.times do
+      success = org.verify_secret 'wrong$ecret'
+      refute success
+    end
+
+    assert org.locked
+  end
+
   def setup
     super
   end

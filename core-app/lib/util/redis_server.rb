@@ -35,16 +35,25 @@ module LT
       def clear_all_test_lists(options={})
         suppress_alert_if_not_empty = !!options[:suppress_alert_if_not_empty]
         if !LT::testing? && !LT::development? then
-          raise LT::BaseException.new("clear_all_test_lists must be run in testing or dev env")
+          raise LT::BaseException.new('clear_all_test_lists must be run in testing or dev env')
         end
         if !suppress_alert_if_not_empty then
-          puts "raw_message queue not empty." if raw_message_queue_length > 0
-          puts "org_api_key queue not empty." if org_api_key_hashlist_length > 0
-          puts "api_key queue not empty." if api_key_hashlist_length > 0
+          puts 'raw_message queue not empty.' if raw_message_queue_length > 0
+          puts 'org_api_key queue not empty.' if org_api_key_hashlist_length > 0
+          puts 'api_key queue not empty.' if api_key_hashlist_length > 0
         end
         self.raw_messages_queue_clear
         self.api_keys_hashlist_clear
         self.org_api_keys_hashlist_clear
+      end
+
+      def ping
+        begin
+          return true if @redis.ping == 'PONG'
+        rescue
+          return false
+        end
+        return false
       end
 
       # raw messages

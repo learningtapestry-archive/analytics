@@ -138,8 +138,8 @@ module LT
         params[:date_begin] = Time.now - 1.days if !params[:date_begin]
         begin
           params[:date_begin] = DateTime.parse params[:date_begin] if !params[:date_begin].is_a? DateTime
-        #rescue
-        #  throw InvalidParameter, "Invalid begin date specified"
+        rescue
+          throw InvalidParameter, "Invalid begin date specified"
         end
 
         params[:date_end] = Time.now if !params[:date_end]
@@ -147,8 +147,8 @@ module LT
           ## If the end date string doesn't have a time component, add last second of date to expand full intended range
           params[:date_end] += 'T23:59:59' if params[:date_end].is_a? String and params[:date_end].length <= 10 and params[:date_end].length > 0
           params[:date_end] = DateTime.parse params[:date_end] if !params[:date_begin].is_a? DateTime
-        #rescue
-        #  throw InvalidParameter, "Invalid end date specified"
+        rescue
+          throw InvalidParameter, "Invalid end date specified"
         end
 
         params[:type] = 'summary' if !params[:type] and !params[:type].to_s.downcase != 'detail'

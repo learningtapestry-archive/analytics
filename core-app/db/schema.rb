@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140902210605) do
+ActiveRecord::Schema.define(version: 20141031) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -73,17 +73,21 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   end
 
   create_table "emails", force: true do |t|
-    t.string  "email"
-    t.boolean "primary"
-    t.integer "user_id"
+    t.string   "email"
+    t.boolean  "primary"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "organizations", force: true do |t|
-    t.string  "name"
-    t.string  "org_api_key"
-    t.string  "org_secret_key"
-    t.integer "login_attempts"
-    t.boolean "locked"
+    t.string   "name"
+    t.string   "org_api_key"
+    t.string   "org_secret_key"
+    t.integer  "invalid_logins", default: 0
+    t.boolean  "locked",         default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "page_clicks", force: true do |t|
@@ -91,6 +95,8 @@ ActiveRecord::Schema.define(version: 20140902210605) do
     t.text     "url_visited"
     t.integer  "user_id"
     t.integer  "page_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "page_visits", force: true do |t|
@@ -98,6 +104,8 @@ ActiveRecord::Schema.define(version: 20140902210605) do
     t.string   "time_active",  limit: nil
     t.integer  "user_id"
     t.integer  "page_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "pages", force: true do |t|
@@ -150,9 +158,11 @@ ActiveRecord::Schema.define(version: 20140902210605) do
   end
 
   create_table "section_users", force: true do |t|
-    t.string  "user_type"
-    t.integer "section_id"
-    t.integer "user_id"
+    t.string   "user_type"
+    t.integer  "section_id"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "sections", force: true do |t|

@@ -99,6 +99,14 @@
       return (Math.floor((curDate - oldDate)/1000) + "S")
     };
 
+    // NOTE: by design this will block UI/user actions, so use only when user is inactive
+    window.ltG.fDelayExecution = function(milliseconds) {
+      var expireDateTime = Date.now()+milliseconds;
+      do {
+        now = new Date();
+      } while (now.getTime() < expireDateTime);
+    };
+
     // ### private/utility functions ###
 
     window.ltG.priv.fGenActionBaseMsg = function(pageTitle, verb) {
@@ -118,19 +126,16 @@
       return lt$(document).find("title").text();
     }
 
+    // generates a URL suitable for contacting remote end point
+    window.ltG.priv.fGenMsgEndPoint = function(msg){
+      var retVal = window.ltG.assert_end_point;
+      retVal += "?oak="+msg.org_api_key;
+      retVal += "&"+lt$.param({"msg": msg});
+      return retVal;
+    };
+
     window.ltG.priv.fSendMsg = function(msg){
-      window.lt$.ajax({
-        url: window.ltG.assert_end_point,
-        crossDomain: true,
-        dataType: "jsonp",
-        data: {
-          oak: msg.org_api_key,
-          msg: msg
-        },
-        success: function(){
-          //nothing at this time on success
-        }
-      });
+      (new Image()).src = window.ltG.priv.fGenMsgEndPoint(msg);
     };
 
     window.ltG.priv.fGenRawMsg = function(uRL, pageTitle, verb, action) {
@@ -203,6 +208,7 @@
     // ***********************
     // main event handler code
     // ***********************
+    
     window.lt$( document ).ready(function() {
       window.ltG.fSendClickMsg();
       window.ltG.fStartPageTimer();
@@ -210,11 +216,11 @@
       //hook document focus/blur events to manage timer
       lt$(function() {
           lt$(window).focus(function() {
-              console.log('Focus');
+              //console.log('Focus');
           });
 
           lt$(window).blur(function() {
-              console.log('Blur');
+              //console.log('Blur');
           });
       });
       //hook document unload event to send timer data: "pageview" event

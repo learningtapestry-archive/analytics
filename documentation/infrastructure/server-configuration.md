@@ -1,5 +1,65 @@
 Server Configuration
 ====================
+# Production Server Management notes
+
+1. Setup ssh public/private keys
+  1. Find keys in LastPass and follow instructions there
+1. Establish Pg tunnel:
+```
+ssh -i ~/.ssh/id_learntap ltdbadmin@db01.learningtapestry.com -L 5432:10.132.196.50:5432
+```
+  1. Setup pgadmin3 to connect to localhost:5432 over ssl
+1. Establish connection to prod / Redis tunnel:
+```
+ssh -i ~/.ssh/id_learntap ltwebadmin@web01.learningtapestry.com -L 6378:localhost:6379
+```
+  1. Setup Redis Desktop Manager to connect to localhost:6378
+  1. Open multiple terminals in byobu terminal manager
+    1. Ctrl-A C
+  1. Switch between open terminals 
+    1. Ctrl-A [0-9]
+1. How to edit postgres config files
+  1. Find conf files in: /etc/postgresql/9.3/main
+  1. When necessary, restart postgres to reload conf files
+```
+sudo /etc/init.d/postgresql restart 
+```
+1. View nginx config file
+```
+sudo more /etc/nginx/nginx.conf
+```
+1. Reload nginx config file
+```
+sudo nginx -s reload
+```
+1. Managing Unicorn
+```
+sudo service unicorn start
+sudo service unicorn stop
+sudo service unicorn restart
+```
+1. Restart server
+```
+sudo reboot now
+```
+
+
+
+1. Interact with application code:
+```
+cd /opt/learningtapestry/core-app
+rake lt:console
+```
+1. Create a new Organization
+  1. From lt:console:
+```
+o = Organization.create(name: 'Learning Tapestry', org_api_key: SecureRandom.uuid)
+```
+1. Sample client configuration script tag (for Learning Tapestry org in prod):
+```
+<script src="https://api.learningtapestry.com/api/v1/loader.js?username=stevemidgley&org_api_key=5eb4766f-34db-41d5-a1a4-29dc73ac99e2&load=collector&autostart=true"></script>
+```
+
 
 # lt01-dev.betaspaces.com
 

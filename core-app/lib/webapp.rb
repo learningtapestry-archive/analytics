@@ -11,6 +11,18 @@ module LT
     def set_title(title)
       @layout[:title] = "Learning Tapestry - #{title}"
     end
+    def get_server_url
+      # force https in production, otherwise mirror incoming request
+      if LT::production? then
+        scheme = "https"
+        port = ""
+      else
+        scheme = request.scheme
+        port = ":#{request.port.to_s}"
+      end
+      lt_api_server = "#{scheme}://#{request.host}#{port}"
+    end
+
   end # WebAppHelper
   class WebApp < Sinatra::Base
     helpers Sinatra::Cookies
@@ -135,6 +147,7 @@ module LT
         status 401
         return
       else
+<<<<<<< HEAD
         # force https in production, otherwise mirror incoming request
         if LT::production? then
           scheme = 'https'
@@ -142,6 +155,9 @@ module LT
           scheme = request.scheme
         end
         lt_api_server = "#{scheme}://#{request.host}:#{request.port.to_s}"
+=======
+        lt_api_server = get_server_url
+>>>>>>> 172b7d73b93ebd3cf935b143663f405979e11600
         locals = {
           org_api_key: CGI::escape(org_api_key),
           user_id: CGI::escape(username),
@@ -180,7 +196,7 @@ module LT
     # This route handles org_api_key assert messages
     #   '/api/v1/assert-org'
     get ORG_API_KEY_ASSERT_ROUTE do
-      content_type :json
+      content_type :javascript
       org_api_key = params[:oak]
       if !org_api_key.nil? && LT::RedisServer::has_org_api_key?(org_api_key)
         msg_string = params[:msg]

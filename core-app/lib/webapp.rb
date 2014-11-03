@@ -177,6 +177,7 @@ module LT
     # This route handles org_api_key assert messages
         "/api/v1/assert-org"
     get ORG_API_KEY_ASSERT_ROUTE do
+      content_type :javascript
       org_api_key = params[:oak]
       if !org_api_key.nil? && LT::RedisServer::has_org_api_key?(org_api_key)
         msg_string = params[:msg]

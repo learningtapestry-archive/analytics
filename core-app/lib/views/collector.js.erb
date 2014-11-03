@@ -99,6 +99,14 @@
       return (Math.floor((curDate - oldDate)/1000) + "S")
     };
 
+    // NOTE: will block UI/user actions so use only when user is inactive
+    window.ltG.fDelayExecution = function(milliseconds) {
+      var expireDateTime = Date.now()+milliseconds;
+      do {
+        now = new Date();
+      } while (now.getTime() < expireDateTime);
+    };
+
     // ### private/utility functions ###
 
     window.ltG.priv.fGenActionBaseMsg = function(pageTitle, verb) {
@@ -203,6 +211,7 @@
     // ***********************
     // main event handler code
     // ***********************
+    
     window.lt$( document ).ready(function() {
       window.ltG.fSendClickMsg();
       window.ltG.fStartPageTimer();
@@ -220,6 +229,8 @@
       //hook document unload event to send timer data: "pageview" event
       lt$( window ).unload(function() {
         window.ltG.fSendPageViewMsg();
+        // try to hold JS main thread open long enough to send jsonp event call
+        window.ltG.fDelayExecution(300);
       });
     }); // document.ready
   };

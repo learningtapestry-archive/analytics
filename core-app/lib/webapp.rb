@@ -147,7 +147,6 @@ module LT
         status 401
         return
       else
-<<<<<<< HEAD
         # force https in production, otherwise mirror incoming request
         if LT::production? then
           scheme = 'https'
@@ -155,9 +154,6 @@ module LT
           scheme = request.scheme
         end
         lt_api_server = "#{scheme}://#{request.host}:#{request.port.to_s}"
-=======
-        lt_api_server = get_server_url
->>>>>>> 172b7d73b93ebd3cf935b143663f405979e11600
         locals = {
           org_api_key: CGI::escape(org_api_key),
           user_id: CGI::escape(username),

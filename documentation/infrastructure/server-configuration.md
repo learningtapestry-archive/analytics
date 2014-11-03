@@ -9,11 +9,15 @@ Server Configuration
 ssh -i ~/.ssh/id_learntap ltdbadmin@db01.learningtapestry.com -L 5432:10.132.196.50:5432
 ```
   1. Setup pgadmin3 to connect to localhost:5432 over ssl
-1. Establish a Redis tunnel:
+1. Establish connection to prod / Redis tunnel:
 ```
 ssh -i ~/.ssh/id_learntap ltwebadmin@web01.learningtapestry.com -L 6378:localhost:6379
 ```
   1. Setup Redis Desktop Manager to connect to localhost:6378
+  1. Open multiple terminals in byobu terminal manager
+    1. Ctrl-A C
+  1. Switch between open terminals 
+    1. Ctrl-A [0-9]
 1. How to edit postgres config files
   1. Find conf files in: /etc/postgresql/9.3/main
   1. When necessary, restart postgres to reload conf files

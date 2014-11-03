@@ -207,26 +207,23 @@ class WebAppJSTest < WebAppJSTestBase
     message = LT::RedisServer.raw_message_pop
     message = JSON.parse(message)
     assert_equal RawMessage::Verbs::CLICKED, message["verb"]
+
     # we visit a new url in the same browser window, which kicks off
     # a js unload event
     set_server(@partner_host) do
       visit(collector_test_url)
       html = wait_for_qunit(page)
     end
-    # first message on the stack will be a "click" from the most recent page
-    message = LT::RedisServer.raw_message_pop
-    message = JSON.parse(message)
-    assert_equal RawMessage::Verbs::CLICKED, message["verb"]
-    
-    # the following tests do not pass b/c visiting two pages in a row
-    # does not create a page unload event for the first page
-    # seems to be a problem with all js drivers, so maybe my code/understanding?    
-    skip
-    
-    # next message on the stack will be a "view" from the previous page when it closed
+    # first message on the stack will be a "viewed" as the previous page unloads
     message = LT::RedisServer.raw_message_pop
     message = JSON.parse(message)
     assert_equal RawMessage::Verbs::VIEWED, message["verb"]
+
+    # next message on the stack will be a "click" from arrival onto the most recent page
+    message = LT::RedisServer.raw_message_pop
+    message = JSON.parse(message)
+    assert_equal RawMessage::Verbs::CLICKED, message["verb"]
+
     # NOTE: try using Capybara's function to close window instead of inside JS
     # we don't seem to be able to blur or close windows
     # and generate associated events in phantomjs

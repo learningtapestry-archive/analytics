@@ -5,6 +5,7 @@
     - postgresql-9.3
     - postgresql-common
     - postgresql-server-dev-9.3
+    - postgresql-contrib
 
 
 - user: name=ltdbadmin comment="LT DB Admin" shell=/bin/bash group=sudo ssh_key_file=~/.ssh/id_learntap.pub password="$1$1t5s@1t$B6AqaUL/L1RnRNxzJzUL6/"

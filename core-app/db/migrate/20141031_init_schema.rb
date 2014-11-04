@@ -13,8 +13,8 @@ class InitSchema < ActiveRecord::Migration
       t.string        'name'
       t.string        'org_api_key'
       t.string        'org_secret_key'
-      t.integer       'login_attempts'
-      t.boolean       'locked'
+      t.integer       'invalid_logins',   default: 0
+      t.boolean       'locked',           default: false
       t.timestamps
     end
 

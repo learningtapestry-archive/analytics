@@ -66,4 +66,8 @@ class RedisConfigurationTest < LTDBTestBase
     assert_equal 0, count
   end
 
+  def test_RedisPing
+    assert LT::RedisServer::ping
+  end
+
 end

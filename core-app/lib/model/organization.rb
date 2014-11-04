@@ -29,4 +29,16 @@ class Organization < ActiveRecord::Base
     return true
   end
 
+  # Will verify secret, after 4 invalid attempts, will lock account
+  def verify_secret(secret)
+    if self.org_secret_key == secret
+      return true
+    else
+      self.invalid_logins += 1
+      if self.invalid_logins >= 4 then self.locked = true end
+      self.save
+      return false
+    end
+  end
+
 end # class Organization

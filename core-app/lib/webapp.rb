@@ -27,7 +27,7 @@ module LT
   class WebApp < Sinatra::Base
     helpers Sinatra::Cookies
     helpers Sinatra::JSON
-    use Rack::Session::Cookie, key: "rack.session", secret: "I3p3AIXG4ELYC77k"
+    use Rack::Session::Cookie, key: 'rack.session', secret: 'I3p3AIXG4ELYC77k'
 
     # TODO this is ugly - not sure how to get non-html exceptions raised in testing otherwise
     # There should be a way to get the config object from Sinatra/WebApp and configure that with these values
@@ -58,23 +58,23 @@ module LT
     end
 
     ### START Dashboard
-    get "/" do
-      set_title("Knowledge for Learning")
-      erb :home, locals: { page_title: "Welcome", extension_login: (params[:src] == "ext") }, layout: :layout_noauth
+    get '/' do
+      set_title('Knowledge for Learning')
+      erb :home, locals: { page_title: 'Welcome', extension_login: (params[:src] == 'ext') }, layout: :layout_noauth
       # This is the only page that does not use the default layout
     end
 
-    post "/" do
-      set_title("Knowledge for Learning")
+    post '/' do
+      set_title('Knowledge for Learning')
       user_retval = User.get_validated_user(params[:username], params[:password])
 
       if user_retval[:exception] then
-        erb :home, locals: {page_title: "Welcome", exception: user_retval[:exception], extension_login: (params[:src] == "ext")}, layout: :layout_noauth 
+        erb :home, locals: {page_title: 'Welcome', exception: user_retval[:exception], extension_login: (params[:src] == 'ext')}, layout: :layout_noauth
       else
         session[:user_id] = user_retval[:user].id
 
-        # If the source is the extension, then set a cookie for the extension long-lived session  
-        if params[:src] == "ext" then
+        # If the source is the extension, then set a cookie for the extension long-lived session
+        if params[:src] == 'ext' then
           user = user_retval[:user]
           api_key = ApiKey.create_api_key(user.id)
           response.set_cookie('api_key', httponly: true, value: "#{api_key}.#{user.id}.#{user.first_name}")
@@ -87,26 +87,26 @@ module LT
     # Routes for dashboard defined as GET and POST below
     dashboard = lambda do
       if !session || !session[:user_id] then redirect '/' end
-      set_title("Your Dashboard")
+      set_title('Your Dashboard')
       user = User.find(session[:user_id])
       begin_date = params[:begin_date] || Time.now.strftime("%D")
       end_date = params[:end_date] || Time.now.strftime("%D")
-      erb :dashboard, locals: { page_title: "Dashboard", user: user, begin_date: begin_date, end_date: end_date }
+      erb :dashboard, locals: { page_title: 'Dashboard', user: user, begin_date: begin_date, end_date: end_date }
     end
 
-    get "/dashboard", &dashboard
-    post "/dashboard", &dashboard
+    get '/dashboard', &dashboard
+    post '/dashboard', &dashboard
 
-    get "/welcome" do
-      erb :welcome, locals: { page_title: "Welcome!" }, layout: :layout_noauth
+    get '/welcome' do
+      erb :welcome, locals: { page_title: 'Welcome!' }, layout: :layout_noauth
     end
 
-    get "/privacy" do
-      erb :privacy, locals: { page_title: "Privacy" }, layout: :layout_noauth
+    get '/privacy' do
+      erb :privacy, locals: { page_title: 'Privacy' }, layout: :layout_noauth
     end
 
     # This is used by js-collector testing to pull known page/data from server
-    get "/test.html" do
+    get '/test.html' do
       erb :test, layout: :layout_noauth
     end
 
@@ -119,12 +119,21 @@ module LT
       mime_type :javascript, 'application/javascript'
     end
 
+    get '/api/v1/service-status' do
+      content_type :json
+
+      redis_up = LT::RedisServer.ping
+      database_up = LT::ping_db
+
+      json database: database_up, redis: redis_up
+    end
+
     get '/api/v1/common.js' do
-      erb :"common.js", :layout=>false
+      erb :'common.js', :layout=>false
     end
 
     # path to assert routes for org_api_key calls
-    ORG_API_KEY_ASSERT_ROUTE = "/api/v1/assert-org"
+    ORG_API_KEY_ASSERT_ROUTE = '/api/v1/assert-org'
 
     # Dynamically load js files based on parameter input
     # Creates Javascript pages based on incoming parameter input
@@ -138,7 +147,13 @@ module LT
         status 401
         return
       else
-        lt_api_server = get_server_url
+        # force https in production, otherwise mirror incoming request
+        if LT::production? then
+          scheme = 'https'
+        else
+          scheme = request.scheme
+        end
+        lt_api_server = "#{scheme}://#{request.host}:#{request.port.to_s}"
         locals = {
           org_api_key: CGI::escape(org_api_key),
           user_id: CGI::escape(username),
@@ -147,21 +162,21 @@ module LT
         }
         # main selector to determine which javascript page to generate/send
         if params[:page] == 'collector' then
-          erb :"collector.js", :layout => false, locals: locals
+          erb :'collector.js', :layout => false, locals: locals
         elsif params[:page] == 'loader' then
           # we are passed parameters to loader, asking which js pages
           # the loader should load async once it's booted. We pass
           # these files into the loader itself so that they will be loaded
           case params[:load]
-            when "collector"
-              locals[:lt_api_libs] = ["collector"]
+            when 'collector'
+              locals[:lt_api_libs] = ['collector']
             else
               status 401
               return
           end
           # instruct loader to auto-start if request asks for this
-          locals[:autostart] = true if params[:autostart] == "true"
-          erb :"loader.js", :layout => false, locals: locals
+          locals[:autostart] = true if params[:autostart] == 'true'
+          erb :'loader.js', :layout => false, locals: locals
         else
           status 401
           return
@@ -175,7 +190,7 @@ module LT
     end # '/api/v1/approved_sites
 
     # This route handles org_api_key assert messages
-        "/api/v1/assert-org"
+    #   '/api/v1/assert-org'
     get ORG_API_KEY_ASSERT_ROUTE do
       content_type :javascript
       org_api_key = params[:oak]
@@ -183,7 +198,7 @@ module LT
         msg_string = params[:msg]
         LT::RedisServer.raw_message_push(msg_string.to_json)
         status 200
-        return " "
+        return '{}'
       else
         status 401 
       end
@@ -193,82 +208,77 @@ module LT
 
     post '/api/v1/assert' do
       begin
-        api_key = request.env["HTTP_X_LT_API_KEY"] 
+        api_key = request.env['HTTP_X_LT_API_KEY']
         if !api_key.nil? && !LT::RedisServer.api_key_get(api_key).nil?
           LT::RedisServer.raw_message_push(request.body.read)
-          status 200
+          status 200 # = HTTP Success
         else
-          status 401 # = HTTP unauthorized
+          status 401 # = HTTP Unauthorized
         end
       rescue Exception => e
-        status 500
         LT::logger.error "Unknown error in /api/v1/assert: #{e.message}"
+        status 500
         API_ERROR_MESSAGE
       end
     end
 
     post '/api/v1/obtain' do
-      ##TODO:  Determine where to model this, I feel as if it is a query factory assembling dev-friendly JSON;
-      ##       Steve may want to include in model objects themselves.
-
-      ## Starter code below
-
+      content_type :json
       body_params = JSON.parse request.body.read
+      params = map_obtain_params(body_params)
 
-      if body_params['org_api_key'].nil? then
-        status 401 # = HTTP unauthorized
-        json status: 'Organization API key (org_api_key) not provided'
-      elsif body_params['usernames'].nil? or !body_params['usernames'].is_a?(Array) or body_params['usernames'].length == 0
-        status 400
-        json status: 'Username list (usernames) not provided'
+      if params[:org_api_key].nil? or params[:org_secret_key].nil? then
+        status 401 # = HTTP Unauthorized
+        json status: 'Organization API key (org_api_key) and secret (org_secret_key) not provided'
+      elsif params[:usernames].nil? or !params[:usernames].is_a?(Array) or params[:usernames].length == 0
+        status 400 # = HTTP Bad Request
+        json status: 'Username array (usernames) not provided'
+      elsif params[:entity].nil?
+        status 400 # = HTTP Bad Request
+        json status: 'Entity type (entity) not provided'
       else
-        org_api_key = body_params['org_api_key']
-        usernames = body_params['usernames']
-
-        if body_params['filters'] then
-          begin_date = body_params['filters']['begin_date'] ? body_params['filters']['begin_date'] : Time::now - 7.days  # default on returning last week's of data
-          end_date = body_params['filters']['end_date'] || Time::now
-        end
-
-        ## if entity = site_visits
-        ##   if usernames provided then
-
-        site_visits = Site
-        .select(User.arel_table[:username])
-        .select(Site.arel_table[:display_name])
-        .select(Site.arel_table[:url])
-        .select(PageVisit.arel_table[:time_active].sum.as('time_active'))
-        .joins('JOIN pages ON pages.site_id = sites.id')
-        .joins('JOIN page_visits ON page_visits.page_id = pages.id')
-        .joins('JOIN users ON users.id = page_visits.user_id')
-        .joins('JOIN organizations ON organizations.id = users.organization_id')
-        .where(['page_visits.date_visited BETWEEN SYMMETRIC ? and ?', begin_date, end_date])
-        .where(User.arel_table[:username].in(usernames))
-        .where(['organizations.org_api_key = ?', org_api_key])
-        .group(User.arel_table[:username])
-        .group(Site.arel_table[:display_name])
-        .group(Site.arel_table[:url])
-        .order(User.arel_table[:username])
-
-        retval = { results: [] }
-        username = nil
-        username_count = -1
-        ## Create a JSON structure organized by username with each site visit
-        site_visits.each do |site_visit|
-          if username != site_visit[:username] then
-            username = site_visit[:username]
-            username_count += 1
-            retval[:results].push({ username: username })
-            retval[:results][username_count][:site_visits] = []
+        org = Organization.find_by_org_api_key(params[:org_api_key])
+        if !org or org.locked or !org.verify_secret(params[:org_secret_key])
+          LT::logger.warn 'Invalid org_api_key submitted or locked, org_api_key: ' + org_api_key
+          status 401 # = HTTP Unauthorized
+          json status: 'org_api_key invalid or locked'
+        else # We have a valid organization with validated secret and not locked out
+          begin
+            case params[:entity]
+              when 'site_visits'
+                retval = LT::Utilities::APIDataFactory.site_visits(params)
+              when 'page_visits'
+                retval = LT::Utilities::APIDataFactory.page_visits(params)
+              else
+                LT::logger.warn "Unknown entity type in /api/v1/obtain, type: #{params[:entity]}"
+                status 400 # = HTTP Bad Request
+                json status: "Unknown entity type: #{params[:entity]}"
+            end
+            status 200 # = HTTP Success
+            json retval
+          rescue Exception => e
+            LT::logger.error "Unknown error in /api/v1/obtain: #{e.message}"
+            status 500 # = HTTP Unknown Error
+            API_ERROR_MESSAGE
           end
-          array = []
-          retval[:results][username_count][:site_visits].push(
-              {display_name: site_visit[:display_name],
-              url: site_visit[:url],
-              time_active: site_visit[:time_active]})
         end
-        json retval
       end
+    end
+
+
+
+
+    def map_obtain_params(http_params)
+      retval = {}
+      retval[:org_api_key] = http_params['org_api_key'] if http_params['org_api_key']
+      retval[:org_secret_key] = http_params['org_secret_key'] if http_params['org_secret_key']
+      retval[:usernames] = http_params['usernames'] if http_params['usernames']
+      retval[:entity] = http_params['usernames'] if http_params['usernames']
+      retval[:date_begin] = http_params['date_begin'] if http_params['date_begin']
+      retval[:date_end] = http_params['date_end'] if http_params['date_end']
+      retval[:site_domains] = http_params['site_domains'] if http_params['site_domains']
+      retval[:page_urls] = http_params['page_urls'] if http_params['page_urls']
+      retval
     end
 
    ### END API

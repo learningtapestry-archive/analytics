@@ -130,6 +130,14 @@ module LT
     def get_db_name
       return ActiveRecord::Base.connection_config[:database]
     end
+    def ping_db
+      begin
+        return ActiveRecord::Base.connection.active?
+      rescue
+        return false
+      end
+      return false
+    end
     def run_tests(test_path = LT::test_path)
     	test_file_glob = File::expand_path(File::join(test_path, '**/*_test.rb'))
       testfiles = Dir::glob(test_file_glob)

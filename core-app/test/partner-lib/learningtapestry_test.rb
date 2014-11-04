@@ -115,7 +115,6 @@ class LearningTapestryLibraryTest < WebAppJSTestBase
     lt_agent.api_base = "http://localhost:#{port}"
 
     response = lt_agent.obtain
-    pp response
     assert response
     assert_equal 200, response[:status]
     assert_equal 1, response[:results].length
@@ -128,7 +127,6 @@ class LearningTapestryLibraryTest < WebAppJSTestBase
     lt_agent.type = 'detail'
 
     response = lt_agent.obtain
-    pp response
     assert response
     assert_equal 200, response[:status]
     assert_equal 1, response[:results].length
@@ -141,7 +139,6 @@ class LearningTapestryLibraryTest < WebAppJSTestBase
     lt_agent.type = 'summary'
 
     response = lt_agent.obtain
-    pp response
     assert_equal 200, response[:status]
     assert_equal 2, response[:results].length
     assert_equal 57, response[:results][0][:page_visits].length
@@ -149,7 +146,6 @@ class LearningTapestryLibraryTest < WebAppJSTestBase
 
     lt_agent.type = 'detail'
     response = lt_agent.obtain
-    pp response
     assert_equal 200, response[:status]
     assert_equal 2, response[:results].length
     assert_equal 92, response[:results][0][:page_visits].length

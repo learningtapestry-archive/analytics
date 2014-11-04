@@ -11,6 +11,9 @@ class Organization < ActiveRecord::Base
     if self.org_api_key.nil? then
       self.org_api_key = SecureRandom.uuid
     end
+    if self.org_secret_key.nil? then
+      self.org_secret_key = SecureRandom.hex(36)
+    end
     return true
   end
 

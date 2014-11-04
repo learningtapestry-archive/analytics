@@ -2,6 +2,7 @@ test_helper_file = File::expand_path(File::join(LT::test_path,'test_helper.rb'))
 require test_helper_file
 
 require File::expand_path(File::join(LT::partner_lib_path,'learning_tapestry.rb'))
+require './lib/util/csv_database_loader.rb'
 
 class LearningTapestryLibraryTest < WebAppJSTestBase
 
@@ -9,11 +10,6 @@ class LearningTapestryLibraryTest < WebAppJSTestBase
 
   def setup
     super
-    # Close out the base transaction, we need to change the strategy to truncation
-    # based on cross-process data sharing and testing
-    DatabaseCleaner.clean
-    DatabaseCleaner[:active_record].strategy = :truncation
-    DatabaseCleaner.start
   end
 
   def teardown
@@ -25,73 +21,140 @@ class LearningTapestryLibraryTest < WebAppJSTestBase
   end
 
   def test_initialize
+    ## No API calls are made here, this tests various methods of object initialization
+
     ## Test initialization by passing in API key while creating new
     usernames = [ 'user1@example.com', 'user2@example.com', 'user3@example.com' ]
     filters = { date_start: '10/21/2014', date_end: '10/23/2014', section: 'CompSci - 7E302 - Data Structures' }
-    lt_client = LearningTapestry::Agent.new(org_api_key: API_KEY, entity: 'page_visits', filters: filters, usernames: usernames)
-    refute_nil lt_client
-    assert_equal API_KEY, lt_client.org_api_key
-    assert_equal 'page_visits', lt_client.entity
-    assert_equal filters, lt_client.filters
-    assert_equal usernames, lt_client.usernames
+    lt_agent = LearningTapestry::Agent.new(org_api_key: API_KEY, entity: 'page_visits', filters: filters, usernames: usernames)
+    refute_nil lt_agent
+    assert_equal API_KEY, lt_agent.org_api_key
+    assert_equal 'page_visits', lt_agent.entity
+    assert_equal filters, lt_agent.filters
+    assert_equal usernames, lt_agent.usernames
 
     ## Test initialization by passing in API key by manually setting attribute
-    lt_client = LearningTapestry::Agent.new
-    refute_nil lt_client
-    assert_nil lt_client.org_api_key
-    lt_client.org_api_key = API_KEY
-    lt_client.entity = 'site_visits'
-    lt_client.add_filter :date_start, '10/23/2014'
-    lt_client.add_filter :date_end, '10/24/2014'
-    lt_client.add_filter :section, 'CompSci - 6E209 - Parallel Processing'
-    lt_client.add_username 'user100@example.org'
-    lt_client.add_username 'user101@example.org'
-    assert_equal API_KEY, lt_client.org_api_key
-    assert_equal 'site_visits', lt_client.entity
+    lt_agent = LearningTapestry::Agent.new
+    refute_nil lt_agent
+    assert_nil lt_agent.org_api_key
+    lt_agent.org_api_key = API_KEY
+    lt_agent.entity = 'site_visits'
+    lt_agent.add_filter :date_start, '10/23/2014'
+    lt_agent.add_filter :date_end, '10/24/2014'
+    lt_agent.add_filter :section, 'CompSci - 6E209 - Parallel Processing'
+    lt_agent.add_username 'user100@example.org'
+    lt_agent.add_username 'user101@example.org'
+    assert_equal API_KEY, lt_agent.org_api_key
+    assert_equal 'site_visits', lt_agent.entity
     test_filters = { date_start: '10/23/2014', date_end: '10/24/2014', section: 'CompSci - 6E209 - Parallel Processing' }
     test_usernames = [ 'user100@example.org', 'user101@example.org' ]
-    assert_equal test_filters, lt_client.filters
-    assert_equal test_usernames, lt_client.usernames
+    assert_equal test_filters, lt_agent.filters
+    assert_equal test_usernames, lt_agent.usernames
+  end
+
+  def test_exceptions
+    ## No API calls are made here, this tests various methods of object initialization
+
+    lt_agent = LearningTapestry::Agent.new
+
+    exception = assert_raises LearningTapestry::LTAgentException do
+      lt_agent.obtain
+    end
+    assert_equal 'Organization API key not provided or not valid', exception.message
+
+    exception = assert_raises LearningTapestry::LTAgentException do
+      lt_agent.org_api_key = 'b4f367d1-6356-4908-85fe-90c45fcb6e06'
+      lt_agent.obtain
+    end
+    assert_equal 'Organization API secret not provided or not valid', exception.message
+
+    exception = assert_raises LearningTapestry::LTAgentException do
+      lt_agent.org_secret_key = 'aaaaaaaaaaaa000000000000FFFFFFFFFFFF'
+      lt_agent.obtain
+    end
+    assert_equal 'Username array not provided', exception.message
+
+    exception = assert_raises LearningTapestry::LTAgentException do
+      lt_agent.usernames = [ 'testuser' ]
+      lt_agent.obtain
+    end
+    assert_equal 'Entity type not provided', exception.message
+
   end
 
   def test_obtain
-    scenario = LT::Scenarios::Students::create_joe_smith_scenario
-    joe_smith = User.find_by_username(scenario[:student][:username])
-    bob_newhart = User.find_by_username(scenario[:student2][:username])
-    page_visits = scenario[:page_visits]
-    sites = scenario[:sites]
-    pages = scenario[:pages]
-    acme_org = Organization.find_by_name(scenario[:organizations][0][:name])
+    ## API calls made here
 
-    usernames = [ joe_smith.username, bob_newhart.username ]
-    filters = { begin_date: Time::now - 30.days }
-    lt_client = LearningTapestry::Agent.new(org_api_key: acme_org[:org_api_key], entity: 'sites_visits', filters: filters, usernames: usernames)
-    refute_nil lt_client
+    DatabaseCleaner.clean
+    DatabaseCleaner[:active_record].strategy = :truncation
+    DatabaseCleaner.start
+
+    ## Load up a big test fixture
+
+    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/organizations.csv'))
+    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
+    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/users.csv'))
+    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
+    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/sites.csv'))
+    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
+    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/pages.csv'))
+    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
+    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/page_visits.csv'))
+    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
+
+
+    lt_agent = LearningTapestry::Agent.new
+    lt_agent.org_api_key = '00000000-1111-4222-8333-444444444444'
+    lt_agent.org_secret_key = 'aaaaaaaaaaaa000000000000FFFFFFFFFFFF'
+    lt_agent.entity = 'site_visits'
+    lt_agent.usernames = [ 'joesmith@foo.com' ]
+    lt_agent.add_filter :date_begin, '2014-10-01'
+    lt_agent.add_filter :date_end, '2014-10-31'
 
     port = Capybara.current_session.server.port
-    lt_client.api_base = "http://localhost:#{port}"
-    response = lt_client.obtain
+    lt_agent.api_base = "http://localhost:#{port}"
 
-    refute_nil response
+    response = lt_agent.obtain
+    pp response
+    assert response
     assert_equal 200, response[:status]
-    assert_equal 2, response[:data][:results].length
+    assert_equal 1, response[:results].length
+    assert_equal 5, response[:results][0][:site_visits].length
+    assert_equal 'site_visits', response[:entity]
+    assert_equal '2014-10-01T00:00:00.000+00:00', response[:date_range][:date_begin]
+    assert_equal '2014-10-31T23:59:59', response[:date_range][:date_end]
+    assert_equal 'joesmith@foo.com', response[:results][0][:username]
 
-    bob_found = false; khanacad_found = false; codeacad_found = false;
-    response[:data][:results].each do |user_result|
-      if user_result[:username] == scenario[:student2][:username] then
-        bob_found = true
-        assert_equal 2, user_result[:site_visits].length
+    lt_agent.type = 'detail'
 
-        user_result[:site_visits].each do |site_visit|
-          codeacad_found = true if site_visit[:display_name] == LT::Scenarios::Sites.codeacademy_data[:display_name] and site_visit[:time_active] == '00:30:00'
-          khanacad_found = true if site_visit[:display_name] == LT::Scenarios::Sites.khanacademy_data[:display_name] and site_visit[:time_active] == '00:41:00'
-        end
-      end
-    end
+    response = lt_agent.obtain
+    pp response
+    assert response
+    assert_equal 200, response[:status]
+    assert_equal 1, response[:results].length
+    assert_equal 27, response[:results][0][:site_visits].length
 
-    assert bob_found
-    assert khanacad_found
-    assert codeacad_found
+    lt_agent.usernames = [ 'bob@foo.com', 'joesmith@foo.com' ]
+    lt_agent.add_filter :date_begin, '2014-10-11'
+    lt_agent.add_filter :date_end, '2014-10-17'
+    lt_agent.entity = 'page_visits'
+    lt_agent.type = 'summary'
 
+    response = lt_agent.obtain
+    pp response
+    assert_equal 200, response[:status]
+    assert_equal 2, response[:results].length
+    assert_equal 57, response[:results][0][:page_visits].length
+    assert_equal 53, response[:results][1][:page_visits].length
+
+    lt_agent.type = 'detail'
+    response = lt_agent.obtain
+    pp response
+    assert_equal 200, response[:status]
+    assert_equal 2, response[:results].length
+    assert_equal 92, response[:results][0][:page_visits].length
+    assert_equal 77, response[:results][1][:page_visits].length
+
+    DatabaseCleaner.clean
   end
 end

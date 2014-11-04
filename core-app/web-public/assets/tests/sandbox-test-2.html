@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Sandbox v2</title>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script>
+    // internal testing function to get the parameters of the page
+    window.getUrlParameter = function(sParam){
+      var sPageURL = window.location.search.substring(1);
+      var sURLVariables = sPageURL.split('&');
+      for (var i = 0; i < sURLVariables.length; i++){
+          var sParameterName = sURLVariables[i].split('=');
+          if (sParameterName[0] == sParam){
+              return sParameterName[1];
+          }
+      }
+    };
+  </script>
+</head>
+<body>
+<span id="msglabel"></span>
+<span id="Message"></span>
+
+<span id="clickme"></span>
+
+<script>
+  window.sendMessage = function(msg){
+    window.win2.window.$("#Message").append(msg+"<br />");
+  }
+  $( document ).ready(function() {
+    var load = window.getUrlParameter("load");
+    window.win2 = "";
+    if(load != "false") {
+      window.win2 = window.open("http://partner.lt.betaspaces.com:8080/assets/tests/sandbox-test-2.html?load=false",'_blank');
+      $("#clickme").text("Click to send message");
+    } else {
+      $("#msglabel").html("Messages:<br />");
+    };
+    var i = 1;
+    do {
+      now = new Date();
+      i = 2;
+    } while (typeof window.win2 == "undefined");
+    // window.win2.window.$("#foobar").text("foo");
+    //$("#foobar").text("foobar");
+
+    $("#clickme").click(function(){window.sendMessage("clicked")});
+    $(window).focus(function() {
+      window.sendMessage("focused")
+    });
+    $(window).blur(function() {
+      window.sendMessage("blurred")
+    });
+    $(window).on("beforeunload", function(){
+      window.sendMessage("before unload");
+    });
+    //hook document unload event to send timer data: "pageview" event
+    $( window ).unload(function() {
+      window.sendMessage("unloaded");
+    });
+  }); // document.ready
+</script>
+
+</body>
+</html>

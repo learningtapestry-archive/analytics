@@ -57,60 +57,10 @@ module LT
       @layout = {}
     end
 
-    ### START Dashboard
-    get '/' do
-      set_title('Knowledge for Learning')
-      erb :home, locals: { page_title: 'Welcome', extension_login: (params[:src] == 'ext') }, layout: :layout_noauth
-      # This is the only page that does not use the default layout
-    end
-
-    post '/' do
-      set_title('Knowledge for Learning')
-      user_retval = User.get_validated_user(params[:username], params[:password])
-
-      if user_retval[:exception] then
-        erb :home, locals: {page_title: 'Welcome', exception: user_retval[:exception], extension_login: (params[:src] == 'ext')}, layout: :layout_noauth
-      else
-        session[:user_id] = user_retval[:user].id
-
-        # If the source is the extension, then set a cookie for the extension long-lived session
-        if params[:src] == 'ext' then
-          user = user_retval[:user]
-          api_key = ApiKey.create_api_key(user.id)
-          response.set_cookie('api_key', httponly: true, value: "#{api_key}.#{user.id}.#{user.first_name}")
-        end
-
-        redirect '/dashboard'
-      end
-    end
-
-    # Routes for dashboard defined as GET and POST below
-    dashboard = lambda do
-      if !session || !session[:user_id] then redirect '/' end
-      set_title('Your Dashboard')
-      user = User.find(session[:user_id])
-      begin_date = params[:begin_date] || Time.now.strftime("%D")
-      end_date = params[:end_date] || Time.now.strftime("%D")
-      erb :dashboard, locals: { page_title: 'Dashboard', user: user, begin_date: begin_date, end_date: end_date }
-    end
-
-    get '/dashboard', &dashboard
-    post '/dashboard', &dashboard
-
-    get '/welcome' do
-      erb :welcome, locals: { page_title: 'Welcome!' }, layout: :layout_noauth
-    end
-
-    get '/privacy' do
-      erb :privacy, locals: { page_title: 'Privacy' }, layout: :layout_noauth
-    end
-
     # This is used by js-collector testing to pull known page/data from server
     get '/test.html' do
-      erb :test, layout: :layout_noauth
+      erb :test
     end
-
-    ### END Dashboard
 
     # TODO make '/assets/tests/' only work dev/test environment?
 
@@ -278,6 +228,7 @@ module LT
       retval[:date_end] = http_params['date_end'] if http_params['date_end']
       retval[:site_domains] = http_params['site_domains'] if http_params['site_domains']
       retval[:page_urls] = http_params['page_urls'] if http_params['page_urls']
+      retval[:type] = http_params['type'] if http_params['type']
       retval
     end
 

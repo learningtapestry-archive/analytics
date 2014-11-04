@@ -183,7 +183,7 @@ module LT
         else
           org = Organization.find_by_org_api_key(params[:org_api_key])
           if !org or org.locked or !org.verify_secret(params[:org_secret_key])
-            LT::logger.warn 'Invalid org_api_key submitted or locked, org_api_key: ' + org_api_key
+            LT::logger.warn 'Invalid org_api_key submitted or locked: ' + params[:org_api_key]
             status 401 # = HTTP Unauthorized
             json status: 'org_api_key invalid or locked'
           else # We have a valid organization with validated secret and not locked out
@@ -205,6 +205,7 @@ module LT
         end
       rescue Exception => e
         LT::logger.error "Unknown error in /api/v1/obtain: #{e.message}"
+        LT::logger.error "- Backtrace: #{e.backtrace}"
         status 500 # = HTTP Unknown Error
         API_ERROR_MESSAGE
       end
@@ -220,6 +221,7 @@ module LT
       retval[:date_end] = http_params['date_end'] if http_params['date_end']
       retval[:site_domains] = http_params['site_domains'] if http_params['site_domains']
       retval[:page_urls] = http_params['page_urls'] if http_params['page_urls']
+      retval[:type] = http_params['type'] if http_params['type']
       retval
     end
 

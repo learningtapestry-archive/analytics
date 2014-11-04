@@ -135,11 +135,12 @@ module LT
         ## default date begin on 24 hours from now and date end on now.
         ## If user specifies date, ensure they are valid format or throw
         ## exception with error message.
-        params[:date_begin] = Time.now - 1.days if !params[:date_begin]
+
+        params[:date_begin] = DateTime.now - 1.days if !params[:date_begin]
         begin
           params[:date_begin] = DateTime.parse params[:date_begin] if !params[:date_begin].is_a? DateTime
         rescue
-          throw InvalidParameter, "Invalid begin date specified"
+          throw InvalidParameter, 'Invalid begin date specified'
         end
 
         params[:date_end] = Time.now if !params[:date_end]
@@ -148,7 +149,7 @@ module LT
           params[:date_end] += 'T23:59:59' if params[:date_end].is_a? String and params[:date_end].length <= 10 and params[:date_end].length > 0
           params[:date_end] = DateTime.parse params[:date_end] if !params[:date_begin].is_a? DateTime
         rescue
-          throw InvalidParameter, "Invalid end date specified"
+          throw InvalidParameter, 'Invalid end date specified'
         end
 
         params[:type] = 'summary' if !params[:type] and !params[:type].to_s.downcase != 'detail'

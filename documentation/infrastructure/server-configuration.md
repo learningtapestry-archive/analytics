@@ -42,13 +42,17 @@ sudo service unicorn restart
 ```
 sudo reboot now
 ```
-
-
-
 1. Interact with application code:
 ```
 cd /opt/learningtapestry/core-app
 rake lt:console
+```
+1. Update source code from git master
+```
+cd /opt/learningtapestry/core-app
+git fetch origin
+sudo git reset --hard origin/master
+sudo service unicorn restart
 ```
 1. Create a new Organization
   1. From lt:console:

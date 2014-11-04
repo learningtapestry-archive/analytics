@@ -223,9 +223,11 @@
               //console.log('Blur');
           });
       });
-      //hook document unload event to send timer data: "pageview" event
-      lt$( window ).unload(function() {
+      //hook document beforeunload event to send timer data: "pageview" event
+      lt$(window).on("beforeunload", function(){
         window.ltG.fSendPageViewMsg();
+        // this ensures no return value is made - any return value could block the page unload
+        null;
       });
     }); // document.ready
   };

@@ -1,7 +1,7 @@
 test_helper_file = File::expand_path(File::join(LT::test_path,'test_helper.rb'))
 require test_helper_file
 
-require File::expand_path(File::join(LT::partner_lib_path,'learning_tapestry.rb'))
+require File::expand_path(File::join(LT::partner_lib_path,'ruby/lib/learning_tapestry.rb'))
 require './lib/util/csv_database_loader.rb'
 
 class LearningTapestryLibraryTest < WebAppJSTestBase

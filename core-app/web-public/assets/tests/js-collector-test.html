@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="qunit-1.15.0.css">
   <script src="qunit-1.15.0.js"></script>
   <script src="qunit-reporter-junit.js"></script>
+  <script src="timecop.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <script>
     window.getUrlParameter = function(sParam){
@@ -36,11 +37,59 @@
 
 QUnit.test("Collector javascript setup test", function( assert){
   assert.ok(true, "Test should always pass");
-  // check that jQuery and lt$ vars are set up property
+  // check that jQuery and lt$ vars are set up properly
   assert.ok(!(typeof $ === 'undefined'), "JQuery var should exist.")
   assert.equal($.fn.jquery, "2.1.1", "JQuery should be 2.1.1. Ver:" +$.fn.jquery); 
   assert.ok(!(typeof window.lt$ === 'undefined'), "ltG should be present.");
   assert.equal(window.lt$.fn.jquery, "1.11.1", "lt$ should be version 1.11.1." )
+});
+
+QUnit.test("Timer unit and functional tests", function( assert){
+  // verify date diff function works
+  curDate = new Date();
+  oldDate = curDate - 400000;
+  var diff = window.ltG.fCalcDateDifference(oldDate, curDate);
+  assert.equal(diff, "400S");
+
+  // verify MS duration function works
+  //start date 6/1/2012 noon
+  var start = new Date(2012, 6, 1, 12);
+  //end date = 15 minutes later
+  var end = new Date(2012, 6, 1, 12, 16);
+  var diff = window.ltG.fCalcDateDifference(start, end);
+  var duration = window.ltG.fMSToDuration(16*60000);
+  assert.equal(diff, "960S");
+  assert.equal(duration, "960S");
+
+  // we test start/pause/unpause/report functions using
+  // timecop which lets us control Date/time flow
+  Timecop.install();
+
+  // start timer on specific point in time
+  Timecop.freeze(2012, 6, 1, 12, 0);
+  window.ltG.fGetResetTimeOnPage();
+  var activeTime = 0;
+  //move time up 15 minutes
+  Timecop.freeze(2012, 6, 1, 12, 15);
+  activeTime += 15;
+  //pause the timer
+  window.ltG.fPausePageTimer();
+  // move time up 5 minutes
+  Timecop.freeze(2012, 6, 1, 12, 20);
+  //unpause the timer
+  window.ltG.fUnPausePageTimer();
+  // move time up 10 minutes
+  Timecop.freeze(2012, 6, 1, 12, 30);
+  activeTime += 10;
+  // get the total time active
+  var measuredActiveTime = window.ltG.fGetResetTimeOnPage();
+  var actualActiveTime = String(activeTime*60)+"S";
+  assert.equal(measuredActiveTime, actualActiveTime);
+
+  // return time flow to normal
+  Timecop.uninstall();
+  window.ltG.fGetResetTimeOnPage();
+
 });
 
 QUnit.test("Verify that stock jquery ajax does not work (CORS test)", function(assert){
@@ -53,10 +102,14 @@ QUnit.test("Verify that stock jquery ajax does not work (CORS test)", function(a
     url: '//'+ltHostName+'/test.html',
     type: "GET",
     success: function(){
-      assert.ok(false, "Ajax called succeeded to CORS server but should have failed: "+ltHostName);
+      QUnit.test("Ajax succeeded indicating a CORS problem - test", function(assert){
+        assert.ok(false, "Test ajax call succeeded to CORS server but should have failed: "+ltHostName);
+      });
     },
     error: function(jqxhr,error){
-      assert.ok(true, "Ajax call failed on CORS server call, as expected");
+      QUnit.test("Ajax fails as intended test.", function(assert){
+        assert.ok(true, "Ajax call failed on CORS server call, as expected");
+      });
     }
   });
 
@@ -81,14 +134,6 @@ QUnit.test("ltG vars and methods tests", function(assert){
   var testPageTitle = window.ltG.priv.fGetCurPageTitle();
   var validPageTitle = "LT JS Collector Tests";
   assert.equal(validPageTitle, testPageTitle);
-
-  // verify date diff function works
-  curDate = new Date();
-  oldDate = curDate - 400000;
-  var diff = window.ltG.fCalcDateDifference(curDate, oldDate);
-  assert.equal("400S", diff);
-
-
 });
 
 //we write the results of our tests to xml in this document

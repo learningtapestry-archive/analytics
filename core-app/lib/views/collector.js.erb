@@ -72,31 +72,46 @@
     
     window.ltG.fStartPageTimer = function() {
       window.ltG.priv.timerStartDate = new Date();
+      // this var is used to hold accumulated time during timer pauses
+      if (typeof window.ltG.priv.timerAccumulation == 'undefined') {
+        window.ltG.priv.timerAccumulation = 0;  
+      }
     };
 
     window.ltG.fPausePageTimer = function() {
-      //window.ltG.timerPauseDate = new Date();
-      // not yet implemented
+      var now = new Date();
+      var accumulated = now - window.ltG.priv.timerStartDate;
+      window.ltG.priv.timerAccumulation += accumulated;
     };
 
     window.ltG.fUnPausePageTimer = function () {
-      //not yet implemented
+      window.ltG.fStartPageTimer();
     }
 
     // returns duration since timer start and restarts timer at 0
     // see fCalcDateDifference for return value format (e.g. "129S")
     window.ltG.fGetResetTimeOnPage = function () {
-      var currentDate = new Date();    
+      // we add any accumulated paused time to current date to get total
+      // time on page
+      currentDate = new Date(new Date().getTime() + window.ltG.priv.timerAccumulation);
+      window.ltG.priv.timerAccumulation = 0;
       var startDate = window.ltG.priv.timerStartDate;
-      var retVal = window.ltG.fCalcDateDifference(currentDate, startDate);
+      var retVal = window.ltG.fCalcDateDifference(startDate, currentDate);
       window.ltG.fStartPageTimer();
       return retVal;
     };
 
     // returns a string with interval difference between two dates in seconds
     // format: NNNS e.g., "129S"
-    window.ltG.fCalcDateDifference = function(curDate, oldDate) {
-      return (Math.floor((curDate - oldDate)/1000) + "S")
+    window.ltG.fCalcDateDifference = function(oldDate, newDate) {
+      //return (Math.floor((newDate - oldDate)/1000) + "S");
+      return (window.ltG.fMSToDuration(newDate - oldDate));
+    };
+
+    // returns string formatted duration: "NNS"
+    // takes a duration in milliseconds
+    window.ltG.fMSToDuration = function(milliseconds) {
+      return (Math.floor((milliseconds)/1000) + "S");
     };
 
     // NOTE: by design this will block UI/user actions, so use only when user is inactive
@@ -209,29 +224,36 @@
     // main event handler code
     // ***********************
     
-    window.lt$( document ).ready(function() {
+    window.ltG.priv.boot = function(){
       window.ltG.fSendClickMsg();
       window.ltG.fStartPageTimer();
       //start timer that we are on page
       //hook document focus/blur events to manage timer
       lt$(function() {
           lt$(window).focus(function() {
-              //console.log('Focus');
           });
-
           lt$(window).blur(function() {
-              //console.log('Blur');
           });
       });
+
       //hook document beforeunload event to send timer data: "pageview" event
       lt$(window).on("beforeunload", function(){
+        //lt$('#spanid').remove();
         window.ltG.fSendPageViewMsg();
         // this ensures no return value is made - any return value could block the page unload
         null;
       });
+    }; // ltG.boot
+
+    window.lt$( document ).ready(function() {
+      window.ltG.priv.boot();
     }); // document.ready
-  };
-  document.getElementsByTagName('head')[0].appendChild(script);
+    // if we missed the document.ready event (very likely), force boot
+  }; // script.onload
+
+  //we attach our jquery instance to first available script tag to run it
+  //our code on this page will run when jquery has finished loading
+  document.getElementsByTagName('script')[0].appendChild(script);
 })();
 
 

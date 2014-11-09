@@ -79,11 +79,14 @@ module LT
     end; end # Pages
     module Organizations class << self
       @acme_org_api_key = nil
+      @acme_org_secret_key = nil
       def acme_organization_data
         @acme_org_api_key = SecureRandom.uuid if !@acme_org_api_key
+        @acme_org_secret_key =  SecureRandom.hex(36) if !@acme_org_secret_key
         {
           name: 'Acme Organization',
-          org_api_key: @acme_org_api_key
+          org_api_key: @acme_org_api_key,
+          org_secret_key: @acme_org_secret_key
         }
       end
     end; end # Organizations

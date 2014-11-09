@@ -85,7 +85,7 @@ module LT
       LT::janitor_path = File::expand_path(File::join(LT::lib_path,'/janitors'))
       LT::web_root_path = File::expand_path(File::join(LT::root_dir, '/web-public'))
       LT::web_asset_path = File::expand_path(File::join(LT::web_root_path, '/assets'))
-      LT::partner_lib_path = File::expand_path(File::join(LT::root_dir, '/partner-lib/lib'))
+      LT::partner_lib_path = File::expand_path(File::join(LT::root_dir, '/partner-lib'))
       LT::tmp_path = Dir::tmpdir
 
       LT::message_path = File::expand_path(File::join(LT::root_dir, '/log/messages'))

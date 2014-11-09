@@ -6,6 +6,8 @@ require 'sinatra/json'
 require 'json'
 require 'chronic'
 
+require './lib/util/api_data_factory.rb'
+
 module LT
   module WebAppHelper
     def set_title(title)
@@ -58,57 +60,9 @@ module LT
       @layout = {}
     end
 
-    ### START Dashboard
-    get '/' do
-      set_title('Knowledge for Learning')
-      erb :home, locals: { page_title: 'Welcome', extension_login: (params[:src] == 'ext') }, layout: :layout_noauth
-      # This is the only page that does not use the default layout
-    end
-
-    post '/' do
-      set_title('Knowledge for Learning')
-      user_retval = User.get_validated_user(params[:username], params[:password])
-
-      if user_retval[:exception] then
-        erb :home, locals: {page_title: 'Welcome', exception: user_retval[:exception], extension_login: (params[:src] == 'ext')}, layout: :layout_noauth
-      else
-        session[:user_id] = user_retval[:user].id
-
-        # If the source is the extension, then set a cookie for the extension long-lived session
-        if params[:src] == 'ext' then
-          user = user_retval[:user]
-          api_key = ApiKey.create_api_key(user.id)
-          response.set_cookie('api_key', httponly: true, value: "#{api_key}.#{user.id}.#{user.first_name}")
-        end
-
-        redirect '/dashboard'
-      end
-    end
-
-    # Routes for dashboard defined as GET and POST below
-    dashboard = lambda do
-      if !session || !session[:user_id] then redirect '/' end
-      set_title('Your Dashboard')
-      user = User.find(session[:user_id])
-      begin_date = params[:begin_date] || Time.now.strftime("%D")
-      end_date = params[:end_date] || Time.now.strftime("%D")
-      erb :dashboard, locals: { page_title: 'Dashboard', user: user, begin_date: begin_date, end_date: end_date }
-    end
-
-    get '/dashboard', &dashboard
-    post '/dashboard', &dashboard
-
-    get '/welcome' do
-      erb :welcome, locals: { page_title: 'Welcome!' }, layout: :layout_noauth
-    end
-
-    get '/privacy' do
-      erb :privacy, locals: { page_title: 'Privacy' }, layout: :layout_noauth
-    end
-
     # This is used by js-collector testing to pull known page/data from server
     get '/test.html' do
-      erb :test, layout: :layout_noauth
+      erb :test
     end
 
     ### END Dashboard
@@ -222,60 +176,62 @@ module LT
 
     post '/api/v1/obtain' do
       content_type :json
-      body_params = JSON.parse request.body.read
-      params = map_obtain_params(body_params)
 
-      if params[:org_api_key].nil? or params[:org_secret_key].nil? then
-        status 401 # = HTTP Unauthorized
-        json status: 'Organization API key (org_api_key) and secret (org_secret_key) not provided'
-      elsif params[:usernames].nil? or !params[:usernames].is_a?(Array) or params[:usernames].length == 0
-        status 400 # = HTTP Bad Request
-        json status: 'Username array (usernames) not provided'
-      elsif params[:entity].nil?
-        status 400 # = HTTP Bad Request
-        json status: 'Entity type (entity) not provided'
-      else
-        org = Organization.find_by_org_api_key(params[:org_api_key])
-        if !org or org.locked or !org.verify_secret(params[:org_secret_key])
-          LT::logger.warn 'Invalid org_api_key submitted or locked, org_api_key: ' + org_api_key
+      begin
+        body_params = JSON.parse request.body.read
+        params = map_obtain_params(body_params)
+
+        if params[:org_api_key].nil? or params[:org_secret_key].nil? then
           status 401 # = HTTP Unauthorized
-          json status: 'org_api_key invalid or locked'
-        else # We have a valid organization with validated secret and not locked out
-          begin
-            case params[:entity]
-              when 'site_visits'
-                retval = LT::Utilities::APIDataFactory.site_visits(params)
-              when 'page_visits'
-                retval = LT::Utilities::APIDataFactory.page_visits(params)
-              else
-                LT::logger.warn "Unknown entity type in /api/v1/obtain, type: #{params[:entity]}"
-                status 400 # = HTTP Bad Request
-                json status: "Unknown entity type: #{params[:entity]}"
-            end
-            status 200 # = HTTP Success
-            json retval
-          rescue Exception => e
-            LT::logger.error "Unknown error in /api/v1/obtain: #{e.message}"
-            status 500 # = HTTP Unknown Error
-            API_ERROR_MESSAGE
+          json status: 'Organization API key (org_api_key) and secret (org_secret_key) not provided'
+        elsif params[:usernames].nil? or !params[:usernames].is_a?(Array) or params[:usernames].length == 0
+          status 400 # = HTTP Bad Request
+          json status: 'Username array (usernames) not provided'
+        elsif params[:entity].nil?
+          status 400 # = HTTP Bad Request
+          json status: 'Entity type (entity) not provided'
+        else
+          org = Organization.find_by_org_api_key(params[:org_api_key])
+          if !org or org.locked or !org.verify_secret(params[:org_secret_key])
+            LT::logger.warn 'Invalid org_api_key submitted or locked: ' + params[:org_api_key]
+            status 401 # = HTTP Unauthorized
+            json status: 'org_api_key invalid or locked'
+          else # We have a valid organization with validated secret and not locked out
+              case params[:entity]
+                when 'site_visits'
+                  retval = LT::Utilities::APIDataFactory.site_visits(params)
+                  status 200 # = HTTP Success
+                when 'page_visits'
+                  retval = LT::Utilities::APIDataFactory.page_visits(params)
+                  status 200 # = HTTP Success
+                else
+                  LT::logger.warn "Unknown entity type in /api/v1/obtain, type: #{params[:entity]}"
+                  status 400 # = HTTP Bad Request
+                  retval = { status: "Unknown entity type: #{params[:entity]}" }
+              end
+
+              json retval
           end
         end
+      rescue Exception => e
+        LT::logger.error "Unknown error in /api/v1/obtain: #{e.message}"
+        LT::logger.error "- Backtrace: #{e.backtrace}"
+        status 500 # = HTTP Unknown Error
+        API_ERROR_MESSAGE
       end
     end
-
-
-
 
     def map_obtain_params(http_params)
       retval = {}
       retval[:org_api_key] = http_params['org_api_key'] if http_params['org_api_key']
       retval[:org_secret_key] = http_params['org_secret_key'] if http_params['org_secret_key']
       retval[:usernames] = http_params['usernames'] if http_params['usernames']
-      retval[:entity] = http_params['usernames'] if http_params['usernames']
+      retval[:entity] = http_params['entity'] if http_params['entity']
       retval[:date_begin] = http_params['date_begin'] if http_params['date_begin']
       retval[:date_end] = http_params['date_end'] if http_params['date_end']
       retval[:site_domains] = http_params['site_domains'] if http_params['site_domains']
       retval[:page_urls] = http_params['page_urls'] if http_params['page_urls']
+      retval[:type] = http_params['type'] if http_params['type']
       retval
     end
 

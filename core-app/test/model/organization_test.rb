@@ -6,7 +6,8 @@ class OrganizationTest < LTDBTestBase
     # show that we can create an org with a predefined key
     # and that is the key that will be persisted
     org_api_key = SecureRandom.uuid
-    o = Organization.create(org_api_key: org_api_key)
+    org_secret_key = SecureRandom.hex(36)
+    o = Organization.create(org_api_key: org_api_key, org_secret_key: org_secret_key)
     assert !o.new_record?
     assert_equal org_api_key, o.org_api_key
   end
@@ -27,6 +28,7 @@ class OrganizationTest < LTDBTestBase
     assert_equal org_id.to_s, LT::RedisServer::org_api_key_get(org_api_key)
     # show that when we change the org_api_key during update, redis reflects the change
     o.org_api_key = SecureRandom.uuid
+    o.org_secret_key = SecureRandom.hex(36)
     o.save
     assert_equal 1, LT::RedisServer::org_api_key_hashlist_length
     assert_equal o.id.to_s, LT::RedisServer::org_api_key_get(o.org_api_key)
@@ -46,19 +48,19 @@ class OrganizationTest < LTDBTestBase
 
   def test_locked_account
     org = Organization.new
-    org.org_api_key = '00000000-1111-4222-8333-444444444444'
-    org.org_secret_key = '$hared$ecret'
+    org.org_api_key = SecureRandom.uuid
+    org.org_secret_key = SecureRandom.hex(36)
     org.save
     assert_equal 0, org.invalid_logins
     refute org.locked
-    success = org.verify_secret 'wrong$ecret'
+    success = org.verify_secret SecureRandom.hex(36)
     refute success
     assert_equal 1, org.invalid_logins
     refute org.locked
 
     ## Send the wrong secret to the account 3 times to lock out account
     3.times do
-      success = org.verify_secret 'wrong$ecret'
+      success = org.verify_secret SecureRandom.hex(36)
       refute success
     end
 

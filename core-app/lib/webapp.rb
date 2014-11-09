@@ -13,6 +13,7 @@ module LT
     end
     def get_server_url
       # force https in production, otherwise mirror incoming request
+      # we have to mirror incoming port in testing, b/c the port number is always changing
       if LT::production? then
         scheme = "https"
         port = ""
@@ -117,6 +118,7 @@ module LT
     ### START API
     configure do
       mime_type :javascript, 'application/javascript'
+      mime_type :jpeg, 'image/jpeg'
     end
 
     get '/api/v1/service-status' do
@@ -147,7 +149,6 @@ module LT
         status 401
         return
       else
-        # force https in production, otherwise mirror incoming request
         lt_api_server = get_server_url
         locals = {
           org_api_key: CGI::escape(org_api_key),
@@ -187,13 +188,15 @@ module LT
     # This route handles org_api_key assert messages
     #   '/api/v1/assert-org'
     get ORG_API_KEY_ASSERT_ROUTE do
-      content_type :javascript
+      # we return jpeg b/c assert-org requests come via an image tag load
+      # see collector.js.erb for more detail
+      content_type :jpeg
       org_api_key = params[:oak]
       if !org_api_key.nil? && LT::RedisServer::has_org_api_key?(org_api_key)
         msg_string = params[:msg]
         LT::RedisServer.raw_message_push(msg_string.to_json)
         status 200
-        return '{}'
+        return ' '
       else
         status 401 
       end

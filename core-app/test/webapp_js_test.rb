@@ -168,9 +168,12 @@ class WebAppJSTest < WebAppJSTestBase
     # verify that this message has a user_agent value in action
     assert_match /Mozilla/, message["action"]["user_agent"]
 
-    # TODO TEST WARNING: I cannot determine how to simulate a window close event in phantomjs
-    #  This means that we cannot programmatically verify that closing a window
-    #  will trigger the a "viewed" event with a correct "time on page" duration
+    # I cannot determine how to simulate a window close event in phantomjs
+    # I can open a new page in the active browser which causes the close events to fire
+    #  But this means we can't fully test that closing a window generates the right events
+    #  In fact, Firefox 33 on Windows doesn't fire correctly close events correctly
+    #    on application close (though it does fire on close tab and class app via close tab)
+    #  It is possible to manually test browsers to see how they handle page close events
     #  Manual test: The way I am manually testing this feature currently is:
     #    Run Sinatra in development mode
     #    Run LT:console at terminal
@@ -224,6 +227,66 @@ class WebAppJSTest < WebAppJSTestBase
     message = JSON.parse(message)
     assert_equal RawMessage::Verbs::CLICKED, message["verb"]
 
+    #use_selenium
+    #use_webkit
+    # set_server(@partner_host) do
+    #   visit(collector_test_url)
+    #   html = wait_for_qunit(page)
+    # end
+
+    # msg = LT::RedisServer.raw_message_pop
+    # while (msg) do 
+    #   #puts msg
+    #   msg = LT::RedisServer.raw_message_pop
+    # end
+
+    #webkit
+    #page.execute_script("window.lt$(window).blur();")
+    #page.execute_script("window.open('');")
+    # first_window = page.driver.current_window_handle
+    # second_window = page.driver.open_new_window
+    # first_window = page.driver.switch_to_window(first_window)
+    #page.driver.close_window(page.driver.current_window_handle)
+    # page.driver.window_handles.each do |handle|
+    #   #puts page.driver.methods.sort - Object.methods
+    #   #page.driver.switch_to_window(handle)
+    #   page.driver.close_window(handle)
+    #   #page.execute_script("window.close();")
+    # end
+
+    # selenium
+    # puts page.evaluate_script("window.ltG.debug.focus;")
+    # page.execute_script("window.open('');")
+    #orig_window = page.driver.current_window_handle
+    #second_window = page.driver.open_new_window
+    # sleep 0.5
+    #page.driver.switch_to_window(orig_window)
+    #page.execute_script("window.ltG.debug.focus+=1;")
+    # puts page.evaluate_script("window.ltG.debug.focus;")
+    # puts page.evaluate_script("window.ltG.debug.blur;")
+    # page.driver.close_window(orig_window)
+    # sleep 0.5
+
+
+    # msg = LT::RedisServer.raw_message_pop
+    # while (msg) do 
+    #   puts msg
+    #   msg = LT::RedisServer.raw_message_pop
+    # end
+
+    
+
+    #page.execute_script("window.lt$(window).blur();")
+    #page.execute_script("window.open('');")
+    #page.driver.open_new_window
+    #page.driver.close_window(page.driver.current_window_handle)
+    # page.driver.window_handles.each do |handle|
+    #   #puts page.driver.methods.sort - Object.methods
+    #   #page.driver.switch_to_window(handle)
+    #   page.driver.close_window(handle)
+    #   #page.execute_script("window.close();")
+    # end
+
     # NOTE: try using Capybara's function to close window instead of inside JS
     # we don't seem to be able to blur or close windows
     # and generate associated events in phantomjs
@@ -232,7 +295,6 @@ class WebAppJSTest < WebAppJSTestBase
     # page.driver.browser.window_handles.each do |handle|
     #   page.driver.browser.switch_to.window(handle)
     #   page.execute_script "window.close();"
-
     # end
     # Use page.driver.debug to debug JS in Chrome
   end

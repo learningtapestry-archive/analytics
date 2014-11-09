@@ -546,6 +546,9 @@ function extractStacktrace( e, offset ) {
 				if ( stack[ i ].indexOf( fileName ) !== -1 ) {
 					break;
 				}
+				//SM 11/8/14 - hack to get line number output on screen prints from phantomjs
+				var regex = /^(.*)(https{0,1}:\/\/.*):(\d+)$/;
+				stack[i] = stack[i].replace(regex, "$1$3:$2");
 				include.push( stack[ i ] );
 			}
 			if ( include.length ) {

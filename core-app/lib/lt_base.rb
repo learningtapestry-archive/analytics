@@ -60,6 +60,7 @@ module LT
       LT::init_logger
       LT::boot_db(File::join(LT::db_path, 'config.yml'))
       LT::load_all_models
+      LT::require_env_specific_files
       LT::boot_redis(File::join(LT::db_path, 'redis.yml'))
       LT::logger.info("Core-app booted (mode: #{LT::run_env})")
     end
@@ -100,6 +101,15 @@ module LT
         require full_file
       end
     end
+    def require_env_specific_files
+      # Note to future self: do not create production specific requirements
+      if LT::testing? || LT::development? then
+        require 'pry'
+        require 'pry-debugger'
+        require 'pry-stack_explorer'
+      end
+    end
+
     def boot_db(config_file)
       # Connect to DB
       begin

@@ -42,6 +42,8 @@ module LearningTapestry
       uri = URI("#{@api_base}#{LT_API_PATH_OBTAIN}")
       header = { 'Content-Type' => 'application/json' }
       http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE # read into this
       path = '/api/v1/obtain'
       response = http.post path, params.to_json, header
 

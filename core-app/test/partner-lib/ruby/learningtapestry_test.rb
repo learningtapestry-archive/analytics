@@ -6,7 +6,8 @@ require './lib/util/csv_database_loader.rb'
 
 class LearningTapestryLibraryTest < WebAppJSTestBase
 
-  API_KEY = '5651668c-4e89-4d15-99b5-274c19d318b6'
+  API_KEY = '00000000-4e89-4d15-99b5-274c19d318b6'
+  API_SECRET = 'aaaaaaaaaaaa000000000000FFFFFFFFFFFF'
 
   def setup
     super
@@ -23,21 +24,29 @@ class LearningTapestryLibraryTest < WebAppJSTestBase
   def test_initialize
     ## No API calls are made here, this tests various methods of object initialization
 
+    ## Test initialization by configuration file
+    lt_agent = LearningTapestry::Agent.new({use_ssl: false})
+    refute_nil lt_agent
+    assert_equal '00000000-0000-4000-8000-000000000000', lt_agent.org_api_key
+    assert_equal '0123456789abcdef0123456789abcdef0000', lt_agent.org_secret_key
+
     ## Test initialization by passing in API key while creating new
     usernames = [ 'user1@example.com', 'user2@example.com', 'user3@example.com' ]
     filters = { date_start: '10/21/2014', date_end: '10/23/2014', section: 'CompSci - 7E302 - Data Structures' }
-    lt_agent = LearningTapestry::Agent.new(org_api_key: API_KEY, entity: 'page_visits', filters: filters, usernames: usernames)
+    lt_agent = LearningTapestry::Agent.new(org_api_key: API_KEY, org_secret_key: API_SECRET, entity: 'page_visits', filters: filters, usernames: usernames)
     refute_nil lt_agent
     assert_equal API_KEY, lt_agent.org_api_key
+    assert_equal API_SECRET, lt_agent.org_secret_key
     assert_equal 'page_visits', lt_agent.entity
     assert_equal filters, lt_agent.filters
     assert_equal usernames, lt_agent.usernames
 
-    ## Test initialization by passing in API key by manually setting attribute
-    lt_agent = LearningTapestry::Agent.new
+    ## Test initialization by manually setting attributes
+    lt_agent = LearningTapestry::Agent.new({ignore_config_file: true, use_ssl: false})
     refute_nil lt_agent
     assert_nil lt_agent.org_api_key
     lt_agent.org_api_key = API_KEY
+    lt_agent.org_secret_key = API_SECRET
     lt_agent.entity = 'site_visits'
     lt_agent.add_filter :date_start, '10/23/2014'
     lt_agent.add_filter :date_end, '10/24/2014'
@@ -45,6 +54,7 @@ class LearningTapestryLibraryTest < WebAppJSTestBase
     lt_agent.add_username 'user100@example.org'
     lt_agent.add_username 'user101@example.org'
     assert_equal API_KEY, lt_agent.org_api_key
+    assert_equal API_SECRET, lt_agent.org_secret_key
     assert_equal 'site_visits', lt_agent.entity
     test_filters = { date_start: '10/23/2014', date_end: '10/24/2014', section: 'CompSci - 6E209 - Parallel Processing' }
     test_usernames = [ 'user100@example.org', 'user101@example.org' ]
@@ -55,7 +65,7 @@ class LearningTapestryLibraryTest < WebAppJSTestBase
   def test_exceptions
     ## No API calls are made here, this tests various methods of object initialization
 
-    lt_agent = LearningTapestry::Agent.new
+    lt_agent = LearningTapestry::Agent.new({ignore_config_file: true, use_ssl: false})
 
     exception = assert_raises LearningTapestry::LTAgentException do
       lt_agent.obtain
@@ -63,13 +73,13 @@ class LearningTapestryLibraryTest < WebAppJSTestBase
     assert_equal 'Organization API key not provided or not valid', exception.message
 
     exception = assert_raises LearningTapestry::LTAgentException do
-      lt_agent.org_api_key = 'b4f367d1-6356-4908-85fe-90c45fcb6e06'
+      lt_agent.org_api_key = API_KEY
       lt_agent.obtain
     end
     assert_equal 'Organization API secret not provided or not valid', exception.message
 
     exception = assert_raises LearningTapestry::LTAgentException do
-      lt_agent.org_secret_key = 'aaaaaaaaaaaa000000000000FFFFFFFFFFFF'
+      lt_agent.org_secret_key = API_SECRET
       lt_agent.obtain
     end
     assert_equal 'Username array not provided', exception.message
@@ -103,9 +113,9 @@ class LearningTapestryLibraryTest < WebAppJSTestBase
     LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
 
 
-    lt_agent = LearningTapestry::Agent.new
-    lt_agent.org_api_key = '00000000-1111-4222-8333-444444444444'
-    lt_agent.org_secret_key = 'aaaaaaaaaaaa000000000000FFFFFFFFFFFF'
+    lt_agent = LearningTapestry::Agent.new({use_ssl: false})
+    lt_agent.org_api_key = API_KEY
+    lt_agent.org_secret_key = API_SECRET
     lt_agent.entity = 'site_visits'
     lt_agent.usernames = [ 'joesmith@foo.com' ]
     lt_agent.add_filter :date_begin, '2014-10-01'

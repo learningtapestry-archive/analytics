@@ -3,11 +3,12 @@
 require 'net/http'
 require 'uri'
 require 'json'
+require 'yaml'
 
 module LearningTapestry
   class LTAgentException < Exception;end;
   class Agent
-    attr_accessor :org_api_key, :org_secret_key, :api_base, :entity, :filters, :usernames, :type
+    attr_accessor :org_api_key, :org_secret_key, :api_base, :entity, :filters, :usernames, :type, :use_ssl
 
     LT_API_BASE = 'https://api.learningtapestry.com'
     LT_API_PATH_OBTAIN = '/api/v1/obtain'
@@ -15,12 +16,21 @@ module LearningTapestry
     #TODO: Add query token for async callers to reference their calls
 
     def initialize(params={})
-      @api_base = params[:api_base] ? params[:api_base] : LT_API_BASE
-      @filters = {}
-      @usernames = []
+      @api_base = LT_API_BASE
+
+      if !params[:ignore_config_file] and File.exists?(File.join(File.dirname(__FILE__), '../config.yml'))
+        lib_config = YAML::load_file(File.join(File.dirname(__FILE__), '../config.yml'))
+        @api_base = lib_config['api_base'] if lib_config['api_base']
+        @org_api_key = lib_config['org_api_key'] if lib_config['org_api_key']
+        @org_secret_key = lib_config['org_secret_key'] if lib_config['org_secret_key']
+      end
+
+      @api_base = params[:api_base] if params[:api_base]
+      @use_ssl = params[:use_ssl].nil? ? true : params[:use_ssl]
       @org_api_key = params[:org_api_key] if params[:org_api_key]
       @org_secret_key = params[:org_secret_key] if params[:org_secret_key]
-      @api_base = params[:api_base] if params[:api_base]
+      @filters = {}
+      @usernames = []
       @entity = params[:entity] if params[:entity]
       @filters = params[:filters] if params[:filters]
       @usernames = params[:usernames] if params[:usernames]
@@ -28,10 +38,10 @@ module LearningTapestry
     end
 
     def obtain
-      raise LTAgentException, 'Organization API key not provided or not valid' if !validate_org_api_key
-      raise LTAgentException, 'Organization API secret not provided or not valid' if !validate_org_secret_key
-      raise LTAgentException, 'Username array not provided' if !@usernames or @usernames == []
-      raise LTAgentException, 'Entity type not provided' if !@entity
+      raise LTAgentException, 'Organization API key not provided or not valid' unless validate_org_api_key
+      raise LTAgentException, 'Organization API secret not provided or not valid' unless validate_org_secret_key
+      raise LTAgentException, 'Username array not provided' unless @usernames and @usernames != []
+      raise LTAgentException, 'Entity type not provided' unless @entity
 
       params = { org_api_key: @org_api_key, org_secret_key: @org_secret_key, usernames: @usernames, entity: @entity, type: @type }
       params[:date_begin] = @filters[:date_begin] if @filters[:date_begin]
@@ -42,8 +52,11 @@ module LearningTapestry
       uri = URI("#{@api_base}#{LT_API_PATH_OBTAIN}")
       header = { 'Content-Type' => 'application/json' }
       http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = true
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE # read into this
+      if @use_ssl
+        http.ssl_version = 'TLSv1'
+        http.use_ssl = true
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE #TODO: not in use without client certificates
+      end
       path = '/api/v1/obtain'
       response = http.post path, params.to_json, header
 

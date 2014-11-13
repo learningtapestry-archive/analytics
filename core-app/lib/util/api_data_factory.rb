@@ -127,7 +127,10 @@ module LT
         retval
       end
 
-
+=begin TODO:  Implement and factor down from webapp.rb
+      def self.users(params)
+      end
+=end
 
       def self.process_filters(params)
 

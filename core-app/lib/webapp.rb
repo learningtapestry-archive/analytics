@@ -15,7 +15,7 @@ module LT
     end
     def get_server_url
       # force https in production, otherwise mirror incoming request
-      if LT::production? then
+      if LT::production?
         scheme = "https"
         port = ""
       else
@@ -33,12 +33,12 @@ module LT
 
     # TODO this is ugly - not sure how to get non-html exceptions raised in testing otherwise
     # There should be a way to get the config object from Sinatra/WebApp and configure that with these values
-    if LT::testing? then
+    if LT::testing?
       set :raise_errors, true
       set :dump_errors, false
       set :show_exceptions, false
     end
-    if LT::development? then
+    if LT::development?
       register Sinatra::Reloader
       enable :reloader
       also_reload './lib/views/*.erb'
@@ -97,7 +97,7 @@ module LT
       username = params[:username]
       org_api_key = params[:org_api_key]
       # reject this request unless org_api_key is found in Redis
-      if LT::RedisServer::org_api_key_get(org_api_key).nil? then
+      if LT::RedisServer::org_api_key_get(org_api_key).nil?
         status 401
         return
       else
@@ -153,7 +153,6 @@ module LT
 
     end
 
-
     post '/api/v1/assert' do
       begin
         api_key = request.env['HTTP_X_LT_API_KEY']
@@ -174,8 +173,7 @@ module LT
       content_type :json
 
       begin
-        body_params = JSON.parse request.body.read
-        params = map_obtain_params(body_params)
+        params = map_obtain_params(JSON.parse(request.body.read))
 
         if params[:org_api_key].nil? or params[:org_secret_key].nil? then
           status 401 # = HTTP Unauthorized
@@ -216,6 +214,27 @@ module LT
         API_ERROR_MESSAGE
       end
     end
+
+    get '/api/v1/users' do
+      content_type :json
+
+      if params[:org_api_key].nil? or params[:org_secret_key].nil?
+        status 401 # = HTTP Unauthorized
+        json status: 'Organization API key (org_api_key) and secret (org_secret_key) not provided'
+      else
+        org = Organization.find_by_org_api_key(params[:org_api_key])
+        if !org or org.locked or !org.verify_secret(params[:org_secret_key])
+          LT::logger.warn 'Invalid org_api_key submitted or locked: ' + params[:org_api_key]
+          status 401 # = HTTP Unauthorized
+          json status: 'org_api_key invalid or locked'
+        else
+          status 200
+          retval = { results: org.users.select(:id, :first_name, :last_name, :username) }
+          json retval
+        end
+      end
+    end
+
 
     def map_obtain_params(http_params)
       retval = {}

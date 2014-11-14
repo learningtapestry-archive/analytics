@@ -90,7 +90,7 @@ class ApiAppTest < WebAppTestBase
     end
 
     assert_equal 401, last_response.status
-    assert_equal response_json[:status], 'Organization API key (org_api_key) and secret (org_secret_key) not provided'
+    assert_equal 'Organization API key (org_api_key) and secret (org_secret_key) not provided', response_json[:error]
 
     ### No usernames fail test
 
@@ -100,7 +100,7 @@ class ApiAppTest < WebAppTestBase
     end
 
     assert_equal 400, last_response.status
-    assert_equal response_json[:status], 'Username array (usernames) not provided'
+    assert_equal 'Username array (usernames) not provided', response_json[:error]
 
     ### No entity fail test
 
@@ -110,7 +110,7 @@ class ApiAppTest < WebAppTestBase
     end
 
     assert_equal 400, last_response.status
-    assert_equal response_json[:status], 'Entity type (entity) not provided'
+    assert_equal 'Entity type (entity) not provided', response_json[:error]
 
     ### Bad entity fail test
 
@@ -122,7 +122,7 @@ class ApiAppTest < WebAppTestBase
     end
 
     assert_equal 400, last_response.status
-    assert_equal response_json[:status], 'Unknown entity type: junkentity'
+    assert_equal 'Unknown entity type: junkentity', response_json[:error]
 
   end
 
@@ -132,7 +132,7 @@ class ApiAppTest < WebAppTestBase
     get '/api/v1/users' do
       response_json = JSON.parse(last_response.body, symbolize_names: true) if last_response.body and last_response.body != 'null'
       assert_equal 401, last_response.status
-      assert_equal 'Organization API key (org_api_key) and secret (org_secret_key) not provided', response_json[:status]
+      assert_equal 'Organization API key (org_api_key) and secret (org_secret_key) not provided', response_json[:error]
     end
 
     ## Invalid api_key test
@@ -140,7 +140,7 @@ class ApiAppTest < WebAppTestBase
     get '/api/v1/users', params  do
       response_json = JSON.parse(last_response.body, symbolize_names: true) if last_response.body and last_response.body != 'null'
       assert_equal 401, last_response.status
-      assert_equal 'org_api_key invalid or locked', response_json[:status]
+      assert_equal 'org_api_key invalid or locked', response_json[:error]
     end
 
     ## Invalid secret_key test
@@ -148,7 +148,7 @@ class ApiAppTest < WebAppTestBase
     get '/api/v1/users', params  do
       response_json = JSON.parse(last_response.body, symbolize_names: true) if last_response.body and last_response.body != 'null'
       assert_equal 401, last_response.status
-      assert_equal 'org_api_key invalid or locked', response_json[:status]
+      assert_equal 'org_api_key invalid or locked', response_json[:error]
     end
 
     ## Valid test, receive two users

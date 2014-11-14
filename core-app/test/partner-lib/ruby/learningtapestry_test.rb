@@ -11,10 +11,28 @@ class LearningTapestryLibraryTest < WebAppJSTestBase
 
   def setup
     super
+    DatabaseCleaner.clean # Stop prior transaction
+    DatabaseCleaner[:active_record].strategy = :truncation
+    DatabaseCleaner.start
+
+    ## Load up a big test fixture
+
+    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/organizations.csv'))
+    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
+    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/users.csv'))
+    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
+    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/sites.csv'))
+    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
+    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/pages.csv'))
+    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
+    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/page_visits.csv'))
+    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
   end
 
   def teardown
     super
+
+    DatabaseCleaner.clean
   end
 
   def app
@@ -95,24 +113,6 @@ class LearningTapestryLibraryTest < WebAppJSTestBase
   def test_obtain
     ## API calls made here
 
-    DatabaseCleaner.clean
-    DatabaseCleaner[:active_record].strategy = :truncation
-    DatabaseCleaner.start
-
-    ## Load up a big test fixture
-
-    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/organizations.csv'))
-    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
-    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/users.csv'))
-    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
-    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/sites.csv'))
-    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
-    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/pages.csv'))
-    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
-    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/page_visits.csv'))
-    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
-
-
     lt_agent = LearningTapestry::Agent.new({use_ssl: false})
     lt_agent.org_api_key = API_KEY
     lt_agent.org_secret_key = API_SECRET
@@ -160,7 +160,26 @@ class LearningTapestryLibraryTest < WebAppJSTestBase
     assert_equal 2, response[:results].length
     assert_equal 92, response[:results][0][:page_visits].length
     assert_equal 77, response[:results][1][:page_visits].length
-
-    DatabaseCleaner.clean
   end
+
+  def test_users
+    lt_agent = LearningTapestry::Agent.new({use_ssl: false})
+    lt_agent.org_api_key = API_KEY
+    lt_agent.org_secret_key = API_SECRET
+    port = Capybara.current_session.server.port
+    lt_agent.api_base = "http://localhost:#{port}"
+
+    response = lt_agent.users
+    assert response
+    assert_equal 200, response[:status]
+    assert_equal 3, response[:results].length
+    bob_found = false; joe_found = false; jane_found = false
+    response[:results].each do |user|
+      bob_found = true if user[:username] == 'bob@foo.com'
+      joe_found = true if user[:username] == 'joesmith@foo.com"'
+      jane_found = true if user[:username] == 'janedoe@bar.com'
+    end
+    assert bob_found and joe_found and jane_found
+  end
+
 end

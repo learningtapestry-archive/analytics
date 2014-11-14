@@ -175,21 +175,21 @@ module LT
       begin
         params = map_obtain_params(JSON.parse(request.body.read))
 
-        if params[:org_api_key].nil? or params[:org_secret_key].nil? then
+        if params[:org_api_key].nil? or params[:org_secret_key].nil?
           status 401 # = HTTP Unauthorized
-          json status: 'Organization API key (org_api_key) and secret (org_secret_key) not provided'
+          json error: 'Organization API key (org_api_key) and secret (org_secret_key) not provided'
         elsif params[:usernames].nil? or !params[:usernames].is_a?(Array) or params[:usernames].length == 0
           status 400 # = HTTP Bad Request
-          json status: 'Username array (usernames) not provided'
+          json error: 'Username array (usernames) not provided'
         elsif params[:entity].nil?
           status 400 # = HTTP Bad Request
-          json status: 'Entity type (entity) not provided'
+          json error: 'Entity type (entity) not provided'
         else
           org = Organization.find_by_org_api_key(params[:org_api_key])
           if !org or org.locked or !org.verify_secret(params[:org_secret_key])
             LT::logger.warn 'Invalid org_api_key submitted or locked: ' + params[:org_api_key]
             status 401 # = HTTP Unauthorized
-            json status: 'org_api_key invalid or locked'
+            json error: 'org_api_key invalid or locked'
           else # We have a valid organization with validated secret and not locked out
               case params[:entity]
                 when 'site_visits'
@@ -201,7 +201,7 @@ module LT
                 else
                   LT::logger.warn "Unknown entity type in /api/v1/obtain, type: #{params[:entity]}"
                   status 400 # = HTTP Bad Request
-                  retval = { status: "Unknown entity type: #{params[:entity]}" }
+                  retval = { error: "Unknown entity type: #{params[:entity]}" }
               end
 
               json retval
@@ -220,18 +220,18 @@ module LT
 
       if params[:org_api_key].nil? or params[:org_secret_key].nil?
         status 401 # = HTTP Unauthorized
-        json status: 'Organization API key (org_api_key) and secret (org_secret_key) not provided'
+        json error: 'Organization API key (org_api_key) and secret (org_secret_key) not provided'
       else
-        org = Organization.find_by_org_api_key(params[:org_api_key])
-        if !org or org.locked or !org.verify_secret(params[:org_secret_key])
-          LT::logger.warn 'Invalid org_api_key submitted or locked: ' + params[:org_api_key]
-          status 401 # = HTTP Unauthorized
-          json status: 'org_api_key invalid or locked'
-        else
-          status 200
-          retval = { results: org.users.select(:id, :first_name, :last_name, :username) }
-          json retval
+        begin
+          retval = LT::Utilities::APIDataFactory.users(params[:org_api_key], params[:org_secret_key])
+          status retval[:status]
+        rescue Exception => e
+          LT::logger.error "Unknown error in /api/v1/users: #{e.message}"
+          LT::logger.error "- Backtrace: #{e.backtrace}"
+          status 500 # = HTTP Unknown Error
+          API_ERROR_MESSAGE
         end
+        json retval
       end
     end
 

@@ -127,10 +127,21 @@ module LT
         retval
       end
 
-=begin TODO:  Implement and factor down from webapp.rb
-      def self.users(params)
+      def self.users(org_api_key, org_secret_key)
+        throw ParameterMissing, 'Required org_api_key and org_secret_key not provided' unless org_api_key and org_secret_key
+
+        retval = {}
+        org = Organization.find_by_org_api_key(org_api_key)
+        if org.nil? or org.locked or !org.verify_secret(org_secret_key)
+          retval[:error] = 'org_api_key invalid or locked'
+          retval[:status] = 401
+        else
+          retval[:results] = org.users.select(:id, :first_name, :last_name, :username)
+        end
+
+        retval
       end
-=end
+
 
       def self.process_filters(params)
 

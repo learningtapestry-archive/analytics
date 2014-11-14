@@ -1,0 +1,59 @@
+<!-- Main -->
+<div class="container">
+
+<!-- lower section -->
+<div class="row">
+
+  <div class="col-md-12">
+    <hr>
+    <a href="#"><strong><i class="glyphicon glyphicon-list-alt"></i> Reports</strong></a>
+    <hr>
+  </div>
+
+  <div class="col-md-12">
+
+    <input type="date" name="date_begin" value="<%= Time.now.strftime('%Y-%m-%d') %>" />
+    <input type="date" name="date_end"  value="<%= Time.now.strftime('%Y-%m-%d') %>" />
+    <input type="submit" name="Update" />
+
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th>Username</th>
+        <th>Site</th>
+        <th>Time</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @site_visits[:results].each do |username| %>
+        <tr>
+          <td style="background-color: #eaeaea" colspan="3"><%= username[:username] %></td>
+        </tr>
+
+        <% if username[:site_visits]
+           username[:site_visits].each do |site_visit| %>
+          <tr>
+            <td>&nbsp</td>
+            <td>
+              <a href="http://<%= site_visit[:site_domain] %>" target="_blank"><%= site_visit[:site_name] %></a>
+            </td>
+            <td><%= site_visit[:time_active] %></td>
+          </tr>
+          <% end %>
+        <% end %>
+      <% end %>
+      </tbody>
+    </table>
+
+    <hr>
+
+
+  </div>
+
+
+</div>
+<!--/row-->
+
+</div>
+<!--/container-->
+<!-- /Main -->

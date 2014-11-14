@@ -90,7 +90,7 @@ class ApiAppTest < WebAppTestBase
     end
 
     assert_equal 401, last_response.status
-    assert_equal response_json[:status], 'Organization API key (org_api_key) and secret (org_secret_key) not provided'
+    assert_equal 'Organization API key (org_api_key) and secret (org_secret_key) not provided', response_json[:error]
 
     ### No usernames fail test
 
@@ -100,7 +100,7 @@ class ApiAppTest < WebAppTestBase
     end
 
     assert_equal 400, last_response.status
-    assert_equal response_json[:status], 'Username array (usernames) not provided'
+    assert_equal 'Username array (usernames) not provided', response_json[:error]
 
     ### No entity fail test
 
@@ -110,7 +110,7 @@ class ApiAppTest < WebAppTestBase
     end
 
     assert_equal 400, last_response.status
-    assert_equal response_json[:status], 'Entity type (entity) not provided'
+    assert_equal 'Entity type (entity) not provided', response_json[:error]
 
     ### Bad entity fail test
 
@@ -122,8 +122,50 @@ class ApiAppTest < WebAppTestBase
     end
 
     assert_equal 400, last_response.status
-    assert_equal response_json[:status], 'Unknown entity type: junkentity'
+    assert_equal 'Unknown entity type: junkentity', response_json[:error]
 
   end
 
+  def test_users
+
+    ## No parameters test
+    get '/api/v1/users' do
+      response_json = JSON.parse(last_response.body, symbolize_names: true) if last_response.body and last_response.body != 'null'
+      assert_equal 401, last_response.status
+      assert_equal 'Organization API key (org_api_key) and secret (org_secret_key) not provided', response_json[:error]
+    end
+
+    ## Invalid api_key test
+    params = { org_api_key: 'ffffffff-ffff-4d15-99b5-274c19d318b6', org_secret_key: @org[:org_secret_key] }
+    get '/api/v1/users', params  do
+      response_json = JSON.parse(last_response.body, symbolize_names: true) if last_response.body and last_response.body != 'null'
+      assert_equal 401, last_response.status
+      assert_equal 'org_api_key invalid or locked', response_json[:error]
+    end
+
+    ## Invalid secret_key test
+    params = { org_api_key: @org[:org_api_key], org_secret_key: 'badsecret' }
+    get '/api/v1/users', params  do
+      response_json = JSON.parse(last_response.body, symbolize_names: true) if last_response.body and last_response.body != 'null'
+      assert_equal 401, last_response.status
+      assert_equal 'org_api_key invalid or locked', response_json[:error]
+    end
+
+    ## Valid test, receive two users
+    params = { org_api_key: @org[:org_api_key], org_secret_key: @org[:org_secret_key] }
+    get '/api/v1/users', params  do
+      response_json = JSON.parse(last_response.body, symbolize_names: true) if last_response.body and last_response.body != 'null'
+      assert_equal 200, last_response.status
+      assert response_json[:results]
+      assert_equal 2, response_json[:results].length
+      joe_found = false; bob_found = false
+      response_json[:results].each do |user|
+        joe_found = true if user[:first_name] == 'Joe' and user[:last_name] == 'Smith' and user[:username] == 'joesmith@foo.com'
+        bob_found = true if user[:first_name] == 'Bob' and user[:last_name] == 'Newhart' and user[:username] == 'bob@foo.com'
+      end
+
+      assert joe_found
+      assert bob_found
+    end
+  end
 end

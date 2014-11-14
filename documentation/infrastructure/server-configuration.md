@@ -51,7 +51,13 @@ rake lt:console
 ```
 cd /opt/learningtapestry/core-app
 git fetch origin
+# Github password is in LastPass under "LT prod Github PK"
 sudo git reset --hard origin/master
+sudo chown -R nobody:www-data /opt/learningtapestry/core-app
+sudo chmod -R ugoa-rwx /opt/learningtapestry/core-app
+sudo chmod -R ug+rx /opt/learningtapestry/core-app
+sudo chmod -R ug+w /opt/learningtapestry/core-app/log
+sudo chmod -R ug+w /opt/learningtapestry/core-app/tmp
 sudo service unicorn restart
 ```
 1. Create a new Organization

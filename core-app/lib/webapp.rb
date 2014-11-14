@@ -15,6 +15,7 @@ module LT
     end
     def get_server_url
       # force https in production, otherwise mirror incoming request
+      # we have to mirror incoming port in testing, b/c the port number is always changing
       if LT::production?
         scheme = "https"
         port = ""
@@ -152,6 +153,7 @@ module LT
       end
 
     end
+
 
     post '/api/v1/assert' do
       begin

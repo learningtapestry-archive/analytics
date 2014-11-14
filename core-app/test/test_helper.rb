@@ -72,8 +72,8 @@ class WebAppJSTestBase < WebAppTestBase
   # To use the poltergeist javascript debugger add "page.driver.debug" 
   # in test file, *before* the JS code call you want to debug
   # When you run your test, you'll get a new window in chrome. 
-  # Click the second link on that page
-  # Chrome opens your code/page - select the JS file from the upper left pull-down
+  # Click the second link on the page that is opened for you in chrome
+  # That link opens your code/page - select the JS file from the upper left pull-down
   # Set a breakpoint where you want to intercept the code
   # Press enter in the terminal console where your test is running
   # You'll see the code in the browser stopped on the line you breakpointed.
@@ -100,12 +100,13 @@ class WebAppJSTestBase < WebAppTestBase
   def setup
     super
     Capybara.app = LT::WebApp
-    # debug mode
+    # we create a new driver which is the debug mode for poltergeist
     Capybara.register_driver :poltergeist_debug do |app|
       Capybara::Poltergeist::Driver.new(app, {:inspector => true, :timeout=>999})
     end
     # use_selenium
     # use poltergeist
+    # use web_kit
     use_poltergeist_debug
 
   end

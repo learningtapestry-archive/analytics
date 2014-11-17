@@ -41,6 +41,17 @@ lt_agent = LearningTapestry::Agent.new(org_api_key: API_KEY, entity: 'page_visit
 
 # Queries
 
+## Users
+
+```
+lt_agent = LearningTapestry::Agent.new
+lt_agent.org_api_key = '[API_KEY]'
+lt_agent.org_secret_key = '[SECRET]'
+users = lt_agent.users
+```
+
+## Site or Page Visits
+
 To issue a query, follow the syntax below.
 
 ```

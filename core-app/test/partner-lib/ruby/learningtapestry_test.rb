@@ -6,8 +6,8 @@ require './lib/util/csv_database_loader.rb'
 
 class LearningTapestryLibraryTest < WebAppJSTestBase
 
-  API_KEY = '00000000-4e89-4d15-99b5-274c19d318b6'
-  API_SECRET = 'aaaaaaaaaaaa000000000000FFFFFFFFFFFF'
+  API_KEY = '00000000-0000-4000-8000-000000000000'
+  API_SECRET = '0123456789abcdef0123456789abcdef0000'
 
   def setup
     super
@@ -45,8 +45,8 @@ class LearningTapestryLibraryTest < WebAppJSTestBase
     ## Test initialization by configuration file
     lt_agent = LearningTapestry::Agent.new({use_ssl: false})
     refute_nil lt_agent
-    assert_equal '00000000-0000-4000-8000-000000000000', lt_agent.org_api_key
-    assert_equal '0123456789abcdef0123456789abcdef0000', lt_agent.org_secret_key
+    assert_equal API_KEY, lt_agent.org_api_key
+    assert_equal API_SECRET, lt_agent.org_secret_key
 
     ## Test initialization by passing in API key while creating new
     usernames = [ 'user1@example.com', 'user2@example.com', 'user3@example.com' ]

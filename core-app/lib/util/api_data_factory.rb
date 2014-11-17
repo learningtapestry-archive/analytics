@@ -26,6 +26,8 @@ module LT
 
         site_visits = Site
         .select(User.arel_table[:username])
+        .select(User.arel_table[:first_name])
+        .select(User.arel_table[:last_name])
         .select(Site.arel_table[:display_name])
         .select(Site.arel_table[:url])
         .select(PageVisit.arel_table[:time_active].sum.as('time_active'))
@@ -37,6 +39,8 @@ module LT
         .where(['page_visits.date_visited BETWEEN SYMMETRIC ? and ?', params[:date_begin], params[:date_end]])
         .where(User.arel_table[:username].in(params[:usernames]))
         .group(User.arel_table[:username])
+        .group(User.arel_table[:first_name])
+        .group(User.arel_table[:last_name])
         .group(Site.arel_table[:display_name])
         .group(Site.arel_table[:url])
         .order(User.arel_table[:username])
@@ -57,7 +61,7 @@ module LT
           if username != site_visit[:username] then
             username = site_visit[:username]
             username_count += 1
-            retval[:results].push({ username: username })
+            retval[:results].push({ username: username, first_name: site_visit[:first_name], last_name: site_visit[:last_name] })
             retval[:results][username_count][:site_visits] = []
           end
           result_hash = {site_name: site_visit[:display_name],
@@ -77,6 +81,8 @@ module LT
 
         page_visits = Site
         .select(User.arel_table[:username])
+        .select(User.arel_table[:first_name])
+        .select(User.arel_table[:last_name])
         .select(Site.arel_table[:display_name].as('site_name'))
         .select(Page.arel_table[:display_name].as('page_name'))
         .select(Site.arel_table[:url].as('site_domain'))
@@ -90,6 +96,8 @@ module LT
         .where(['page_visits.date_visited BETWEEN SYMMETRIC ? and ?', params[:date_begin], params[:date_end]])
         .where(User.arel_table[:username].in(params[:usernames]))
         .group(User.arel_table[:username])
+        .group(User.arel_table[:first_name])
+        .group(User.arel_table[:last_name])
         .group(Site.arel_table[:display_name])
         .group(Page.arel_table[:display_name])
         .group(Site.arel_table[:url])
@@ -113,7 +121,7 @@ module LT
           if username != page_visit[:username]
             username = page_visit[:username]
             username_count += 1
-            retval[:results].push({ username: username })
+            retval[:results].push({ username: username, first_name: page_visit[:first_name], last_name: page_visit[:last_name] })
             retval[:results][username_count][:page_visits] = []
           end
           result_hash = {site_name: page_visit[:site_name],
@@ -136,7 +144,7 @@ module LT
           retval[:error] = 'org_api_key invalid or locked'
           retval[:status] = 401
         else
-          retval[:results] = org.users.select(:id, :first_name, :last_name, :username)
+          retval[:results] = org.users.select(:id, :first_name, :last_name, :username).order(:username)
         end
 
         retval

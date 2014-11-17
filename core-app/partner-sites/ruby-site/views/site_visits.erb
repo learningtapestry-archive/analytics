@@ -1,0 +1,88 @@
+<!-- Main -->
+<div class="container" xmlns="http://www.w3.org/1999/html">
+
+<!-- lower section -->
+<div class="row">
+
+  <div class="col-md-12">
+    <hr>
+    <strong><i class="glyphicon glyphicon-list-alt"></i> Site Visits</strong>
+    <hr>
+  </div>
+</div>
+
+  <div class="row" style="background-color: #fcf8e3">
+
+
+    <form method="post">
+
+      <div class="col-md-2">
+        Type:
+        <select name="type">
+          <option value="summary"  <%= 'SELECTED' if @type == 'summary' %> >Summary</option>
+          <option value="detail" <%= 'SELECTED' if @type == 'detail' %> >By Date</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        Start Date: <input style="line-height: 20px" type="date" name="date_begin" value="<%= @date_begin %>" />
+      </div>
+      <div class="col-md-4">
+        End Date: <input style="line-height: 20px" type="date" name="date_end"  value="<%= @date_end %>" />
+      </div>
+
+      <div class="col-md-1">
+        <input type="submit" value="Update" />
+      </div>
+    </form>
+  </div>
+
+  <div class="row">
+
+  <div class="col-md-12">
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th>Username</th>
+        <th>Site</th>
+        <% if @type == 'detail' %>
+          <th>Date</th>
+        <% end %>
+        <th>Time</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% if @site_visits[:results] then @site_visits[:results].each do |username| %>
+        <tr>
+          <td style="background-color: #c4e3f3; font-weight: bold" colspan="4"><%= username[:first_name] %> <%= username[:last_name] %></td>
+        </tr>
+
+        <% if username[:site_visits]
+           username[:site_visits].each do |site_visit| %>
+          <tr>
+            <td>&nbsp</td>
+            <td>
+              <a href="<%= "page-visits?domain=#{site_visit[:site_domain]}&username=#{username[:username]}&date_begin=#{@date_begin}&date_end=#{@date_end}&type=#{@type}" %>"><%= site_visit[:site_name] %></a>
+            </td>
+            <% if @type == 'detail' %>
+              <td><%= DateTime.parse(site_visit[:date_visited]).strftime('%b %d %Y') %></td>
+            <% end %>
+            <td><%= site_visit[:time_active] %></td>
+          </tr>
+          <% end %>
+        <% end %>
+      <% end; end %>
+      </tbody>
+    </table>
+
+    <hr>
+
+
+  </div>
+
+
+</div>
+<!--/row-->
+
+</div>
+<!--/container-->
+<!-- /Main -->

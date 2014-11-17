@@ -17,19 +17,21 @@
         </div>
         <div class="panel-body">
 
+          <span style="color: #ff0000"><%= @message %></span>
+
           <form method="post" class="form form-vertical">
             <div class="control-group">
               <label>Username</label>
 
               <div class="controls">
-                <input type="text" class="form-control">
+                <input type="text" class="form-control" name="username">
               </div>
             </div>
             <div class="control-group">
               <label>Password</label>
 
               <div class="controls">
-                <input type="password" class="form-control">
+                <input type="password" class="form-control" name="password">
 
               </div>
             </div>

@@ -18,7 +18,7 @@ class Organization < ActiveRecord::Base
   end
 
   # resets all the org api keys in redis
-  def self.update_redis
+  def self.update_all_org_api_keys
     Organization.all.each do |org|
       org.update_redis_org_api_key
     end

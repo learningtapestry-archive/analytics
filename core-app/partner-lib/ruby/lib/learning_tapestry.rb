@@ -1,4 +1,4 @@
-### (C) 2014 Learning Tapestry, Inc. - All rights reserved.
+### (C) 2014 Learning Tapestry, Inc. under MIT License (see included LICENSE for more details)
 
 require 'net/http'
 require 'uri'

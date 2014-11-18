@@ -32,6 +32,7 @@ Initialize a new agent class:
 ```
 lt_agent = LearningTapestry::Agent.new
 ```
+If present, the Learning Tapestry agent will use config.yml for configuration.
 
 or initialize with parameters:
 

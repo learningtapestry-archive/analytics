@@ -5,6 +5,10 @@ Learning Tapestry Library for Ruby
 
 This library aides in obtaining data from the Learning Tapestry APIs.  You must have an organization API key and secret in order to use the library.  For organization setup or any questions, please contact support@learningtapestry.com.
 
+# License
+
+The Learning Tapestry Library for Ruby is licensed under The MIT License (MIT).  Please see LICENSE for more details.
+
 # Requirements
 
 Ruby 1.9.3 or later

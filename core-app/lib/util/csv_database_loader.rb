@@ -11,7 +11,7 @@ module LT
           table_name = File.basename(filename, ".csv")
           model_name = ActiveSupport::Inflector::classify(table_name)
           begin
-            model = eval(model_name).new
+            model = model_name.constantize.new
           rescue Exception => e
             LT::logger.error("CsvDatabaseLoader: Model not found for #{table_name}, exception: #{e.message}")
             raise LT::ModelNotFound
@@ -29,7 +29,7 @@ module LT
             num_inserts = 0;
             ActiveRecord::Base.transaction do
               csv_file.each do |csv_line|
-                model = eval(model_name).new
+                model = model_name.constantize.new
                 csv_line.each do |key, value|
                   model[key] = value
                 end # csv_line.each

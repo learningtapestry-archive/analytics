@@ -17,9 +17,11 @@ module LearningTapestry
 
     def initialize(params={})
       @api_base = LT_API_BASE
+      default_config_file = File.join(File.dirname(__FILE__), '../config.yml')
+      config_file = params[:config_file] || default_config_file
 
-      if !params[:ignore_config_file] and File.exists?(File.join(File.dirname(__FILE__), '../config.yml'))
-        lib_config = YAML::load_file(File.join(File.dirname(__FILE__), '../config.yml'))
+      if !params[:ignore_config_file] and File.exists?(config_file)
+        lib_config = YAML::load_file(config_file)
         @api_base = lib_config['api_base'] if lib_config['api_base']
         @org_api_key = lib_config['org_api_key'] if lib_config['org_api_key']
         @org_secret_key = lib_config['org_secret_key'] if lib_config['org_secret_key']

@@ -140,10 +140,14 @@ module LT
 
         retval = {}
         org = Organization.find_by_org_api_key(org_api_key)
+        # TODO Security: Organization should take care of being locked internally
+        #   -- the .verify_secret method should check self.locked
         if org.nil? or org.locked or !org.verify_secret(org_secret_key)
           retval[:error] = 'org_api_key invalid or locked'
           retval[:status] = 401
         else
+          # TODO: Jason check this line - is this always a 200 response?
+          retval[:status] = 200
           retval[:results] = org.users.select(:id, :first_name, :last_name, :username).order(:username)
         end
 

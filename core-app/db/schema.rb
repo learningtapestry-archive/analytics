@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140902210605) do
+ActiveRecord::Schema.define(version: 20141118) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -138,6 +138,7 @@ ActiveRecord::Schema.define(version: 20140902210605) do
     t.datetime "captured_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "organization_id"
   end
 
   create_table "schools", force: true do |t|
@@ -230,6 +231,7 @@ ActiveRecord::Schema.define(version: 20140902210605) do
     t.datetime "updated_at"
   end
 
-  add_index "users", ["username"], name: "index_users_on_username", unique: true, using: :btree
+  add_index "users", ["username", "organization_id"], name: "index_users_on_username_and_organization_id", unique: true, using: :btree
+  add_index "users", ["username"], name: "index_users_on_username", unique: true, where: "(organization_id IS NULL)", using: :btree
 
 end

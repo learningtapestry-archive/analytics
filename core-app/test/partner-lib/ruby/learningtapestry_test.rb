@@ -4,6 +4,18 @@ require test_helper_file
 require File::expand_path(File::join(LT::partner_lib_path,'ruby/lib/learning_tapestry.rb'))
 require './lib/util/csv_database_loader.rb'
 
+# cross-thread AR bug when Capybara is running a server alongside our testing code
+# disable connection pooling with this monkey patch
+# http://blog.plataformatec.com.br/2011/12/three-tips-to-improve-the-performance-of-your-test-suite/
+class ActiveRecord::Base
+  mattr_accessor :shared_connection
+  @@shared_connection = nil
+
+  def self.connection
+    @@shared_connection || retrieve_connection
+  end
+end
+
 class LearningTapestryLibraryTest < WebAppJSTestBase
 
   API_KEY = '00000000-0000-4000-8000-000000000000'
@@ -11,9 +23,9 @@ class LearningTapestryLibraryTest < WebAppJSTestBase
 
   def setup
     super
-    DatabaseCleaner.clean # Stop prior transaction
-    DatabaseCleaner[:active_record].strategy = :truncation
-    DatabaseCleaner.start
+    # Forces all threads to share the same connection. This works on
+    # Capybara because it starts the web server in a thread.
+    ActiveRecord::Base.shared_connection = ActiveRecord::Base.connection
 
     ## Load up a big test fixture
 
@@ -31,8 +43,9 @@ class LearningTapestryLibraryTest < WebAppJSTestBase
 
   def teardown
     super
-
-    DatabaseCleaner.clean
+    # disable single AR connection (enable connection pooling)
+    # (to make sure we don't leave it enabled for other test suites!)
+    ActiveRecord::Base.shared_connection = nil
   end
 
   def app
@@ -43,7 +56,10 @@ class LearningTapestryLibraryTest < WebAppJSTestBase
     ## No API calls are made here, this tests various methods of object initialization
 
     ## Test initialization by configuration file
-    lt_agent = LearningTapestry::Agent.new({use_ssl: false})
+    path = File::expand_path(File::dirname(__FILE__))
+    config_file = File::join(path, 'config-test.yml')
+    assert File::exists?(config_file)
+    lt_agent = LearningTapestry::Agent.new({use_ssl: false, config_file: config_file})
     refute_nil lt_agent
     assert_equal API_KEY, lt_agent.org_api_key
     assert_equal API_SECRET, lt_agent.org_secret_key
@@ -168,7 +184,6 @@ class LearningTapestryLibraryTest < WebAppJSTestBase
     lt_agent.org_secret_key = API_SECRET
     port = Capybara.current_session.server.port
     lt_agent.api_base = "http://localhost:#{port}"
-
     response = lt_agent.users
     assert response
     assert_equal 200, response[:status]

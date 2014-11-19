@@ -26,16 +26,45 @@ end
 
 # provides for transactional cleanup of activerecord activity
 class LTDBTestBase < LTTestBase
-  def setup
-    super
-    DatabaseCleaner[:active_record].strategy = :transaction
-    DatabaseCleaner[:redis].strategy = :truncation
+  def initialize(*opts)
+    super(*opts)
+    clean_using_default
+  end
+
+  # call this method to use truncation *once* for current test method
+  # system will reset to using default strategy after the test method executes
+  def clean_using_truncation
+    @pg_strategy = :truncation
+    @redis_strategy = :truncation
+    setup_db_cleaner
+  end
+
+  def clean_using_transactions
+    @pg_strategy = :transaction
+    @redis_strategy = :truncation
+    setup_db_cleaner
+  end
+
+  def clean_using_default
+    clean_using_transactions # transactions are our default cleaning strategy
+  end
+
+  def setup_db_cleaner
+    DatabaseCleaner.clean
+    DatabaseCleaner[:active_record].strategy = @pg_strategy
+    DatabaseCleaner[:redis].strategy = @redis_strategy
     DatabaseCleaner[:redis, {connection: LT::RedisServer.connection_string}] 
     # set database transaction, so we can revert seeds
     DatabaseCleaner.start
   end
+
+  def setup
+    super
+    setup_db_cleaner
+  end
   def teardown
     DatabaseCleaner.clean # cleanup of the database
+    clean_using_default
   end
 end
 

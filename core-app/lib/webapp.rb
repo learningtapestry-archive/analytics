@@ -219,7 +219,6 @@ module LT
 
     get '/api/v1/users' do
       content_type :json
-
       if params[:org_api_key].nil? or params[:org_secret_key].nil?
         status 401 # = HTTP Unauthorized
         json error: 'Organization API key (org_api_key) and secret (org_secret_key) not provided'

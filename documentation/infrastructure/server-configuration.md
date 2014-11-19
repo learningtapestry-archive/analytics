@@ -58,7 +58,8 @@ sudo chmod -R ugoa-rwx /opt/learningtapestry/core-app
 sudo chmod -R ug+rx /opt/learningtapestry/core-app
 sudo chmod -R ug+w /opt/learningtapestry/core-app/log
 sudo chmod -R ug+w /opt/learningtapestry/core-app/tmp
-sudo chmod ug+w /opt/learningtapestry/db/schema.rb 
+sudo chmod ug+w /opt/learningtapestry/core-app/db/schema.rb 
+rake db:migrate
 sudo service unicorn restart
 ```
 1. Create a new Organization
@@ -70,7 +71,14 @@ o = Organization.create(name: 'Learning Tapestry', org_api_key: SecureRandom.uui
 ```
 <script src="https://api.learningtapestry.com/api/v1/loader.js?username=stevemidgley&org_api_key=5eb4766f-34db-41d5-a1a4-29dc73ac99e2&load=collector&autostart=true"></script>
 ```
-
+1. Manually run Janitor raw message process:
+```
+cd /opt/learningtapestry/core-app
+rake lt:console
+require File::join(LT::janitor_path,'redis_postgres_extract.rb')
+LT::Janitors::RedisPostgresExtract::redis_to_raw_messages
+LT::Janitors::RawMessagesExtract::raw_messages_to_page_visits
+```
 
 # lt01-dev.betaspaces.com
 

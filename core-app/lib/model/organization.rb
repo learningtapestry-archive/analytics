@@ -12,7 +12,7 @@ class Organization < ActiveRecord::Base
       self.org_api_key = SecureRandom.uuid
     end
     if self.org_secret_key.nil? then
-      self.org_secret_key = SecureRandom.hex(36)
+      self.org_secret_key = SecureRandom.hex(18)
     end
     return true
   end

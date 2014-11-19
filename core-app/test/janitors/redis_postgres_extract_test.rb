@@ -28,7 +28,11 @@ class RedisPostgresExtractTest < LTDBTestBase
     test_msg = test_msgs.first
     # spot check in raw_messages table that the records imported correctly
     assert_equal scenario[:raw_messages][0][:action][:time], test_msg.action["time"]
+    # show this record doesn't have an org id (b/c no org_api_key in incoming raw message)
+    assert_equal nil, test_msg.organization_id
     assert !test_msg.action["time"].nil?
+
+    # spot check in raw_messages table that the records imported correctly
     # verify that raw_message_logs table entries were created as well
     logs = test_msg.raw_message_logs
     assert_equal RawMessageLog::Actions::FROM_REDIS, logs.first.action
@@ -56,6 +60,18 @@ class RedisPostgresExtractTest < LTDBTestBase
     assert_equal scenario[:raw_messages].size, RawMessage.find_new_page_visits.size
     assert_equal scenario[:raw_messages].size+1, RawMessage.all.size
 
+    # verify that org_api_key was correctly converted to Org ID for raw messages
+    # where an org api key was provided
+    test_msg = scenario[:raw_messages][4]
+    org = Organization.find_by_org_api_key(test_msg[:org_api_key])
+    raw_msg = RawMessage.where(:url => test_msg[:url])
+      .where(['org_api_key = ?', test_msg[:org_api_key]])
+      .where(:verb => 'viewed')
+      .where(:username => LT::Scenarios::Students::joe_smith_data[:username])
+      .first
+    refute_nil org.id
+    refute_nil raw_msg.id
+    assert_equal org.id, raw_msg.organization_id
 
     # convert raw_messages to appropriate page visits
     LT::Janitors::RawMessagesExtract::raw_messages_to_page_visits
@@ -86,10 +102,18 @@ class RedisPostgresExtractTest < LTDBTestBase
 
     # verify that we can find the org_api raw message as a PageVisit
     date_visited = joe_smith_org_api_raw_message.captured_at
+    username = joe_smith_org_api_raw_message.username
+    org_api_key = joe_smith_org_api_raw_message.org_api_key
+    org = Organization.find_by_org_api_key(org_api_key)
+    # find the joe smith user associated with this organization
+    org_joe_smith = User.where(username: username)
+      .where(organization_id: org.id)
+      .first
     pv = PageVisit.find_by_date_visited(date_visited)
     assert_equal date_visited, pv.date_visited
+    refute_nil org_joe_smith.id
     # username should have been translated into user id
-    assert_equal joe_smith_id, pv.user_id
+    assert_equal org_joe_smith.id, pv.user_id
 
     # verify we can find a page_visit that is aligned to a non-existing user
     date_visited = new_student_org_api_raw_message.captured_at
@@ -99,8 +123,10 @@ class RedisPostgresExtractTest < LTDBTestBase
     # username should have been translated into user id
     assert_equal new_student.id, pv.user_id
     assert new_student.id > 0
-
-
+    org_api_key = LT::Scenarios::Organizations::acme_organization_data[:org_api_key]
+    org = Organization.find_by_org_api_key(org_api_key)
+    refute_nil org.id
+    assert_equal org.id, new_student.organization_id
 
     # re-running RawMessagesExtract should not process any records
     #  this confirms that RawMessages that were processed have been correctly

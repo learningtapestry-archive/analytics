@@ -6,7 +6,7 @@ module LT
 			#  finds all records in raw_messages that haven't been processed for page_visits
 			#  translates as appropriate into page_visit records
 			#  marks these records as having been processed
-			MAX_RAW_MESSAGE_TRANSACTION_LENGTH = 200
+			MAX_RAW_MESSAGE_TRANSACTION_LENGTH = 2000
 			def raw_messages_to_page_visits
 				num_transactions = 0; num_failed = 0
 				RawMessage.transaction do
@@ -28,7 +28,7 @@ module LT
 		end; end # RawMessagesExtract
 
 		module RedisPostgresExtract class << self
-			MAX_REDIS_RAW_MESSAGE_QUEUE = 200
+			MAX_REDIS_RAW_MESSAGE_QUEUE = 2000
 			# pulls raw_messages from redis and saves them into raw_messages table
 			def redis_to_raw_messages
 				total_msg_count = 0; total_msg_failed = 0

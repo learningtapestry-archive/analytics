@@ -43,7 +43,7 @@ class PageVisit < ActiveRecord::Base
     # handle cases where user_id is missing but username is present
     # we will create a new user based on username if necessary
     if pv_data[:user_id].nil? then
-      user = User.find_or_create_by(username: raw_message[:username])
+      user = User.find_or_create_by(username: raw_message[:username], organization_id: raw_message[:organization_id])
       pv_data[:user_id] = user.id
     end
     pv_data[:page] = {

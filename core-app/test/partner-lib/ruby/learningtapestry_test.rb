@@ -84,10 +84,7 @@ class LearningTapestryLibraryTest < WebAppJSTestBase
 
   def test_obtain
     ## API calls made here
-
-    DatabaseCleaner.clean
-    DatabaseCleaner[:active_record].strategy = :truncation
-    DatabaseCleaner.start
+    clean_using_truncation
 
     ## Load up a big test fixture
 
@@ -150,7 +147,5 @@ class LearningTapestryLibraryTest < WebAppJSTestBase
     assert_equal 2, response[:results].length
     assert_equal 92, response[:results][0][:page_visits].length
     assert_equal 77, response[:results][1][:page_visits].length
-
-    DatabaseCleaner.clean
   end
 end

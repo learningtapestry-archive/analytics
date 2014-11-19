@@ -7,6 +7,12 @@ class RawMessage < ActiveRecord::Base
 
   def self.create_from_json(raw_json_msg)
     message = JSON.parse(raw_json_msg)
+    # TODO - Optimize: this makes an org query per message
+    # It should be possible to locally cache org_id's somehow to speed this up
+    org_api_key = message["org_api_key"]
+    if org_api_key then
+      message["organization_id"] = Organization.find_by_org_api_key(org_api_key).id
+    end
     retval = new_with_log(message, RawMessageLog.new_from_redis)
     retval.save
     retval

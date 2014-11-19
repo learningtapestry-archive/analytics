@@ -58,6 +58,7 @@ sudo chmod -R ugoa-rwx /opt/learningtapestry/core-app
 sudo chmod -R ug+rx /opt/learningtapestry/core-app
 sudo chmod -R ug+w /opt/learningtapestry/core-app/log
 sudo chmod -R ug+w /opt/learningtapestry/core-app/tmp
+sudo chmod ug+w /opt/learningtapestry/db/schema.rb 
 sudo service unicorn restart
 ```
 1. Create a new Organization

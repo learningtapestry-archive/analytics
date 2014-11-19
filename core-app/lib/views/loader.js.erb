@@ -6,8 +6,12 @@
  *
 */
 
-// This file is designed to be as small as possible so that it can be loaded
-// synchronously by the calling page with a simple script tag
+
+// To include this application on your web pages, use the following script tag.
+// The script tag can be placed at the bottom of your html page to minimize
+// impact on page load user experience.
+// <script src="https://api.learningtapestry.org/api/v1/loader.js?username=[your user's ID here]&org_api_key=[your org api key here]&load=collector&autostart=true"></script>
+
 // This file will load additional javascript library files as needed asynchronously
 
 // calling parameters: it is expected that this library will be called with URL parameters
@@ -18,6 +22,7 @@
 //     If autostart is not true, you can manually boot loader by calling
 //       window.lt.init(function(){//code to run when init is finished});
 //     Generally you would skip autostart if you need a callback when init is loaded
+
 
 // javascript sdk
 (function(window, undefined) {

@@ -5,6 +5,10 @@ Learning Tapestry Library for Ruby
 
 This library aides in obtaining data from the Learning Tapestry APIs.  You must have an organization API key and secret in order to use the library.  For organization setup or any questions, please contact support@learningtapestry.com.
 
+# License
+
+The Learning Tapestry Library for Ruby is licensed under The MIT License (MIT).  Please see LICENSE for more details.
+
 # Requirements
 
 Ruby 1.9.3 or later
@@ -32,6 +36,7 @@ Initialize a new agent class:
 ```
 lt_agent = LearningTapestry::Agent.new
 ```
+If present, the Learning Tapestry agent will use config.yml for configuration.
 
 or initialize with parameters:
 
@@ -40,6 +45,17 @@ lt_agent = LearningTapestry::Agent.new(org_api_key: API_KEY, entity: 'page_visit
 ```
 
 # Queries
+
+## Users
+
+```
+lt_agent = LearningTapestry::Agent.new
+lt_agent.org_api_key = '[API_KEY]'
+lt_agent.org_secret_key = '[SECRET]'
+users = lt_agent.users
+```
+
+## Site or Page Visits
 
 To issue a query, follow the syntax below.
 

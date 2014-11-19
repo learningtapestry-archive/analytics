@@ -30,7 +30,7 @@ sig () {
 
 case "$1" in
   start)
-        RAILS_ENV=$ENVIRO $DAEMON $DAEMON_ARGS
+        sudo --user nobody RAILS_ENV=$ENVIRO $DAEMON $DAEMON_ARGS
         echo "Unicorn starting using:" $DAEMON $DAEMON_ARGS
         ;;
   stop)

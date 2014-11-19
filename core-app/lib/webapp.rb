@@ -16,7 +16,7 @@ module LT
     def get_server_url
       # force https in production, otherwise mirror incoming request
       # we have to mirror incoming port in testing, b/c the port number is always changing
-      if LT::production? then
+      if LT::production?
         scheme = "https"
         port = ""
       else
@@ -34,12 +34,12 @@ module LT
 
     # TODO this is ugly - not sure how to get non-html exceptions raised in testing otherwise
     # There should be a way to get the config object from Sinatra/WebApp and configure that with these values
-    if LT::testing? then
+    if LT::testing?
       set :raise_errors, true
       set :dump_errors, false
       set :show_exceptions, false
     end
-    if LT::development? then
+    if LT::development?
       register Sinatra::Reloader
       enable :reloader
       also_reload './lib/views/*.erb'
@@ -72,7 +72,6 @@ module LT
     ### START API
     configure do
       mime_type :javascript, 'application/javascript'
-      mime_type :jpeg, 'image/jpeg'
     end
 
     get '/api/v1/service-status' do
@@ -99,7 +98,7 @@ module LT
       username = params[:username]
       org_api_key = params[:org_api_key]
       # reject this request unless org_api_key is found in Redis
-      if LT::RedisServer::org_api_key_get(org_api_key).nil? then
+      if LT::RedisServer::org_api_key_get(org_api_key).nil?
         status 401
         return
       else
@@ -142,15 +141,13 @@ module LT
     # This route handles org_api_key assert messages
     #   '/api/v1/assert-org'
     get ORG_API_KEY_ASSERT_ROUTE do
-      # we return jpeg b/c assert-org requests come via an image tag load
-      # see collector.js.erb for more detail
-      content_type :jpeg
+      content_type :javascript
       org_api_key = params[:oak]
       if !org_api_key.nil? && LT::RedisServer::has_org_api_key?(org_api_key)
         msg_string = params[:msg]
         LT::RedisServer.raw_message_push(msg_string.to_json)
         status 200
-        return ' '
+        return '{}'
       else
         status 401 
       end
@@ -178,24 +175,23 @@ module LT
       content_type :json
 
       begin
-        body_params = JSON.parse request.body.read
-        params = map_obtain_params(body_params)
+        params = map_obtain_params(JSON.parse(request.body.read))
 
-        if params[:org_api_key].nil? or params[:org_secret_key].nil? then
+        if params[:org_api_key].nil? or params[:org_secret_key].nil?
           status 401 # = HTTP Unauthorized
-          json status: 'Organization API key (org_api_key) and secret (org_secret_key) not provided'
+          json error: 'Organization API key (org_api_key) and secret (org_secret_key) not provided'
         elsif params[:usernames].nil? or !params[:usernames].is_a?(Array) or params[:usernames].length == 0
           status 400 # = HTTP Bad Request
-          json status: 'Username array (usernames) not provided'
+          json error: 'Username array (usernames) not provided'
         elsif params[:entity].nil?
           status 400 # = HTTP Bad Request
-          json status: 'Entity type (entity) not provided'
+          json error: 'Entity type (entity) not provided'
         else
           org = Organization.find_by_org_api_key(params[:org_api_key])
           if !org or org.locked or !org.verify_secret(params[:org_secret_key])
             LT::logger.warn 'Invalid org_api_key submitted or locked: ' + params[:org_api_key]
             status 401 # = HTTP Unauthorized
-            json status: 'org_api_key invalid or locked'
+            json error: 'org_api_key invalid or locked'
           else # We have a valid organization with validated secret and not locked out
               case params[:entity]
                 when 'site_visits'
@@ -207,7 +203,7 @@ module LT
                 else
                   LT::logger.warn "Unknown entity type in /api/v1/obtain, type: #{params[:entity]}"
                   status 400 # = HTTP Bad Request
-                  retval = { status: "Unknown entity type: #{params[:entity]}" }
+                  retval = { error: "Unknown entity type: #{params[:entity]}" }
               end
 
               json retval
@@ -220,6 +216,26 @@ module LT
         API_ERROR_MESSAGE
       end
     end
+
+    get '/api/v1/users' do
+      content_type :json
+      if params[:org_api_key].nil? or params[:org_secret_key].nil?
+        status 401 # = HTTP Unauthorized
+        json error: 'Organization API key (org_api_key) and secret (org_secret_key) not provided'
+      else
+        begin
+          retval = LT::Utilities::APIDataFactory.users(params[:org_api_key], params[:org_secret_key])
+          status retval[:status]
+        rescue Exception => e
+          LT::logger.error "Unknown error in /api/v1/users: #{e.message}"
+          LT::logger.error "- Backtrace: #{e.backtrace}"
+          status 500 # = HTTP Unknown Error
+          API_ERROR_MESSAGE
+        end
+        json retval
+      end
+    end
+
 
     def map_obtain_params(http_params)
       retval = {}

@@ -46,7 +46,7 @@ class LTDBTestBase < LTTestBase
   end
 
   def clean_using_default
-    clean_using_transactions
+    clean_using_transactions # transactions are our default cleaning strategy
   end
 
   def setup_db_cleaner

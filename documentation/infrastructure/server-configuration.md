@@ -59,6 +59,8 @@ sudo chmod -R ug+rx /opt/learningtapestry/core-app
 sudo chmod -R ug+w /opt/learningtapestry/core-app/log
 sudo chmod -R ug+w /opt/learningtapestry/core-app/tmp
 sudo chmod ug+w /opt/learningtapestry/core-app/db/schema.rb 
+# needs to provide sudo password for unattended install
+bundle install
 rake db:migrate
 sudo service unicorn restart
 ```

@@ -1,0 +1,12 @@
+---
+- hosts: boxen_staging
+  gather_facts: False
+  tasks:
+    - name: inventory_hostname variable
+      debug: msg={{inventory_hostname}}
+    - name: Check variable
+      debug: var=ansible_connection
+    # - name: Check variable
+    #   debug: var=groups["staging"]
+    # - name: Dump all vars
+    #   action: template src=dumpall.j2 dest=/tmp/ansible.all

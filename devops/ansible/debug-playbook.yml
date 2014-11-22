@@ -1,11 +1,18 @@
 ---
-- hosts: boxen_staging
+- hosts: boxen
+  vars:
+    ip_address: 107.170.64.223
   gather_facts: False
   tasks:
-    - name: inventory_hostname variable
-      debug: msg={{inventory_hostname}}
-    - name: Check variable
-      debug: var=ansible_connection
+  - name: inventory_hostname variable
+    debug: msg={{inventory_hostname}}
+  - name: Check variable
+    debug: var=ansible_connection
+  - name: Remove any old SSH key records for these IP/dns records
+    local_action: command rm ~/.ssh/known_hosts.old
+    local_action: command ssh-keygen -R {{ inventory_hostname }}.learningtapestry.com
+    local_action: command ssh-keygen -R {{ ip_address }}
+
     # - name: Check variable
     #   debug: var=groups["staging"]
     # - name: Dump all vars

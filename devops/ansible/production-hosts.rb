@@ -8,26 +8,29 @@ module LT
   module Ansible
     def self.production_inventory
       {
-        # 
-        :"_meta" => {
-          hostvars: {
-            web01: {
-              ansible_ssh_host: "web01.learningtapestry.com",
-              # ideally, this lives in vars/main.yml, but can't get it to work now
-              ansible_ssh_user: "root"
-            },
-            db01: {
-              ansible_ssh_host: "db01.learningtapestry.com",
-              # ideally, this lives in vars/main.yml, but can't get it to work now
-              ansible_ssh_user: "root"
-            }
+        common: {
+          hosts: [],
+          children: ["web", "db"]
+        },
+        web: {
+          hosts: [],
+          children: ["web_production"]
+        },
+        db: {
+          hosts: [],
+          children: ["db_production"]
+        },
+        web_production: {
+          hosts: ["web01"],
+          vars: {
+            ansible_connection: "ssh"
           }
         },
-        webservers: {
-          hosts: ["web01"]
-        },
-        dbservers: {
-          hosts: ["db01"]
+        db_production: {
+          hosts: ["db01"],
+          vars: {
+            ansible_connection: "ssh"
+          }
         },
       }
     end

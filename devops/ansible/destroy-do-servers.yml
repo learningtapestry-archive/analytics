@@ -4,12 +4,14 @@
 # export DO_CLIENT_ID=YOUR DIGITAL OCEAN CLIENT ID
 # export DO_API_KEY=YOUR DIGITAL OCEAN API KEY
 # To run this file:
-# ansible-playbook -i staging-hosts.rb create-staging-playbook.yml -v
+# ansible-playbook -i staging-hosts.rb destroy-do-server-playbook.yml -v
 ---
-- hosts: boxen_staging
+- hosts: common
+  vars: 
+    ansible_connection: "local"
   gather_facts: False
   tasks:
-  - name: Destroy DO Staging Web server
+  - name: Destroy DO server
     digital_ocean: >
         state=deleted
         command=droplet
@@ -17,13 +19,18 @@
         wait_timeout=500
         backups_enabled=no
         private_networking=yes
-        client_id={{ lookup('env','DO_CLIENT_ID') }}
-        api_key={{ lookup('env','DO_API_KEY') }}
-        name={{inventory_hostname}}
+        client_id="{{ lookup('env','DO_CLIENT_ID') }}"
+        api_key="{{ lookup('env','DO_API_KEY') }}"
+        name="{{inventory_hostname}}"
         ssh_key_ids=422316
         size_id=63
         region_id=4
         image_id=6918990
+  - name: Destroy DO dns record
+    digital_ocean_domain: >
+      state=absent
+      name="{{ inventory_hostname }}.learningtapestry.com"
+
 
 
 # Get SSH key info

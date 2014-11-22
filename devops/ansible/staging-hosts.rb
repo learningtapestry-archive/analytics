@@ -8,18 +8,29 @@ module LT
   module Ansible
     def self.staging_inventory
       {
-        boxen_staging: {
+        common: {
           hosts: [],
-          children: ["web_staging", "db_staging"],
-          vars: {
-            ansible_connection: "local"
-          }
+          children: ["web", "db"]
+        },
+        web: {
+          hosts: [],
+          children: ["web_staging"]
+        },
+        db: {
+          hosts: [],
+          children: ["db_staging"]
         },
         web_staging: {
-          hosts: ["web01-staging"]
+          hosts: ["web01-staging"],
+          vars: {
+            ansible_connection: "ssh"
+          }
         },
         db_staging: {
-          hosts: ["db01-staging"]
+          hosts: ["db01-staging"],
+          vars: {
+            ansible_connection: "ssh"
+          }
         }
       }
     end

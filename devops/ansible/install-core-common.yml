@@ -1,0 +1,58 @@
+# requires passlib: sudo pip install passlib
+---
+  - hosts: web
+    vars:
+      ansible_ssh_host: "{{inventory_hostname}}.learningtapestry.com"
+      ansible_ssh_user: root
+# copy public ssh key from server to .ssh known_hosts
+
+    # vars_prompt: 
+    #   - name: "deploy_password"
+    #     prompt: "Enter password for deployment user:"
+    #     private: yes
+    #     encrypt: "sha512_crypt"
+    #     confirm: no
+    #     salt_size: 7
+    tasks:
+      - shell: hostname
+
+    # - name: General | Install required packages
+    #   #apt: pkg={{ item }} state=installed update_cache=true
+    #   action: apt pkg={{ item }} state=installed update_cache=true
+    #   remote_user: ltwebadmin
+    #   with_items:
+    #     - build-essential
+    #     - unzip
+    #     - zip
+    #     - ufw
+    #     - unattended-upgrades
+    #     - postfix # used so boxes can send email
+    #     - byobu
+    #     - git
+
+    # - name: Create deploy user - sudo group
+    #   user: >
+    #     name=deploy
+    #     state=present
+    #     createhome=no
+    #     password="{{deploy_password}}"
+    #     group=sudo
+
+    # prevent deploy user from logging in (can still use for sudo)
+    # shell: passwd -l deploy
+
+    # - name: Copy the unattended-upgrades file
+    #   copy: src=roles/common/files/50unattended-upgrades dest=/etc/apt/apt.conf.d/50unattended-upgrades
+    #   copy: src=roles/common/files/20auto-upgrades dest=/etc/apt/apt.conf.d/20auto-upgrades
+
+    # - name:  UFW - Allow port 22
+    #   ufw: rule=allow port=22 proto=tcp
+
+    # - name:  UFW - Deny all others by default
+    #   ufw: policy=deny direction=incoming
+
+    # - name:  UFW - Enable logging
+    #   ufw: logging=on
+
+    # - name:  UFW - enable, deny traffic by default
+    #   ufw: state=enabled

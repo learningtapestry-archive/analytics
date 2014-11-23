@@ -33,11 +33,10 @@
       state=present
       name="{{ inventory_hostname }}.learningtapestry.com"
       ip="{{ new_server.droplet.ip_address }}"
-  - name: Remove old SSH key file entries
-    local_action: command rm ~./ssh/known_hosts.old removes=True
-    local_action: command ssh-keygen -R {{ inventory_hostname }}.learningtapestry.com
-    local_action: command rm ~./ssh/known_hosts.old removes=True
-    local_action: command ssh-keygen -R {{ new_server.droplet.ip_address }}
+  - name: Make sure to run "sudo ruby setup_local_dns.rb" if you haven't already.
+    debug: "msg=If you create or delete DNS records rapidly, you need to run that file."
+  - name: Make sure to run tasks 'remove-old-ssh.yml' to clear out your old ssh keys
+    debug: "msg=We should eventually be able to figure out how to include that playbook in this playbook..."
 
 # Get SSH key info
 # https://api.digitalocean.com/v1/ssh_keys/?client_id=[id]&api_key=[key]

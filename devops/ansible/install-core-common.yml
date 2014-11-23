@@ -1,19 +1,32 @@
-# requires passlib: sudo pip install passlib
 ---
+  # run: ansible-playbook -i staging-hosts.rb --ask-vault-pass -v install-core-common.yml 
+  #- include: remove-old-ssh.yml
   - hosts: common
+    #serial: 1
     vars:
       ansible_ssh_host: "{{inventory_hostname}}.learningtapestry.com"
       ansible_ssh_user: root
-    # vars_prompt: 
-    #   - name: "deploy_password"
-    #     prompt: "Enter password for deployment user:"
-    #     private: yes
-    #     encrypt: "sha512_crypt"
-    #     confirm: no
-    #     salt_size: 7
     tasks:
-    - shell: hostname
-
+    # secrets.yml contains "deploy_password"
+    - include_vars: ./secrets/secrets.yml
+    - name: Display hostname that we think we are running on.
+      debug: "msg='Should be: {{inventory_hostname}}'"
+    - name: Display hostname that we are running on.
+      shell: hostname
+    - name: Create deploy user - sudo group
+      user: >
+        name=deploy
+        state=absent
+        createhome=yes
+        password="{{deploy_password}}"
+        group=sudo
+        ssh_key_file=./secrets/id_lt.pub
+    # - name: Set up authorized_keys for the deploy user
+    #   authorized_key: user=deploy
+    #                   key="{{ item }}"
+    #   with_file:
+    #     - ./secrets/id_lt.pub
+    # - debug: "msg=Remember to copy ./secrets/id_lt to your ~/.ssh folder"
     # - name: General | Install required packages
     #   #apt: pkg={{ item }} state=installed update_cache=true
     #   action: apt pkg={{ item }} state=installed update_cache=true
@@ -27,17 +40,6 @@
     #     - postfix # used so boxes can send email
     #     - byobu
     #     - git
-
-    # - name: Create deploy user - sudo group
-    #   user: >
-    #     name=deploy
-    #     state=present
-    #     createhome=no
-    #     password="{{deploy_password}}"
-    #     group=sudo
-
-    # prevent deploy user from logging in (can still use for sudo)
-    # shell: passwd -l deploy
 
     # - name: Copy the unattended-upgrades file
     #   copy: src=roles/common/files/50unattended-upgrades dest=/etc/apt/apt.conf.d/50unattended-upgrades
@@ -54,3 +56,14 @@
 
     # - name:  UFW - enable, deny traffic by default
     #   ufw: state=enabled
+
+    # Example on how to collect a password from user input
+    # This goes below hosts: command (parallel to vars:)
+    # requires passlib: sudo pip install passlib
+    # vars_prompt: 
+    #   - name: "Get user input for deploy password"
+    #     prompt: "Enter password for deployment user:"
+    #     private: yes
+    #     encrypt: "sha512_crypt"
+    #     confirm: no
+    #     salt_size: 7

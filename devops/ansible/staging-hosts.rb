@@ -9,7 +9,10 @@ module LT
     def self.staging_inventory
       {
         local: {
-          hosts:["127.0.0.1"]
+          hosts:["127.0.0.1"],
+          vars: { 
+            ansible_connection: "local"
+          }
         },
         common: {
           hosts: [],

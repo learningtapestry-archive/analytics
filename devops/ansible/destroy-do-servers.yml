@@ -4,14 +4,14 @@
 # export DO_CLIENT_ID=YOUR DIGITAL OCEAN CLIENT ID
 # export DO_API_KEY=YOUR DIGITAL OCEAN API KEY
 # To run this file:
-# ansible-playbook -i staging-hosts.rb destroy-do-server-playbook.yml -v
+# ansible-playbook -i staging-hosts.rb -v destroy-do-servers.yml
 ---
 - hosts: common
   vars: 
     ansible_connection: "local"
   gather_facts: False
   tasks:
-  - name: Destroy DO server
+  - name: Destroy Digital Ocean server
     digital_ocean: >
         state=deleted
         command=droplet

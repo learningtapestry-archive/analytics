@@ -8,6 +8,9 @@ module LT
   module Ansible
     def self.staging_inventory
       {
+        local: {
+          hosts:["127.0.0.1"]
+        },
         common: {
           hosts: [],
           children: ["web", "db"]

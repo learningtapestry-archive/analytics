@@ -4,14 +4,14 @@
 # export DO_CLIENT_ID=YOUR DIGITAL OCEAN CLIENT ID
 # export DO_API_KEY=YOUR DIGITAL OCEAN API KEY
 # To run this file:
-# ansible-playbook -i staging-hosts.rb create-do-server-playbook.yml -v
+# ansible-playbook -i staging-hosts.rb -v create-do-servers.yml
 ---
 - hosts: common
   vars: 
     ansible_connection: "local"
   gather_facts: False
   tasks:
-  - name: Create DO server
+  - name: Create Digital Ocean server
     digital_ocean: >
         state=present
         command=droplet
@@ -27,16 +27,16 @@
         region_id=4
         image_id=6918990
     register: new_server
-  - name: Print name and IP to console
-    debug: "msg='Created server: {{new_server.droplet.name}} / IP: {{new_server.droplet.ip_address}}'"
-  - name: Create DO dns records
+  - debug: "msg='Created server: {{new_server.droplet.name}} / IP: {{new_server.droplet.ip_address}}'"
+  - name: Create DNS
     digital_ocean_domain: >
       state=present
       name="{{ inventory_hostname }}.learningtapestry.com"
       ip="{{ new_server.droplet.ip_address }}"
-  - name: Remove old SSH key records for these IP/dns records
-    local_action: command rm ~/.ssh/known_hosts.old
+  - name: Remove old SSH key file entries
+    local_action: command rm ~./ssh/known_hosts.old removes=True
     local_action: command ssh-keygen -R {{ inventory_hostname }}.learningtapestry.com
+    local_action: command rm ~./ssh/known_hosts.old removes=True
     local_action: command ssh-keygen -R {{ new_server.droplet.ip_address }}
 
 # Get SSH key info

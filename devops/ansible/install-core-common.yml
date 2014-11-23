@@ -1,11 +1,9 @@
 # requires passlib: sudo pip install passlib
 ---
-  - hosts: web
+  - hosts: common
     vars:
       ansible_ssh_host: "{{inventory_hostname}}.learningtapestry.com"
       ansible_ssh_user: root
-# copy public ssh key from server to .ssh known_hosts
-
     # vars_prompt: 
     #   - name: "deploy_password"
     #     prompt: "Enter password for deployment user:"
@@ -14,7 +12,7 @@
     #     confirm: no
     #     salt_size: 7
     tasks:
-      - shell: hostname
+    - shell: hostname
 
     # - name: General | Install required packages
     #   #apt: pkg={{ item }} state=installed update_cache=true

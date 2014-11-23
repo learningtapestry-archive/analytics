@@ -1,18 +1,33 @@
 ---
-- hosts: boxen
+- hosts: local
   vars:
-    ip_address: 107.170.64.223
+    ansible_connection: local
   gather_facts: False
   tasks:
-  - name: inventory_hostname variable
-    debug: msg={{inventory_hostname}}
+  # - name: Lookup server's current NS record
+  #   shell: host {{ inventory_hostname }}.learningtapestry.com ns1.digitalocean.com | grep -o address\\s.* | grep -o [0-9.]*
+  #   register: server_ip
+  # - name: inventory_hostname variable
+  #   debug: msg={{inventory_hostname}}/{{server_ip.stdout}}
+  - name: Add domain entry for ns
+    shell: host ns1.digitalocean.com | grep -o address\\s.* | grep -o [0-9.]*
+    register: ns_server_ip
+  - lineinfile: >
+      dest=/etc/dhcp/dhclient.conf
+      state=present
+      line="prepend domain-name-servers {{ns_server_ip.stdout}}"
+      insertafter="^#\s*prepend"
+    sudo: yes
+  - shell: echo sudo service network-manager restart
   - name: Check variable
     debug: var=ansible_connection
-  - name: Remove any old SSH key records for these IP/dns records
-    local_action: command rm ~/.ssh/known_hosts.old
-    local_action: command ssh-keygen -R {{ inventory_hostname }}.learningtapestry.com
-    local_action: command ssh-keygen -R {{ ip_address }}
-
+  # - name: Remove old SSH key file entries
+  #   local_action: command rm ~./ssh/known_hosts.old removes=True
+  #   local_action: command ssh-keygen -R {{ inventory_hostname }}.learningtapestry.com
+  #   local_action: command rm ~./ssh/known_hosts.old removes=True
+  #   local_action: command ssh-keygen -R {{ server_ip.stdout }}
+  - name: Confirm running to completion
+    debug: "msg=Ran to completion"
     # - name: Check variable
     #   debug: var=groups["staging"]
     # - name: Dump all vars

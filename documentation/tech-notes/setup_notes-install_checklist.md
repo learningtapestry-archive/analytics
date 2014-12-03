@@ -1,18 +1,22 @@
-Config (setting up Lubuntu):
+==Dev Box Config Checklist==
+_For setting up Lubuntu, which is a minimally configured Ubuntu)_
+
 vbox shared folder "[x]:\dev" to "/dev"
 Sym link dev to home folder
   ln -s /media/sf_dev /home/steve/dev
 Add user steve to group vboxsf
   sudo usermod -a -G vboxsf steve
 logout/in
-Install:
-*sudo apt-get install gcc
-*sudo apt-get install make
-*sudo apt-get install qt5-default
+Install core tools:
+```
+sudo apt-get install gcc
+sudo apt-get install make
+sudo apt-get install qt5-default
 sudo apt-get install libqt5webkit5-dev
 sudo apt-get -y install postgresql-9.4
 sudo apt-get -y install pgadmin3
 sudo apt-get -y  install autoconf bison build-essential libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libncurses5-dev libcurl4-openssl-dev libreadline-dev
+```
 *Ruby 1.9.3
   * Install rbenv
 ```
@@ -53,4 +57,8 @@ sudo apt-get install python-dev libxml2-dev libxslt-dev
 * Install ansible
 ```
 sudo pip install ansible
+# for managing digital ocean account via api
+sudo pip install dopy
+# for accessing keypass protected ssh files within ansible
+sudo apt-get install sshpass
 ```

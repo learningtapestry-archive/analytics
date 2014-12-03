@@ -1,3 +1,4 @@
+# ansible-playbook -i staging-hosts.rb -v remove-old-ssh.yml
 ---
 - hosts: common
   gather_facts: False
@@ -8,6 +9,7 @@
   - name: Remove old SSH key file entries
     local_action: shell host {{ inventory_hostname }}.learningtapestry.com | grep -o address\\s.* | grep -o [0-9.]*
     register: server_ip
+  - debug: "msg='Server {{inventory_hostname}} / IP: {{server_ip.stdout}}'"
   - local_action: command rm ~/.ssh/known_hosts.old removes=~/.ssh/known_hosts.old
   - local_action: command ssh-keygen -R {{ inventory_hostname }}.learningtapestry.com
   - local_action: command rm ~/.ssh/known_hosts.old removes=~/.ssh/known_hosts.old

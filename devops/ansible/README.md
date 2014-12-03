@@ -6,6 +6,10 @@ Easiest method if Python and Pip are installed:
 
 ```
 sudo pip install ansible --update
+# install sshpass to allow accessing ssh files with passphrases
+sudo apt-get install sshpass
+# for managing digital ocean account from python via api
+sudo pip install dopy
 ```
 Otherwise:
 

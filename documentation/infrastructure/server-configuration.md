@@ -6,12 +6,12 @@ Server Configuration
   1. Find keys in LastPass and follow instructions there
 1. Establish Pg tunnel:
 ```
-ssh -i ~/.ssh/id_learntap ltdbadmin@db01.learningtapestry.com -L 5432:10.132.196.50:5432
+ssh -i ~/.ssh/id_lt_admin ltdbadmin@db01.learningtapestry.com -L 5432:10.132.196.50:5432
 ```
   1. Setup pgadmin3 to connect to localhost:5432 over ssl
 1. Establish connection to prod / Redis tunnel:
 ```
-ssh -i ~/.ssh/id_learntap ltwebadmin@web01.learningtapestry.com -L 6378:localhost:6379
+ssh -i ~/.ssh/id_lt_admin ltwebadmin@web01.learningtapestry.com -L 6378:localhost:6379
 ```
   1. Setup Redis Desktop Manager to connect to localhost:6378
   1. Open multiple terminals in byobu terminal manager

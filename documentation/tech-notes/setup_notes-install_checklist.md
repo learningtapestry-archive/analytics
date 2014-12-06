@@ -52,9 +52,9 @@ cd ~/dev/learntaculous/core-app
 python 2.7 from package manager
 sudo apt-get install python-dev libxml2-dev libxslt-dev
 ```
-* Install python-pip
+* [[Install python-pip]]
 
-* Install ansible
+* [[Install ansible]]
 ```
 sudo pip install ansible
 # for managing digital ocean account via api

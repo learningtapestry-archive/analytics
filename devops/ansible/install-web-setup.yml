@@ -1,5 +1,16 @@
 ---
+  # run: 
+  #   ssh-agent bash
+  #   ssh-add ./secrets/id_deploy
+  #   ansible-playbook -i staging-hosts.rb --ask-sudo-pass install-web-setup.yml 
+  # sudo password is for user deploy
   - hosts: web
+    remote_user: deploy
+    sudo: yes
+    vars:
+      ansible_ssh_host: "{{inventory_hostname}}.learningtapestry.com"
+      ansible_ssh_user: deploy
+      ansible_ssh_private_key_file: ./secrets/id_deploy
     tasks: 
     - name: Web | Install required packages
       action: apt pkg={{ item }} state=installed update_cache=true
@@ -12,21 +23,44 @@
         - ruby1.9.1 # which is Ruby 1.9.3p484
         - ruby1.9.1-dev
 
-    - name: Create user / set password and ssh key
-      user: name=ltwebadmin comment="LT Web Admin" shell=/bin/bash group=sudo ssh_key_file=~/.ssh/id_learntap.pub password="$1$1t5s@1t$OSvZtoB0KwOqgjAfK1/vZ/"
-    # To generate:  openssl passwd -salt '1t5s@1t' -1 'password'
+    - name: Alter nobody user to belong to www-data group
+      user: >
+        name=nobody
+        state=present
+        groups=www-data
+
+    - name: permanently set environment variable RAILS_ENV
+      lineinfile: >
+        state=present
+        dest=/etc/environment
+        insertafter=EOF
+        line='RAILS_ENV={{lt_env}}'
+    - lineinfile: >
+        state=present
+        dest=/home/{{item}}/.bashrc
+        insertafter=EOF
+        line='export RAILS_ENV={{lt_env}}'
+      with_items: 
+        - lt_admin
+        - deploy
 
     - name:  Allow port 443 with UFW
       ufw: rule=allow port=443 proto=tcp
 
     - name: Copy Nginx configuration for Unicorn proxy
-      copy: src=nginx.conf dest=/etc/nginx/nginx.conf owner=root group=root
+      copy: src=./roles/web/files/nginx.conf dest=/etc/nginx/nginx.conf owner=root group=root
 
-    - name: Copy Unicorn init.d startup script
-      copy: src=unicorn.initd dest=/etc/init.d/unicorn owner=root group=root
+    - name: Create/Copy Unicorn init.d startup script from template
+      template: >
+        src=./roles/web/files/unicorn.initd.j2
+        dest=/etc/init.d/unicorn
+        owner=root
+        group=root
+        mode=0751
 
     - name: Install Bundler
       gem: name=bundler state=present user_install=no
 
     - name: Install Unicorn
       gem: name=unicorn state=present user_install=no
+    - shell: /usr/sbin/update-rc.d -f unicorn defaults

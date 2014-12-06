@@ -81,6 +81,15 @@ require File::join(LT::janitor_path,'redis_postgres_extract.rb')
 LT::Janitors::RedisPostgresExtract::redis_to_raw_messages
 LT::Janitors::RawMessagesExtract::raw_messages_to_page_visits
 ```
+1. Reload Postgres configuration
+  1. Login to db server
+```
+sudo -u postgres /usr/lib/postgresql/9.3/bin/pg_ctl reload -D /var/lib/postgresql/9.3/main
+```
+1. To interact with PG via psql on command line from server
+```
+sudo -u postgres psql
+```
 
 # lt01-dev.betaspaces.com
 

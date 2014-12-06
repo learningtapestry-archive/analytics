@@ -11,7 +11,7 @@
   tasks:
   # secrets.yml contains do_client_id/do_api_key
   - include_vars: ./secrets/secrets.yml
-  - name: Create Digital Ocean server
+  - name: Create Digital Ocean server (this will take a while...)
     digital_ocean: >
         state=present
         command=droplet
@@ -42,8 +42,6 @@
       regexp="{{ inventory_hostname }}.learningtapestry.com"
       line="{{new_server.droplet.ip_address}} {{ inventory_hostname }}.learningtapestry.com"
     when: "'staging' in inventory_hostname"
-  - name: Make sure to run tasks 'remove-old-ssh.yml' to clear out your old ssh keys
-    debug: "msg=We should eventually be able to figure out how to include that playbook in this playbook..."
 
 # Get SSH key info
 # https://api.digitalocean.com/v1/ssh_keys/?client_id=[id]&api_key=[key]

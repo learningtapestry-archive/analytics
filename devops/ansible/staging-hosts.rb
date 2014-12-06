@@ -29,13 +29,15 @@ module LT
         web_staging: {
           hosts: ["web01-staging"],
           vars: {
-            ansible_connection: "ssh"
+            ansible_connection: "ssh",
+            lt_env: "staging"
           }
         },
         db_staging: {
           hosts: ["db01-staging"],
           vars: {
-            ansible_connection: "ssh"
+            ansible_connection: "ssh",
+            lt_env: "staging"
           }
         }
       }

@@ -1,23 +1,20 @@
 ---
-  # run: ansible-playbook -i staging-hosts.rb --ask-vault-pass install-core-common.yml 
-  #- include: remove-old-ssh.yml
+  # run: 
+  #   ssh-agent bash
+  #   ssh-add ./secrets/id_deploy
+  #   ansible-playbook -i staging-hosts.rb --ask-sudo-pass install-common-setup.yml 
+  # sudo password is for user deploy
   - hosts: common
-    #serial: 1
+    remote_user: deploy
+    sudo: yes
     vars:
       ansible_ssh_host: "{{inventory_hostname}}.learningtapestry.com"
       ansible_ssh_user: deploy
       ansible_ssh_private_key_file: ./secrets/id_deploy
     tasks:
-    # secrets.yml contains "deploy_password"
-    - include_vars: ./secrets/secrets.yml
-    - name: Display hostname that we think we are running on.
-      debug: "msg='Should be: {{inventory_hostname}}'"
-    - name: Display hostname that we are running on.
-      shell: hostname
-    - name: General | Install required packages
+    - name: General | Install required packages (this will take awhile..)
       #apt: pkg={{ item }} state=installed update_cache=true
       action: apt pkg={{ item }} state=installed update_cache=true
-      remote_user: ltwebadmin
       with_items:
         - build-essential
         - unzip
@@ -30,7 +27,7 @@
 
     - name: Copy the unattended-upgrades file
       copy: src=roles/common/files/50unattended-upgrades dest=/etc/apt/apt.conf.d/50unattended-upgrades
-      copy: src=roles/common/files/20auto-upgrades dest=/etc/apt/apt.conf.d/20auto-upgrades
+    - copy: src=roles/common/files/20auto-upgrades dest=/etc/apt/apt.conf.d/20auto-upgrades
 
     - name:  UFW - Allow port 22
       ufw: rule=allow port=22 proto=tcp
@@ -44,13 +41,3 @@
     - name:  UFW - enable, deny traffic by default
       ufw: state=enabled
 
-    # Example on how to collect a password from user input
-    # This goes below hosts: command (parallel to vars:)
-    # requires passlib: sudo pip install passlib
-    # vars_prompt: 
-    #   - name: "Get user input for deploy password"
-    #     prompt: "Enter password for deployment user:"
-    #     private: yes
-    #     encrypt: "sha512_crypt"
-    #     confirm: no
-    #     salt_size: 7

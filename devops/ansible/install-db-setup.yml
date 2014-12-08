@@ -1,0 +1,72 @@
+---
+  # run: 
+  #   ssh-agent bash
+  #   ssh-add ./secrets/id_deploy
+  #   ansible-playbook -i staging-hosts.rb --ask-vault-pass --ask-sudo-pass install-db-setup.yml 
+  # sudo password is for user deploy
+  - hosts: common
+    vars:
+      ansible_ssh_host: "{{inventory_hostname}}.learningtapestry.com"
+      ansible_ssh_user: deploy
+      ansible_ssh_private_key_file: ./secrets/id_deploy
+    tasks:
+    - debug: "msg='Collecting facts for server: {{inventory_hostname}}'"
+  - hosts: db
+    gather_facts: False
+    remote_user: deploy
+    sudo: yes
+    vars:
+      ansible_ssh_host: "{{inventory_hostname}}.learningtapestry.com"
+      ansible_ssh_user: deploy
+      ansible_ssh_private_key_file: ./secrets/id_deploy
+    tasks:
+    # vault holds lt_dbo_password
+    - include_vars: "./secrets/{{lt_env}}_secrets.yml"
+    - name: Web | Install required packages
+      action: apt pkg={{ item }} state=installed update_cache=true
+      with_items:
+        - postgresql-9.3
+        - postgresql-common
+        - postgresql-server-dev-9.3
+        - postgresql-contrib
+    - name: Copy postgres configuration files
+      template: >
+        src=./roles/db/files/pg_hba.conf.j2
+        dest=/etc/postgresql/9.3/main/pg_hba.conf
+        owner=postgres
+    - template: >
+        src=./roles/db/files/postgresql.conf.j2
+        dest=/etc/postgresql/9.3/main/postgresql.conf
+        owner=postgres
+    - name:  UFW - Allow private network PG access from all machines in app cluster
+      ufw: >
+        rule=allow
+        port=5432
+        proto=tcp 
+        to_ip="{{ansible_eth1["ipv4"]["address"]}}"
+        from_ip="{{hostvars[item]['ansible_eth1']['ipv4']['address']}}"
+      with_items: groups.common
+    - name: Create postgres lt_dbo user
+      shell: 'psql -c "SELECT ''already_exists'' FROM pg_catalog.pg_user WHERE usename = ''lt_dbo''"'
+      sudo_user: postgres
+      register: user_exists
+    - shell: 'psql -c "CREATE USER lt_dbo WITH LOGIN ENCRYPTED PASSWORD ''{{lt_dbo_password}}''"'
+      when: user_exists.stdout.find('already_exists') == -1
+      sudo_user: postgres
+    - name: Create lt_tablespace
+      shell: 'psql -c "SELECT ''already_exists'' FROM pg_tablespace WHERE spcname = ''lt_tablespace''"'
+      sudo_user: postgres
+      register: ts_exists
+    - shell: 'psql -c "CREATE TABLESPACE lt_tablespace OWNER lt_dbo LOCATION ''/var/lib/postgresql/9.3/main''"'
+      when: ts_exists.stdout.find('already_exists') == -1
+      sudo_user: postgres
+    - name: create lt database for this environment
+      shell: 'psql -c "SELECT ''already_exists'' FROM pg_database WHERE datname = ''lt_{{lt_env}}_db''"'
+      sudo_user: postgres
+      register: db_exists
+    - shell: 'psql -c "CREATE DATABASE lt_{{lt_env}}_db WITH OWNER=lt_dbo ENCODING=''UTF8'' TABLESPACE=lt_tablespace"'
+      when: db_exists.stdout.find('already_exists') == -1
+      sudo_user: postgres
+    - name: Restart PG server to incorporate changes
+      shell: /usr/lib/postgresql/9.3/bin/pg_ctl restart -D /var/lib/postgresql/9.3/main
+      sudo_user: postgres

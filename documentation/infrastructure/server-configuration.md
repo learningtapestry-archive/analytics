@@ -6,12 +6,12 @@ Server Configuration
   1. Find keys in LastPass and follow instructions there
 1. Establish Pg tunnel:
 ```
-ssh -i ~/.ssh/id_learntap ltdbadmin@db01.learningtapestry.com -L 5432:10.132.196.50:5432
+ssh -i ~/.ssh/id_lt_admin ltdbadmin@db01.learningtapestry.com -L 5432:10.132.196.50:5432
 ```
   1. Setup pgadmin3 to connect to localhost:5432 over ssl
 1. Establish connection to prod / Redis tunnel:
 ```
-ssh -i ~/.ssh/id_learntap ltwebadmin@web01.learningtapestry.com -L 6378:localhost:6379
+ssh -i ~/.ssh/id_lt_admin ltwebadmin@web01.learningtapestry.com -L 6378:localhost:6379
 ```
   1. Setup Redis Desktop Manager to connect to localhost:6378
   1. Open multiple terminals in byobu terminal manager
@@ -59,6 +59,8 @@ sudo chmod -R ug+rx /opt/learningtapestry/core-app
 sudo chmod -R ug+w /opt/learningtapestry/core-app/log
 sudo chmod -R ug+w /opt/learningtapestry/core-app/tmp
 sudo chmod ug+w /opt/learningtapestry/core-app/db/schema.rb 
+# needs to provide sudo password for unattended install
+bundle install
 rake db:migrate
 sudo service unicorn restart
 ```
@@ -78,6 +80,15 @@ rake lt:console
 require File::join(LT::janitor_path,'redis_postgres_extract.rb')
 LT::Janitors::RedisPostgresExtract::redis_to_raw_messages
 LT::Janitors::RawMessagesExtract::raw_messages_to_page_visits
+```
+1. Reload Postgres configuration
+  1. Login to db server
+```
+sudo -u postgres /usr/lib/postgresql/9.3/bin/pg_ctl reload -D /var/lib/postgresql/9.3/main
+```
+1. To interact with PG via psql on command line from server
+```
+sudo -u postgres psql
 ```
 
 # lt01-dev.betaspaces.com

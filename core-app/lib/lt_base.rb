@@ -87,7 +87,8 @@ module LT
       LT::web_root_path = File::expand_path(File::join(LT::root_dir, '/web-public'))
       LT::web_asset_path = File::expand_path(File::join(LT::web_root_path, '/assets'))
       LT::partner_lib_path = File::expand_path(File::join(LT::root_dir, '/partner-lib'))
-      LT::tmp_path = Dir::tmpdir
+      local_tmp = File::expand_path(File::join(LT::root_dir, '/tmp'))
+      LT::tmp_path = File::exists?(local_tmp) ? local_tmp : Dir::tmpdir
 
       LT::message_path = File::expand_path(File::join(LT::root_dir, '/log/messages'))
       unless File.directory?(LT::message_path)

@@ -1,0 +1,22 @@
+# run:
+# ansible-playbook -i staging-hosts.rb remove-old-ssh.yml
+---
+- hosts: common
+  gather_facts: False
+  sudo: no
+  serial: 1
+  vars: 
+    ansible_connection: "local"
+  tasks:
+  - local_action: shell touch ~/.ssh/known_hosts
+  - name: Remove old SSH key file entries
+    local_action: shell host {{ inventory_hostname }}.learningtapestry.com | grep -o address\\s.* | grep -o [0-9.]*
+    register: server_ip
+  - local_action: command rm -f ~/.ssh/known_hosts.old
+  - local_action: command ssh-keygen -R {{ inventory_hostname }}.learningtapestry.com
+  - local_action: command rm -f ~/.ssh/known_hosts.old
+  - local_action: command ssh-keygen -R {{ server_ip.stdout }}
+  - local_action: command rm -f ~/.ssh/known_hosts.old
+  - name: Add new ssh fingerprints to known_hosts
+    local_action: shell ssh-keyscan -H {{inventory_hostname}}.learningtapestry.com >> ~/.ssh/known_hosts
+  - local_action: shell ssh-keyscan -H {{server_ip.stdout}} >> ~/.ssh/known_hosts

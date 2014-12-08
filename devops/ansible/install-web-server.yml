@@ -1,0 +1,47 @@
+---
+  # run: 
+  #   ssh-agent bash
+  #   ssh-add ./secrets/id_deploy
+  #   ansible-playbook -i staging-hosts.rb --ask-sudo-pass install-web-setup.yml 
+  # sudo password is for user deploy
+  - hosts: web
+    remote_user: deploy
+    sudo: yes
+    vars:
+      ansible_ssh_host: "{{inventory_hostname}}.learningtapestry.com"
+      ansible_ssh_user: deploy
+      ansible_ssh_private_key_file: ./secrets/id_deploy
+    tasks: 
+    - name: Install Nginx prerequisites
+      shell: sudo apt-get update
+    - shell: sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 561F9B9CAC40B2F7
+    - shell: touch /etc/apt/sources.list.d/passenger.list
+    - lineinfile: >
+        state=present
+        insertafter=EOF
+        dest=/etc/apt/sources.list.d/passenger.list
+        line="deb https://oss-binaries.phusionpassenger.com/apt/passenger trusty main"
+    - shell: "sudo chown root:root /etc/apt/sources.list.d/passenger.list"
+    - shell: sudo chmod 600 /etc/apt/sources.list.d/passenger.list
+    - shell: sudo apt-get update
+    - action: apt pkg={{ item }} state=installed update_cache=true
+      with_items:
+        - nginx-extras
+        - passenger
+    - shell: rm -f /etc/nginx/sites-enabled/*
+    - copy: src='./roles/web/files/nginx.learningtap.{{lt_env}}.conf' dest='/etc/nginx/sites-enabled/'
+
+# sudo apt-get install passenger
+# # uncomment lines from /etc/nginx/nginx.conf
+#   => passenger_root / passenger_ruby
+# # or if passenger_root line doesn't exist:
+#   shell: /usr/bin/passenger-config --root
+#   register: pass
+#   shell: passenger_root {{pass.stdout}}
+
+# sudo apt get install libcurl4-gnutls-dev
+
+# # sudo apt-get remove nginx nginx-full nginx-light nginx-naxsi nginx-common
+# passenger-install-nginx-module --auto --auto-download --languages ruby
+
+# verify passenger is working: passenger-memory-stats

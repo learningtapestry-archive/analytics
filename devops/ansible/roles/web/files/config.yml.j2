@@ -1,0 +1,24 @@
+# to add a new db environment, create it here and then run
+# rake db:create RAILS_ENV=[name of new env]
+staging:
+  adapter: postgresql
+  encoding: UTF8
+  database: lt_staging_db
+  pool: 25
+{% for host in groups['db'] %}
+  host: {{ hostvars[host]['ansible_eth1']['ipv4']['address'] }}
+{% endfor %}
+  port: 5432
+  username: lt_dbo
+  password: {{lt_dbo_password}}
+production:
+  adapter: postgresql
+  encoding: UTF8
+  database: lt_prod_db
+  pool: 25
+{% for host in groups['db'] %}
+  host: {{ hostvars[host]['ansible_eth1']['ipv4']['address'] }}
+{% endfor %}
+  port: 5432
+  username: lt_dbo
+  password: {{lt_dbo_password}}

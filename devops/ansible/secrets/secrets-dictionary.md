@@ -9,3 +9,4 @@ Keys included in secrets.yml
 Environment specific:
 * lt_dbo_password:
   * Note: this password should not contain special chars - use alpha/num only (make it as long as you like)
+* ssl_cert_password:

@@ -10,7 +10,7 @@
   tasks:
   - local_action: shell touch ~/.ssh/known_hosts
   - name: Remove old SSH key file entries
-    local_action: shell host {{ inventory_hostname }}.learningtapestry.com | grep -o address\\s.* | grep -o [0-9.]*
+    local_action: shell getent hosts {{ inventory_hostname }}.learningtapestry.com | grep -o ^[0-9\.]*
     register: server_ip
   - local_action: command rm -f ~/.ssh/known_hosts.old
   - local_action: command ssh-keygen -R {{ inventory_hostname }}.learningtapestry.com

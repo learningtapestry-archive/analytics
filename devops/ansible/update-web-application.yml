@@ -43,7 +43,7 @@
         owner=nobody
     - local_action: "shell rm -rf {{temp_folder.stdout}}"
       sudo: no
-    - shell: "tar xzvf core-app.tar.gz"
+    - shell: "tar xzf core-app.tar.gz"
       args:
         chdir: /opt/learningtapestry
     - name: Set up code base configuration files
@@ -54,7 +54,7 @@
         force=yes
         group=www-data
         owner=nobody
-    - name: Install AR config.yml template
+    - name: Install database config.yml template
       template: >
         src=./roles/web/files/config.yml.j2
         dest=/opt/learningtapestry/core-app/db/config.yml
@@ -93,4 +93,5 @@
       sudo_user: nobody
     - shell: nginx -s reload
     - shell: service nginx restart
-
+    # nginx log files at: /var/log/nginx
+    # TODO: add cron job for janitors

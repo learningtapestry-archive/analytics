@@ -41,7 +41,7 @@
       state=present
       regexp="{{ inventory_hostname }}.learningtapestry.com"
       line="{{new_server.droplet.ip_address}} {{ inventory_hostname }}.learningtapestry.com"
-    when: "'staging' in inventory_hostname"
+    when: "lt_env == 'staging'"
 
 # Get SSH key info
 # https://api.digitalocean.com/v1/ssh_keys/?client_id=[id]&api_key=[key]

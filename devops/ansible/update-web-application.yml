@@ -91,5 +91,6 @@
       args:
         chdir: /opt/learningtapestry/core-app
       sudo_user: nobody
-    - shell: service unicorn restart
+    - shell: nginx -s reload
+    - shell: service nginx restart
 

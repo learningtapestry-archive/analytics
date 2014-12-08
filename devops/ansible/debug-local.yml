@@ -1,41 +1,23 @@
 ---
-  #   ssh-agent bash
-  #   ssh-add ./secrets/id_deploy
-  #   ansible-playbook -i staging-hosts.rb debug-playbook.yml 
-- hosts: web
+- hosts: common
+  serial: 1
   vars:
-    ansible_ssh_host: "{{inventory_hostname}}.learningtapestry.com"
-    ansible_ssh_user: deploy
-    ansible_ssh_private_key_file: ./secrets/id_deploy
+    ansible_connection: "local"
+  gather_facts: False
   tasks:
-  # - include_vars: ./secrets/secrets.yml
-  # - include_vars: "./secrets/{{lt_env}}_secrets.yml"
-  - debug: "msg=hello"
-  - debug: "msg=Staging"
-    when: "lt_env == 'staging'" 
-  # - debug: "msg='{{hostvars[item]['ansible_eth1']['ipv4']['address']}}'"
-  #   with_items: groups.db
-# - hosts: db
-#   gather_facts: False
-#   vars:
-#     ansible_ssh_host: "{{inventory_hostname}}.learningtapestry.com"
-#     ansible_ssh_user: deploy
-#     ansible_ssh_private_key_file: ./secrets/id_deploy
-#   tasks:
-#   - debug: "msg='{{hostvars[item]['ansible_eth1']['ipv4']['address']}}'"
-#     with_items: groups.common
-  # - name: Update PG access template
-  #   template: >
-  #     src=./roles/db/files/pg_hba.conf.j2
-  #     dest=/etc/postgresql/9.3/main/pg_hba.conf
-  #     owner=postgres
-  #   sudo: yes
+  - include_vars: ./secrets/secrets.yml
+  - debug: "msg='api {{do_api_key}}'"
+  - shell: "openssl passwd -salt '{{password_salt}}' -1 '{{lt_admin_password}}'"
+    register: encpass
+  - debug: "msg='encpass {{encpass.stdout}}'"
   # - name: Add new hosts file entry for server
   #   lineinfile: >
   #     dest=/etc/hosts
   #     state=present
   #     regexp="{{ inventory_hostname }}.learningtapestry.com"
   #     line="10.0.0.1 {{ inventory_hostname }}.learningtapestry.com"
+  #   when: "'staging' in inventory_hostname"
+  # - debug: msg="      regexp={{ inventory_hostname }}.learningtapestry.com"
 # ---
 # - hosts: local
 #   vars:

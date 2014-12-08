@@ -1,13 +1,15 @@
 # run:
-  #   ssh-agent bash
-  #   ssh-add ./secrets/id_deploy
-  #   ssh-add ./secrets/id_lt_admin
-  #   ansible-playbook -i staging-hosts.rb --ask-vault-pass --ask-sudo-pass complete_rebuild.yml 
+  #  BE CAREFUL WITH THIS LINE: ansible-playbook -i staging-hosts.rb --ask-vault-pass destroy-do-servers.yml
+  #  ansible-playbook -i staging-hosts.rb --ask-vault-pass create-do-servers.yml
+  #  ansible-playbook -i staging-hosts.rb remove-old-ssh.yml
+  #  ssh-agent bash
+  #  ssh-add ./secrets/id_deploy
+  #  ssh-add ./secrets/id_lt_admin
+  #  ansible-playbook -i staging-hosts.rb --ask-vault-pass --ask-sudo-pass complete-rebuild.yml 
 ---
-  # - include: create-do-servers.yml
-  # - include: remove-old-ssh.yml
   - include: install-common-users.yml
   - include: install-common-setup.yml
   - include: install-db-setup.yml
   - include: install-web-setup.yml
+  - include: install-web-server.yml
   - include: update-web-application.yml

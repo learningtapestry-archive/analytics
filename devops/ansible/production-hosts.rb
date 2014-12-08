@@ -30,12 +30,14 @@ module LT
           hosts: ["web01"],
           vars: {
             ansible_connection: "ssh"
+            lt_env: "production"
           }
         },
         db_production: {
           hosts: ["db01"],
           vars: {
             ansible_connection: "ssh"
+            lt_env: "production"
           }
         },
       }

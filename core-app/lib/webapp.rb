@@ -80,7 +80,7 @@ module LT
       redis_up = LT::RedisServer.ping
       database_up = LT::ping_db
 
-      json database: database_up, redis: redis_up
+      json({database: database_up, redis: redis_up, current_time: Time::now.to_s })
     end
 
     get '/api/v1/common.js' do

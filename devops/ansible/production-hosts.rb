@@ -27,16 +27,16 @@ module LT
           children: ["db_production"]
         },
         web_production: {
-          hosts: ["web01"],
+          hosts: ["web01-prod"],
           vars: {
-            ansible_connection: "ssh"
+            ansible_connection: "ssh",
             lt_env: "production"
           }
         },
         db_production: {
-          hosts: ["db01"],
+          hosts: ["db01-prod"],
           vars: {
-            ansible_connection: "ssh"
+            ansible_connection: "ssh",
             lt_env: "production"
           }
         },

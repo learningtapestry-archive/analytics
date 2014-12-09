@@ -14,7 +14,7 @@ staging:
 production:
   adapter: postgresql
   encoding: UTF8
-  database: lt_prod_db
+  database: lt_production_db
   pool: 25
 {% for host in groups['db'] %}
   host: {{ hostvars[host]['ansible_eth1']['ipv4']['address'] }}

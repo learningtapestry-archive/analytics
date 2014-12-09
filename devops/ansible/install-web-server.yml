@@ -14,43 +14,43 @@
     tasks: 
     # vault holds ssl_cert_password
     - include_vars: "./secrets/{{lt_env}}_secrets.yml"
-  #   - name: Install Nginx prerequisites
-  #     shell: sudo apt-get update
-  #   - shell: sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 561F9B9CAC40B2F7
-  #   - shell: touch /etc/apt/sources.list.d/passenger.list
-  #   - lineinfile: >
-  #       state=present
-  #       insertafter=EOF
-  #       dest=/etc/apt/sources.list.d/passenger.list
-  #       line="deb https://oss-binaries.phusionpassenger.com/apt/passenger trusty main"
-  #   - shell: "sudo chown root:root /etc/apt/sources.list.d/passenger.list"
-  #   - shell: sudo chmod 600 /etc/apt/sources.list.d/passenger.list
-  #   - shell: sudo apt-get update
-  #   - action: apt pkg={{ item }} state=installed update_cache=true
-  #     with_items:
-  #       - nginx-extras
-  #       - passenger
-  #   - shell: rm -f /etc/nginx/sites-enabled/*
-  #   - copy: src='./roles/web/files/nginx.learningtap.{{lt_env}}.conf' dest='/etc/nginx/sites-enabled/'
-  #   - copy: >
-  #       src=./roles/web/files/nginx.conf
-  #       dest=/etc/nginx/nginx.conf
-  # # To verify if passenger is working: passenger-memory-stats
+    - name: Install Nginx prerequisites
+      shell: sudo apt-get update
+    - shell: sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 561F9B9CAC40B2F7
+    - shell: touch /etc/apt/sources.list.d/passenger.list
+    - lineinfile: >
+        state=present
+        insertafter=EOF
+        dest=/etc/apt/sources.list.d/passenger.list
+        line="deb https://oss-binaries.phusionpassenger.com/apt/passenger trusty main"
+    - shell: "sudo chown root:root /etc/apt/sources.list.d/passenger.list"
+    - shell: sudo chmod 600 /etc/apt/sources.list.d/passenger.list
+    - shell: sudo apt-get update
+    - action: apt pkg={{ item }} state=installed update_cache=true
+      with_items:
+        - nginx-extras
+        - passenger
+    - shell: rm -f /etc/nginx/sites-enabled/*
+    - copy: src='./roles/web/files/nginx.learningtap.{{lt_env}}.conf' dest='/etc/nginx/sites-enabled/'
+    - copy: >
+        src=./roles/web/files/nginx.conf
+        dest=/etc/nginx/nginx.conf
+  # To verify if passenger is working: passenger-memory-stats
 
-  # # Install ssl certs in production
-  # # certs should be located at /learntap/secrets/ssl/learntap-ssl-production-certs.tar.gz.gpg
-  # # cert should be encrypted with gpg using aes256, with a passphrase stored in 
-  # # production_secrets.yml under key ssl_cert_password. CLI to encrypt is:
-  # # tar -C [folder to ssl certs] -czf learntap-ssl-production-certs.tar.gz --owner=root --group=root --mode=0400 .
-  # # gpg --symmetric --cipher-algo aes256 learntap-ssl-production-certs.tar.gz
-  #   - shell: mkdir -p /etc/nginx/ssl
-  #     when: "lt_env == 'production'"
-  #   - shell: chown root:root /etc/nginx/ssl
-  #     when: "lt_env == 'production'"
-  #   - shell: chmod ugoa-rwx /etc/nginx/ssl
-  #     when: "lt_env == 'production'"
-  #   - shell: chmod u+r /etc/nginx/ssl
-  #     when: "lt_env == 'production'"
+  # Install ssl certs in production
+  # certs should be located at /learntap/secrets/ssl/learntap-ssl-production-certs.tar.gz.gpg
+  # cert should be encrypted with gpg using aes256, with a passphrase stored in 
+  # production_secrets.yml under key ssl_cert_password. CLI to encrypt is:
+  # tar -C [folder to ssl certs] -czf learntap-ssl-production-certs.tar.gz --owner=root --group=root --mode=0400 .
+  # gpg --symmetric --cipher-algo aes256 learntap-ssl-production-certs.tar.gz
+    - shell: mkdir -p /etc/nginx/ssl
+      when: "lt_env == 'production'"
+    - shell: chown root:root /etc/nginx/ssl
+      when: "lt_env == 'production'"
+    - shell: chmod ugoa-rwx /etc/nginx/ssl
+      when: "lt_env == 'production'"
+    - shell: chmod u+r /etc/nginx/ssl
+      when: "lt_env == 'production'"
     - copy: >
         src="~/learntap/secrets/ssl/learntap-ssl-production-certs.tar.gz.gpg"
         dest="/etc/nginx/ssl"

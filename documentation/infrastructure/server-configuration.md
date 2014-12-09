@@ -32,11 +32,9 @@ sudo more /etc/nginx/nginx.conf
 ```
 sudo nginx -s reload
 ```
-1. Managing Unicorn
+1. Restart nginx
 ```
-sudo service unicorn start
-sudo service unicorn stop
-sudo service unicorn restart
+sudo service nginx restart
 ```
 1. Restart server
 ```
@@ -90,7 +88,11 @@ sudo -u postgres /usr/lib/postgresql/9.3/bin/pg_ctl reload -D /var/lib/postgresq
 ```
 sudo -u postgres psql
 ```
-
+1. Cron job to run janitor
+```
+sudo crontab -e
+*/5 * * * * sudo --user nobody --non-interactive echo && cd /opt/learningtapestry/core-app && /usr/local/bin/rake RAILS_ENV=production lt:janitors:process_redis_messages > /opt/learningtapestry/core-app/log/cron-redis-janitor.txt 2> /tmp/err-cron-redis-janitor.txt
+```
 # lt01-dev.betaspaces.com
 
 ## Role: Test/Development Server

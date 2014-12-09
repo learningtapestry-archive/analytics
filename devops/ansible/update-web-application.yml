@@ -86,7 +86,7 @@
       # This line simply gets the default gem path
       shell: gem environment | grep -Pzo 'GEM PATHS.*\n\s+-\s+.*' | grep -o /.*$
       register: gem_path
-    - shell: "chown -R nobody:www-data {{gem_path.stdout}}"
+    - shell: chown -R nobody:www-data {{gem_path.stdout}}
     - shell: export RAILS_ENV={{lt_env}} && rake db:migrate
       args:
         chdir: /opt/learningtapestry/core-app
@@ -94,4 +94,9 @@
     - shell: nginx -s reload
     - shell: service nginx restart
     # nginx log files at: /var/log/nginx
-    # TODO: add cron job for janitors
+    # */5 * * * * sudo --user nobody --non-interactive echo && cd /opt/learningtapestry/core-app && /usr/local/bin/rake RAILS_ENV=production lt:janitors:process_redis_messages > /opt/learningtapestry/core-app/log/cron-redis-janitor.txt 2> /tmp/err-cron-redis-janitor.txt
+    - cron: >
+        minute=*/5
+        job="sudo --user nobody --non-interactive echo && cd /opt/learningtapestry/core-app && /usr/local/bin/rake RAILS_ENV=production lt:janitors:process_redis_messages > /opt/learningtapestry/core-app/log/cron-redis-janitor.txt 2> /tmp/err-cron-redis-janitor.txt"
+        state=present
+        name=lt:janitors:process_redis_messages

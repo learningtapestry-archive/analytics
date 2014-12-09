@@ -52,7 +52,7 @@ module LT
     # model_path holds the folder where our models are stored
     # test_path holds folder where the tests are stored
     attr_accessor :run_env,:logger, :root_dir, :model_path, 
-      :test_path, :seed_path, :lib_path, :db_path, :tmp_path, 
+      :test_path, :seed_path, :lib_path, :db_path, :tmp_path, :log_path,
       :message_path, :janitor_path, :web_root_path, :web_asset_path, :partner_lib_path
 
     def boot_all(app_root_dir = File::join(File::dirname(__FILE__),'..'))
@@ -89,7 +89,8 @@ module LT
       LT::partner_lib_path = File::expand_path(File::join(LT::root_dir, '/partner-lib'))
       local_tmp = File::expand_path(File::join(LT::root_dir, '/tmp'))
       LT::tmp_path = File::exists?(local_tmp) ? local_tmp : Dir::tmpdir
-
+      local_log = File::expand_path(File::join(LT::root_dir, '/log'))
+      LT::log_path = File::exists?(local_log) ? local_log : LT::tmp_path
       LT::message_path = File::expand_path(File::join(LT::root_dir, '/log/messages'))
       unless File.directory?(LT::message_path)
         FileUtils.mkdir_p(LT::message_path)

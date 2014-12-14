@@ -2,7 +2,7 @@
   # run: 
   #   ssh-agent bash
   #   ssh-add ./secrets/id_deploy
-  #   ansible-playbook -i staging-hosts.rb --ask-vault-pass --ask-sudo-pass install-web-setup.yml 
+  #   ansible-playbook -i [lt_env]-hosts.rb --ask-vault-pass --ask-sudo-pass install-web-server.yml 
   # sudo password is for user deploy
   - hosts: web
     remote_user: deploy

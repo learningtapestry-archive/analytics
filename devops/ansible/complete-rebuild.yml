@@ -14,6 +14,13 @@
   #  ssh-add ./secrets/id_deploy
   #  ssh-add ./secrets/id_lt_admin
   #  ansible-playbook -i production-hosts.rb --ask-vault-pass --ask-sudo-pass complete-rebuild.yml 
+  # CI/TEST
+  #  ansible-playbook -i ci-hosts.rb --ask-vault-pass create-do-servers.yml
+  #  ansible-playbook -i ci-hosts.rb remove-old-ssh.yml
+  #  ssh-agent bash
+  #  ssh-add ./secrets/id_deploy
+  #  ssh-add ./secrets/id_lt_admin
+  #  ansible-playbook -i ci-hosts.rb --ask-vault-pass --ask-sudo-pass complete-rebuild.yml 
 ---
   - include: install-common-users.yml
   - include: install-common-setup.yml

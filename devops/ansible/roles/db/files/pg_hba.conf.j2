@@ -25,4 +25,10 @@ host    all             all             127.0.0.1/32            md5
 # Server in cluser, IP access for md5:
 #   hostvars[host]['ansible_eth1']['ipv4']['address']
 host    lt_{{lt_env}}_db      lt_dbo          {{ hostvars[host]['ansible_eth1']['ipv4']['address'] }}/32        md5
+{% if lt_env in 'test' %}
+# we have to permit postgres db access for test server b/c of 
+# some automagic in ActiveRecord. During database drop/create 
+# functions, AR seems to access postgres DB without instruction to do so
+host    postgres      lt_dbo          {{ hostvars[host]['ansible_eth1']['ipv4']['address'] }}/32        md5
+{% endif %}
 {% endfor %}

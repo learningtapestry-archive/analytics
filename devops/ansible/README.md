@@ -6,11 +6,30 @@ Easiest method if Python and Pip are installed:
 
 ```
 sudo pip install ansible --update
-# install sshpass to allow accessing ssh files with passphrases
+# install sshpass to allow accessing ssh files with passphrases (not 100% sure if this is still needed)
 sudo apt-get install sshpass
 # for managing digital ocean account from python via api
 sudo pip install dopy
 ```
+
+## Notes on setting up a new environment (new inventory file)
+* Must handle tests for staging/production or other conditionals throughout
+* Create new inventory file based on production/staging
+* Files to customize for a new environment:
+  * web files:
+    * nginx.learningtap.{{lt_env}}.conf
+    * config.yml.j2
+    * redis.yml
+```  
+  * Secrets: {{lt_env}}-secrets.yml file
+    * Be sure to encrypt with ansible-vault after creating (using Ansible vault p/w in LastPass)
+```
+lt_dbo_password
+```
+  * Adjust Gem installer to include new lt_env case in update-web-application.yml
+  * Adjust cron installer in update-web-application.yml
+
+## OLD Info
 Otherwise:
 
 Easy install for Mac and Linux machines, follow: http://docs.ansible.com/intro_installation.html

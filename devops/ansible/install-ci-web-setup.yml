@@ -1,0 +1,73 @@
+    # this is a playbook fragment - it must be included in a full playbook to be run
+    # secrets.yml contains "git_deploy_token"
+    - include_vars: ./secrets/secrets.yml
+    - name:  Allow port 3333 with UFW in test (for CI server)
+      ufw: rule=allow port=3333 proto=tcp
+
+    - name: Web | Install required packages (test env requirements)
+      action: apt pkg={{ item }} state=installed update_cache=true
+      with_items:
+        - qt5-default
+        - libqt5webkit5-dev
+
+    - name: Install phantomjs (for test env)
+      shell: wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-linux-x86_64.tar.bz2
+      args:
+        chdir: /usr/local/share
+    - shell: tar xjf phantomjs-1.9.7-linux-x86_64.tar.bz2
+      args:
+        chdir: /usr/local/share
+      # link new install to location on the path
+    - shell: ln -s -f /usr/local/share/phantomjs-1.9.7-linux-x86_64/bin/phantomjs /usr/local/share/phantomjs &&  ln -s -f /usr/local/share/phantomjs-1.9.7-linux-x86_64/bin/phantomjs /usr/local/bin/phantomjs
+      args:
+        chdir: /usr/local/share
+
+    - name: Install Bundler
+      gem: name=bundler state=present user_install=no
+
+    # add to sudoers for all inventories
+    - name: Permit lt_admin to run bundle with no password on CI server
+      lineinfile: >
+        dest=/etc/sudoers
+        insertbefore=EOF
+        regexp=""
+        line="lt_admin ALL=(ALL) NOPASSWD: /usr/bin/bundle"
+    - name: Install cruise control CI server
+      shell: mkdir -p /usr/local/share/cruise_control
+    - shell: git init .
+      args: 
+        chdir: /usr/local/share/cruise_control
+    - shell: git pull https://github.com/thoughtworks/cruisecontrol.rb/
+      args: 
+        chdir: /usr/local/share/cruise_control
+    - shell: bundle install
+      args: 
+        chdir: /usr/local/share/cruise_control
+    - copy: >
+        src="./roles/web/files/site_config.rb"
+        dest=/home/lt_admin/.cruise
+        mode="0550"
+        force=yes
+        group=root
+        owner=lt_admin
+    - lineinfile: >
+        dest=/etc/rc.local
+        regexp=""
+        insertbefore="^exit"
+        line="sudo -u lt_admin /usr/local/share/cruise_control/cruise start"
+    - shell: chmod uga+r /usr/local/share/cruise_control/cruise
+    - shell: chown -R lt_admin:root /usr/local/share/cruise_control
+    - shell: rm -rf /home/lt_admin/.cruise/learning_tapestry
+    - shell: ruby cruise add learning_tapestry -r https://{{git_deploy_token}}@github.com/science/learntaculous.git -s git
+      sudo_user: lt_admin
+      args: 
+        chdir: /usr/local/share/cruise_control
+    - copy: >
+        src="./roles/web/files/cruise_control.rb"
+        dest=/home/lt_admin/.cruise/projects/learning_tapestry
+        mode="0550"
+        force=yes
+        group=root
+        owner=lt_admin
+    - name: Start Cruise Control server (will restart on reboot)
+      shell: sudo -u lt_admin /usr/local/share/cruise_control/cruise start

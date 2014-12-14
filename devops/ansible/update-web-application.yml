@@ -77,9 +77,16 @@
     - shell: chmod -R oa-rwx /opt/learningtapestry
     - shell: chmod -R ug+rwx /opt/learningtapestry
       # This will install gems but as root, unfortunately
-    - name: Install Ruby Gems via Bundler
+    - name: Install Ruby Gems via Bundler (for production/staging)
       shell: rm -rf /opt/learningtapestry/core-app/.bundle
-      shell: bundle install --without dev_test
+    - shell: bundle install --without dev_test
+      when: lt_env == 'staging' or lt_env == 'production'
+      args:
+        chdir: /opt/learningtapestry/core-app
+    - name: Install Ruby Gems via Bundler (for test/dev)
+      shell: rm -rf /opt/learningtapestry/core-app/.bundle
+    - shell: bundle install
+      when: lt_env == 'test'
       args:
         chdir: /opt/learningtapestry/core-app
     - name: Chown ruby gems to be accessible by nobody:www-data (though root gems seem to work fine)
@@ -100,3 +107,5 @@
         job="sudo --user nobody --non-interactive echo && cd /opt/learningtapestry/core-app && /usr/local/bin/rake RAILS_ENV=production lt:janitors:process_redis_messages > /opt/learningtapestry/core-app/log/cron-redis-janitor.txt 2> /tmp/err-cron-redis-janitor.txt"
         state=present
         name=lt:janitors:process_redis_messages
+      when: lt_env=='staging' or lt_env=='production'
+    # update Organizations table in redis?

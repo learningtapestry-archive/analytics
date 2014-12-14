@@ -2,7 +2,7 @@
   # run: 
   #   ssh-agent bash
   #   ssh-add ./secrets/id_deploy
-  #   ansible-playbook -i staging-hosts.rb --ask-sudo-pass install-web-setup.yml 
+  #   ansible-playbook -i [lt_env]-hosts.rb --ask-sudo-pass install-web-setup.yml 
   # sudo password is for user deploy
   - hosts: web
     remote_user: deploy
@@ -60,7 +60,8 @@
 
     - name:  Allow port 80 with UFW in staging
       ufw: rule=allow port=80 proto=tcp
-      when: lt_env == 'staging'
+      when: lt_env == 'staging' 
 
-    - name: Install Bundler
-      gem: name=bundler state=present user_install=no
+    - include: install-ci-web-setup.yml
+      when: lt_env == 'test'
+

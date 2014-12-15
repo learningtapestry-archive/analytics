@@ -2,7 +2,6 @@ gem "minitest"
 require 'minitest/autorun'
 require 'rack/test'
 require 'nokogiri'
-require 'debugger'
 require 'database_cleaner'
 require 'capybara'
 require 'capybara/poltergeist'

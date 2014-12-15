@@ -69,14 +69,6 @@
         - lt_admin
         - deploy
 
-    - name:  Allow port 443 with UFW in production
-      ufw: rule=allow port=443 proto=tcp
-      when: lt_env == 'production'
-
-    - name:  Allow port 80 with UFW in staging
-      ufw: rule=allow port=80 proto=tcp
-      when: lt_env == 'staging' 
-
     - include: fragment-install-ci-web-setup.yml
       when: lt_env == 'test'
 

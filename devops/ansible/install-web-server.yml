@@ -37,6 +37,15 @@
         dest=/etc/nginx/nginx.conf
       # To verify if passenger is working run: passenger-memory-stats
 
+    - name:  Allow port 443 with UFW in production
+      ufw: rule=allow port=443 proto=tcp
+      when: lt_env == 'production'
+
+    - name:  Allow port 80 with UFW in staging or CI
+      ufw: rule=allow port=80 proto=tcp
+      when: lt_env == 'staging'  or lt_env == 'test'
+
+
     - include: fragment-install-web-ssl-keys.yml
       when: "lt_env == 'production'"
 

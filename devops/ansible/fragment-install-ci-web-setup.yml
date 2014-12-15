@@ -3,8 +3,6 @@
     - include_vars: ./secrets/secrets.yml
     - name:  Allow port 3333 access for CI server interface
       ufw: rule=allow port=3333 proto=tcp
-    - name:  Allow port 80 access for test/sandbox code access
-      ufw: rule=allow port=80 proto=tcp
 
     - name: Web | Install required packages (test env requirements)
       action: apt pkg={{ item }} state=installed update_cache=true

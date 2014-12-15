@@ -5,8 +5,9 @@ require 'sinatra/reloader'
 require 'digest'
 require 'chronic'
 require 'chronic_duration'
-require 'pry'
-require 'pry-debugger'
+# SM: commented out b/c they may break CI/test environment
+# require 'pry'
+# require 'pry-debugger'
 
 require '../../partner-lib/ruby/lib/learning_tapestry'
 

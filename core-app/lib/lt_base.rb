@@ -109,6 +109,7 @@ module LT
         require 'pry'
         require 'pry-debugger'
         require 'pry-stack_explorer'
+        require 'debugger'
       end
     end
 

@@ -62,6 +62,6 @@
       ufw: rule=allow port=80 proto=tcp
       when: lt_env == 'staging' 
 
-    - include: install-ci-web-setup.yml
+    - include: fragment-install-ci-web-setup.yml
       when: lt_env == 'test'
 

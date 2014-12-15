@@ -14,7 +14,7 @@
 # 
 ActionMailer::Base.smtp_settings = {
   :address =>        "localhost",
-  :domain =>         "webdb01-ci.learningtapestry.com",
+  :domain =>         "localhost",
 }
 #
 # If you have no SMTP server at hand, you can configure email notification to use GMail SMTP server, as follows

@@ -59,13 +59,13 @@
       # This will install gems but as root, unfortunately
     - name: Install Ruby Gems via Bundler (for production/staging)
       shell: "rm -rf {{code_install_folder}}/core-app/.bundle"
-    - shell: bundle install --without dev_test
+    - shell: bundle install --without dev_test debugger
       when: lt_env == 'staging' or lt_env == 'production'
       args:
         chdir: "{{code_install_folder}}/core-app"
     - name: Install Ruby Gems via Bundler (for test/dev)
       shell: "rm -rf {{code_install_folder}}/core-app/.bundle"
-    - shell: bundle install
+    - shell: bundle install --without debugger
       when: lt_env == 'test'
       args:
         chdir: "{{code_install_folder}}/core-app"
@@ -79,7 +79,9 @@
         chdir: "{{code_install_folder}}/core-app"
       sudo_user: nobody
     - shell: nginx -s reload
+      when: lt_env != 'test'
     - shell: service nginx restart
+      when: lt_env != 'test'
     # nginx log files at: /var/log/nginx
     # */5 * * * * sudo --user nobody --non-interactive echo && cd /opt/learningtapestry/core-app && /usr/local/bin/rake RAILS_ENV=production lt:janitors:process_redis_messages > /opt/learningtapestry/core-app/log/cron-redis-janitor.txt 2> /tmp/err-cron-redis-janitor.txt
     - name: Install Janitor cron to pull from redis to PG

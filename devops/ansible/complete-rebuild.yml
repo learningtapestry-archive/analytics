@@ -6,6 +6,7 @@
   #  ssh-agent bash
   #  ssh-add ./secrets/id_deploy
   #  ssh-add ./secrets/id_lt_admin
+  #  ssh -i secrets/id_lt_admin root@webdb01-ci.learningtapestry.com # then exit immediately
   #  ansible-playbook -i staging-hosts.rb --ask-vault-pass --ask-sudo-pass complete-rebuild.yml 
   # PRODUCTION
   #  ansible-playbook -i production-hosts.rb --ask-vault-pass --ask-sudo-pass create-do-servers.yml
@@ -13,6 +14,7 @@
   #  ssh-agent bash
   #  ssh-add ./secrets/id_deploy
   #  ssh-add ./secrets/id_lt_admin
+  #  ssh -i secrets/id_lt_admin root@webdb01-ci.learningtapestry.com # then exit immediately
   #  ansible-playbook -i production-hosts.rb --ask-vault-pass --ask-sudo-pass complete-rebuild.yml 
   # CI/TEST
   #  ansible-playbook -i ci-hosts.rb --ask-vault-pass create-do-servers.yml
@@ -20,6 +22,7 @@
   #  ssh-agent bash
   #  ssh-add ./secrets/id_deploy
   #  ssh-add ./secrets/id_lt_admin
+  #  ssh -i secrets/id_lt_admin root@webdb01-ci.learningtapestry.com # then exit immediately
   #  ansible-playbook -i ci-hosts.rb --ask-vault-pass --ask-sudo-pass complete-rebuild.yml 
 ---
   - include: install-common-users.yml

@@ -24,6 +24,7 @@
         size_id=63
         region_id=4
         image_id=6918990
+    when: lt_env != 'production'
   - name: Destroy DO dns record
     digital_ocean_domain: >
       state=absent

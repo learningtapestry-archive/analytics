@@ -18,8 +18,6 @@
         - postgresql-client-9.3
         - libpq-dev
         - redis-server
-        - ruby1.9.1 # which is Ruby 1.9.3p484
-        - ruby1.9.1-dev
         - libssl-dev
         - libyaml-dev
         - libreadline-dev
@@ -33,6 +31,22 @@
         - apt-transport-https
         - ca-certificates
 
+    - shell: which ruby && echo "exists" || echo "not installed"
+      register: ruby_installed
+    - name: Install lastest 1.9.3 Ruby if no ruby installed (this is slow..)
+      shell: wget http://cache.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p551.tar.gz
+      args: 
+        chdir: /tmp
+      when: ruby_installed.stdout.find('exists') == -1
+    - shell: tar xzf ruby-1.9.3-p551.tar.gz
+      args: 
+        chdir: /tmp
+      when: ruby_installed.stdout.find('exists') == -1
+    - shell: ./configure && make && sudo make install
+      args: 
+        chdir: /tmp/ruby-1.9.3-p551
+      when: ruby_installed.stdout.find('exists') == -1
+
     - name: Alter nobody user to belong to www-data group
       user: >
         name=nobody
@@ -42,9 +56,10 @@
     - name: permanently set environment variable RAILS_ENV
       lineinfile: >
         state=present
-        dest=/etc/environment
+        dest=/etc/profile.d/ruby_environment.sh
+        create=yes
         insertafter=EOF
-        line='RAILS_ENV={{lt_env}}\nexport RACK_ENV={{lt_env}}'
+        line='export RAILS_ENV={{lt_env}}\nexport RACK_ENV={{lt_env}}'
     - lineinfile: >
         state=present
         dest=/home/{{item}}/.bashrc

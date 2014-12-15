@@ -15,6 +15,9 @@
 ActionMailer::Base.smtp_settings = {
   :address =>        "localhost",
   :domain =>         "localhost",
+  :openssl_verify_mode => 'none',
+  :enable_starttls_auto => false,
+  :authentication       => "plain"
 }
 #
 # If you have no SMTP server at hand, you can configure email notification to use GMail SMTP server, as follows

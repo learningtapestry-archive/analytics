@@ -11,6 +11,7 @@ Install core tools:
 ```
 sudo apt-get install gcc
 sudo apt-get install make
+# next two lines required by capybara-webkit
 sudo apt-get install qt5-default
 sudo apt-get install libqt5webkit5-dev
 sudo apt-get -y install postgresql-9.4

@@ -10,6 +10,7 @@
       ansible_ssh_user: deploy
       ansible_ssh_private_key_file: ./secrets/id_deploy
     tasks:
+      # This is just a stub task to give this inventory run something to do
     - debug: "msg='Collecting facts for server: {{inventory_hostname}}'"
   - hosts: web
     gather_facts: False
@@ -20,83 +21,4 @@
       ansible_ssh_user: deploy
       ansible_ssh_private_key_file: ./secrets/id_deploy
     tasks: 
-    # secrets.yml contains "git_deploy_token"
-    - include_vars: ./secrets/secrets.yml
-    # vault holds lt_dbo_password
-    - include_vars: "./secrets/{{lt_env}}_secrets.yml"
-    - name: Install current code base
-      local_action: "shell mktemp -d"
-      sudo: no
-      register: temp_folder
-    - local_action: "shell git init {{temp_folder.stdout}}"
-      sudo: no
-    - local_action: "shell cd {{temp_folder.stdout}} && git pull https://{{git_deploy_token}}@github.com/science/learntaculous.git"
-      sudo: no
-    - local_action: "shell cd {{temp_folder.stdout}} && tar czf core-app.tar.gz --exclude-vcs --owner=nobody --group=www-data --mode=0550 core-app/"
-      sudo: no
-    - copy: >
-        src="{{temp_folder.stdout}}/core-app.tar.gz"
-        dest=/opt/learningtapestry/
-        mode="0550"
-        force=yes
-        group=www-data
-        owner=nobody
-    - local_action: "shell rm -rf {{temp_folder.stdout}}"
-      sudo: no
-    - shell: "tar xzf core-app.tar.gz"
-      args:
-        chdir: /opt/learningtapestry
-    - name: Set up code base configuration files
-      copy: >
-        src="./roles/web/files/log4r.yml"
-        dest=/opt/learningtapestry/core-app/db/
-        mode="0550"
-        force=yes
-        group=www-data
-        owner=nobody
-    - name: Install database config.yml template
-      template: >
-        src=./roles/web/files/config.yml.j2
-        dest=/opt/learningtapestry/core-app/db/config.yml
-        owner=nobody
-        group=www-data
-        mode="0550"
-    - name: Install redis.yml config file
-      copy: >
-        src="./roles/web/files/redis.yml"
-        dest=/opt/learningtapestry/core-app/db/
-        mode="0550"
-        force=yes
-        group=www-data
-        owner=nobody
-    - name: Adjust file access rights to code base
-      shell: mkdir -p /opt/learningtapestry/core-app/log
-    - shell: mkdir -p /opt/learningtapestry/core-app/tmp
-    - shell: mkdir -p /opt/learningtapestry/core-app/pids
-    - shell: chown -R nobody:www-data /opt/learningtapestry
-    - shell: chmod -R oa-rwx /opt/learningtapestry
-    - shell: chmod -R ug+rwx /opt/learningtapestry
-      # This will install gems but as root, unfortunately
-    - name: Install Ruby Gems via Bundler
-      shell: rm -rf /opt/learningtapestry/core-app/.bundle
-      shell: bundle install --without dev_test
-      args:
-        chdir: /opt/learningtapestry/core-app
-    - name: Chown ruby gems to be accessible by nobody:www-data (though root gems seem to work fine)
-      # This line simply gets the default gem path
-      shell: gem environment | grep -Pzo 'GEM PATHS.*\n\s+-\s+.*' | grep -o /.*$
-      register: gem_path
-    - shell: chown -R nobody:www-data {{gem_path.stdout}}
-    - shell: export RAILS_ENV={{lt_env}} && rake db:migrate
-      args:
-        chdir: /opt/learningtapestry/core-app
-      sudo_user: nobody
-    - shell: nginx -s reload
-    - shell: service nginx restart
-    # nginx log files at: /var/log/nginx
-    # */5 * * * * sudo --user nobody --non-interactive echo && cd /opt/learningtapestry/core-app && /usr/local/bin/rake RAILS_ENV=production lt:janitors:process_redis_messages > /opt/learningtapestry/core-app/log/cron-redis-janitor.txt 2> /tmp/err-cron-redis-janitor.txt
-    - cron: >
-        minute=*/5
-        job="sudo --user nobody --non-interactive echo && cd /opt/learningtapestry/core-app && /usr/local/bin/rake RAILS_ENV=production lt:janitors:process_redis_messages > /opt/learningtapestry/core-app/log/cron-redis-janitor.txt 2> /tmp/err-cron-redis-janitor.txt"
-        state=present
-        name=lt:janitors:process_redis_messages
+    - include: fragment-update-web-application.yml code_install_folder=/opt/learningtapestry

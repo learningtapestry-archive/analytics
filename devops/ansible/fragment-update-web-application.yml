@@ -1,0 +1,92 @@
+# takes a parameter "code_install_folder"
+# e.g., - include: fragment-update-web-application.yml code_install_folder=/opt/learningtapestry
+    # secrets.yml contains "git_deploy_token"
+    - include_vars: ./secrets/secrets.yml
+    # vault holds lt_dbo_password
+    - include_vars: "./secrets/{{lt_env}}_secrets.yml"
+    - name: Install current code base
+      local_action: "shell mktemp -d"
+      sudo: no
+      register: temp_folder
+    - local_action: "shell git init {{temp_folder.stdout}}"
+      sudo: no
+    - local_action: "shell cd {{temp_folder.stdout}} && git pull https://{{git_deploy_token}}@github.com/science/learntaculous.git"
+      sudo: no
+    - local_action: "shell cd {{temp_folder.stdout}} && tar czf core-app.tar.gz --exclude-vcs --owner=nobody --group=www-data --mode=0550 core-app/"
+      sudo: no
+    - copy: >
+        src="{{temp_folder.stdout}}/core-app.tar.gz"
+        dest="{{code_install_folder}}/"
+        mode="0550"
+        force=yes
+        group=www-data
+        owner=nobody
+    - local_action: "shell rm -rf {{temp_folder.stdout}}"
+      sudo: no
+    - shell: "tar xzf core-app.tar.gz"
+      args:
+        chdir: "{{code_install_folder}}"
+    - name: Set up code base configuration files
+      copy: >
+        src="./roles/web/files/log4r.yml"
+        dest="{{code_install_folder}}/core-app/db/"
+        mode="0550"
+        force=yes
+        group=www-data
+        owner=nobody
+    - name: Install database config.yml template
+      template: >
+        src=./roles/web/files/config.yml.j2
+        dest="{{code_install_folder}}/core-app/db/config.yml"
+        owner=nobody
+        group=www-data
+        mode="0550"
+    - name: Install redis.yml config file
+      copy: >
+        src="./roles/web/files/redis.yml"
+        dest="{{code_install_folder}}/core-app/db/"
+        mode="0550"
+        force=yes
+        group=www-data
+        owner=nobody
+    - name: Adjust file access rights to code base
+      shell: "mkdir -p {{code_install_folder}}/core-app/log"
+    - shell: "mkdir -p {{code_install_folder}}/core-app/tmp"
+    - shell: "mkdir -p {{code_install_folder}}/core-app/pids"
+    - shell: "chown -R nobody:www-data {{code_install_folder}}"
+    - shell: "chmod -R oa-rwx {{code_install_folder}}"
+    - shell: "chmod -R ug+rwx {{code_install_folder}}"
+      # This will install gems but as root, unfortunately
+    - name: Install Ruby Gems via Bundler (for production/staging)
+      shell: "rm -rf {{code_install_folder}}/core-app/.bundle"
+    - shell: bundle install --without dev_test
+      when: lt_env == 'staging' or lt_env == 'production'
+      args:
+        chdir: "{{code_install_folder}}/core-app"
+    - name: Install Ruby Gems via Bundler (for test/dev)
+      shell: "rm -rf {{code_install_folder}}/core-app/.bundle"
+    - shell: bundle install
+      when: lt_env == 'test'
+      args:
+        chdir: "{{code_install_folder}}/core-app"
+    - name: Chown ruby gems to be accessible by nobody:www-data (though root gems seem to work fine)
+      # This line simply gets the default gem path
+      shell: gem environment | grep -Pzo 'GEM PATHS.*\n\s+-\s+.*' | grep -o /.*$
+      register: gem_path
+    - shell: chown -R nobody:www-data {{gem_path.stdout}}
+    - shell: export RAILS_ENV={{lt_env}} && rake db:migrate
+      args:
+        chdir: "{{code_install_folder}}/core-app"
+      sudo_user: nobody
+    - shell: nginx -s reload
+    - shell: service nginx restart
+    # nginx log files at: /var/log/nginx
+    # */5 * * * * sudo --user nobody --non-interactive echo && cd /opt/learningtapestry/core-app && /usr/local/bin/rake RAILS_ENV=production lt:janitors:process_redis_messages > /opt/learningtapestry/core-app/log/cron-redis-janitor.txt 2> /tmp/err-cron-redis-janitor.txt
+    - name: Install Janitor cron to pull from redis to PG
+      cron: >
+        minute=*/5
+        job="sudo --user nobody --non-interactive echo && cd {{code_install_folder}}/core-app && /usr/local/bin/rake RAILS_ENV=production lt:janitors:process_redis_messages > {{code_install_folder}}/core-app/log/cron-redis-janitor.txt 2> {{code_install_folder}}/err-cron-redis-janitor.txt"
+        state=present
+        name=lt:janitors:process_redis_messages
+      when: lt_env=='staging' or lt_env=='production'
+    # update Organizations table in redis?

@@ -1,0 +1,19 @@
+  # Install ssl certs in production
+  # certs should be located at /learntap/secrets/ssl/learntap-ssl-production-certs.tar.gz.gpg
+  # cert should be encrypted with gpg using aes256, with a passphrase stored in 
+  # production_secrets.yml under key ssl_cert_password. CLI to encrypt is:
+  # tar -C [folder to ssl certs] -czf learntap-ssl-production-certs.tar.gz --owner=root --group=root --mode=0400 .
+  # gpg --symmetric --cipher-algo aes256 learntap-ssl-production-certs.tar.gz
+    - shell: mkdir -p /etc/nginx/ssl
+    - shell: chown root:root /etc/nginx/ssl
+    - shell: chmod ugoa-rwx /etc/nginx/ssl
+    - shell: chmod u+r /etc/nginx/ssl
+    - copy: >
+        src="~/learntap/secrets/ssl/learntap-ssl-production-certs.tar.gz.gpg"
+        dest="/etc/nginx/ssl"
+    - shell: echo {{ssl_cert_password}} | gpg --passphrase-fd 0 -d learntap-ssl-production-certs.tar.gz.gpg > learntap-ssl-production-certs.tar.gz
+      args:
+        chdir: /etc/nginx/ssl
+    - shell: tar xzf /etc/nginx/ssl/learntap-ssl-production-certs.tar.gz
+      args:
+        chdir: /etc/nginx/ssl

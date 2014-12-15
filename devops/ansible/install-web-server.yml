@@ -2,7 +2,7 @@
   # run: 
   #   ssh-agent bash
   #   ssh-add ./secrets/id_deploy
-  #   ansible-playbook -i staging-hosts.rb --ask-vault-pass --ask-sudo-pass install-web-setup.yml 
+  #   ansible-playbook -i [lt_env]-hosts.rb --ask-vault-pass --ask-sudo-pass install-web-server.yml 
   # sudo password is for user deploy
   - hosts: web
     remote_user: deploy
@@ -35,33 +35,9 @@
     - copy: >
         src=./roles/web/files/nginx.conf
         dest=/etc/nginx/nginx.conf
-  # To verify if passenger is working: passenger-memory-stats
+      # To verify if passenger is working run: passenger-memory-stats
 
-  # Install ssl certs in production
-  # certs should be located at /learntap/secrets/ssl/learntap-ssl-production-certs.tar.gz.gpg
-  # cert should be encrypted with gpg using aes256, with a passphrase stored in 
-  # production_secrets.yml under key ssl_cert_password. CLI to encrypt is:
-  # tar -C [folder to ssl certs] -czf learntap-ssl-production-certs.tar.gz --owner=root --group=root --mode=0400 .
-  # gpg --symmetric --cipher-algo aes256 learntap-ssl-production-certs.tar.gz
-    - shell: mkdir -p /etc/nginx/ssl
+    - include: fragment-install-web-ssl-keys.yml
       when: "lt_env == 'production'"
-    - shell: chown root:root /etc/nginx/ssl
-      when: "lt_env == 'production'"
-    - shell: chmod ugoa-rwx /etc/nginx/ssl
-      when: "lt_env == 'production'"
-    - shell: chmod u+r /etc/nginx/ssl
-      when: "lt_env == 'production'"
-    - copy: >
-        src="~/learntap/secrets/ssl/learntap-ssl-production-certs.tar.gz.gpg"
-        dest="/etc/nginx/ssl"
-      when: "lt_env == 'production'"
-    - shell: echo {{ssl_cert_password}} | gpg --passphrase-fd 0 -d learntap-ssl-production-certs.tar.gz.gpg > learntap-ssl-production-certs.tar.gz
-      when: "lt_env == 'production'"
-      args:
-        chdir: /etc/nginx/ssl
-      when: "lt_env == 'production'"
-    - shell: tar xzf /etc/nginx/ssl/learntap-ssl-production-certs.tar.gz
-      args:
-        chdir: /etc/nginx/ssl
-      when: "lt_env == 'production'"
+
 

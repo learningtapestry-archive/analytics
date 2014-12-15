@@ -1,5 +1,10 @@
 # configuration file for Redis similar to db/config.yml, however does not
 # process migrations or seeds
+test:
+  url: redis://127.0.0.1:6379/0
+  queue_raw_messages: "queue-raw_messages-test"
+  hashlist_api_keys: "list-api_keys-test"
+  hashlist_org_api_keys: "hashlist_org_api_keys"
 staging:
   url: redis://127.0.0.1:6379/1
   queue_raw_messages: "queue-raw_messages-test"

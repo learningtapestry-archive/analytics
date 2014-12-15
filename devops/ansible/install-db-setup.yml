@@ -53,6 +53,10 @@
     - shell: 'psql -c "CREATE USER lt_dbo WITH LOGIN ENCRYPTED PASSWORD ''{{lt_dbo_password}}''"'
       when: user_exists.stdout.find('already_exists') == -1
       sudo_user: postgres
+    - name: Give user CREATEDB rights (in test env)
+      shell: 'psql -c "ALTER USER lt_dbo WITH CREATEDB"'
+      sudo_user: postgres
+      when: lt_env == 'test'
     - name: Create lt_tablespace
       shell: 'psql -c "SELECT ''already_exists'' FROM pg_tablespace WHERE spcname = ''lt_tablespace''"'
       sudo_user: postgres

@@ -35,15 +35,14 @@
       ip="{{ new_server.droplet.ip_address }}"
       client_id="{{do_client_id}}"
       api_key="{{do_api_key}}"
-  # Google dns won't resolve non-existent servers, so we have to put add
-  # Hosts file records for DO servers as they are created
-  - name: Add/replace hosts file entry on local computer 
-    lineinfile: >
-      dest=/etc/hosts
-      state=present
-      regexp="{{ inventory_hostname }}.learningtapestry.com"
-      line="{{new_server.droplet.ip_address}} {{ inventory_hostname }}.learningtapestry.com"
-    sudo: yes
+  # Hosts file records for DO servers as they are created (only necessary if you destroy/create servers rapidly)
+  # - name: Add/replace hosts file entry on local computer 
+  #   lineinfile: >
+  #     dest=/etc/hosts
+  #     state=present
+  #     regexp="{{ inventory_hostname }}.learningtapestry.com"
+  #     line="{{new_server.droplet.ip_address}} {{ inventory_hostname }}.learningtapestry.com"
+  #   sudo: yes
 # Get SSH key info
 # https://api.digitalocean.com/v1/ssh_keys/?client_id=[id]&api_key=[key]
 # {"status":"OK","ssh_keys":[{"id":422316,"name":"Learning Tapestry Public Key"}]}

@@ -19,7 +19,6 @@ gem 'activerecord', '~> 4.1.6'
 gem 'actionview', '~> 4.1.6'
 gem 'sinatra', '~> 1.4.5'
 gem 'sinatra-contrib', '~> 1.4.2'
-gem 'unicorn', '~> 4.8.3'
 
 # additional gems (probably can accept new major versions without breaking)
 gem 'log4r', '>= 1.1.10'
@@ -44,21 +43,22 @@ group :dev_test do
   # gems requiring version control
   gem 'capybara', '~> 2.4.3'
   gem 'thin', '~> 1.6.3' # development
-  
   # gems that probably don't need version control
   gem 'minitest', '>= 5.4.0'
   gem 'rerun', '>=0.10.0' # process reload agent, helpful for sinatra development
   gem 'database_cleaner', '>= 1.3.0'
-  gem 'debugger', '>=1.6.8'
   # poltgereist depends on phantomjs being installed on system
   # sudo apt-get install phantomjs
   gem 'poltergeist', '>= 1.5.1'
   gem 'pry', '>=0.10.1'
-  gem 'pry-debugger', '>=0.2.3'
-  gem 'pry-stack_explorer', '>=0.4.9.1'
   gem 'launchy' # required by capybara to open web browser automatically
   gem 'selenium-webdriver', '>=2.43.0'
   # capybara-webkit requires qt install
   # sudo apt-get install libqt4-dev
   gem 'capybara-webkit', '>=1.3.1'
+end
+group :debugger do
+  gem 'debugger'
+  gem 'pry-debugger', '>=0.2.3'
+  gem 'pry-stack_explorer', '>=0.4.9.1'
 end

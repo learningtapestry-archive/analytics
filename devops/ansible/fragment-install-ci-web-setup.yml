@@ -12,17 +12,22 @@
         - qt5-default
         - libqt5webkit5-dev
 
+    - shell: which phantomjs && echo "exists" || echo "not installed"
+      register: phantomjs_installed
     - name: Install phantomjs (for test env)
       shell: wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-linux-x86_64.tar.bz2
       args:
         chdir: /usr/local/share
+      when: phantomjs_installed.stdout.find('exists') == -1
     - shell: tar xjf phantomjs-1.9.7-linux-x86_64.tar.bz2
       args:
         chdir: /usr/local/share
+      when: phantomjs_installed.stdout.find('exists') == -1
       # link new install to location on the path
     - shell: ln -s -f /usr/local/share/phantomjs-1.9.7-linux-x86_64/bin/phantomjs /usr/local/share/phantomjs &&  ln -s -f /usr/local/share/phantomjs-1.9.7-linux-x86_64/bin/phantomjs /usr/local/bin/phantomjs
       args:
         chdir: /usr/local/share
+      when: phantomjs_installed.stdout.find('exists') == -1
 
     - name: Install Bundler
       gem: name=bundler state=present user_install=no
@@ -41,7 +46,7 @@
     - shell: git pull https://github.com/thoughtworks/cruisecontrol.rb/
       args: 
         chdir: /usr/local/share/cruise_control
-    - shell: bundle install
+    - shell: bundle install --without test development jruby
       args: 
         chdir: /usr/local/share/cruise_control
     - name: Ensure cruise control restarts on reboot
@@ -78,4 +83,4 @@
       include: fragment-update-web-application.yml code_install_folder=/home/lt_admin/.cruise/projects/learning_tapestry/work
     - shell: chown -R lt_admin:root /home/lt_admin/.cruise/projects/learning_tapestry/work
     - name: Start Cruise Control server (will restart on reboot)
-      shell: sudo -u lt_admin /usr/local/share/cruise_control/cruise start
+      shell: sudo -u lt_admin nohup /usr/local/share/cruise_control/cruise start &

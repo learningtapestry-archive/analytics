@@ -8,6 +8,9 @@
     ansible_ssh_user: deploy
     ansible_ssh_private_key_file: ./secrets/id_deploy
   tasks:
+  - stat: ruby
+    register: rv
+  - debug: "msg='{{rv.stdout}}'"
   - debug: "msg=hello"
   - debug: "msg='test test:{{lt_code_folder}} value'"
   # - include_vars: ./secrets/secrets.yml

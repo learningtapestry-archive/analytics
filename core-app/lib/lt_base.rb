@@ -105,7 +105,7 @@ module LT
     end
     def require_env_specific_files
       # Note to future self: do not create production specific requirements
-      if LT::testing? || LT::development? then
+      if LT::development? then
         require 'pry'
         require 'pry-debugger'
         require 'pry-stack_explorer'

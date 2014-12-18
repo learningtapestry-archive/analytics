@@ -1,3 +1,6 @@
+require 'bundler'
+# this line adds correct load paths for gem files
+Bundler.setup
 require 'yaml'
 require 'tmpdir'
 require 'active_record'
@@ -107,9 +110,7 @@ module LT
       # Note to future self: do not create production specific requirements
       if LT::development? then
         require 'pry'
-        require 'pry-debugger'
         require 'pry-stack_explorer'
-        require 'debugger'
       end
     end
 

@@ -1,6 +1,3 @@
-require 'bundler'
-# this line adds correct load paths for gem files
-Bundler.setup
 require 'yaml'
 require 'tmpdir'
 require 'active_record'

@@ -12,18 +12,26 @@ require './lib/util/redis_server.rb'
 require './lib/util/scenarios.rb'
 
 module LT
-  # TODO:  Namespace this Exceptions
-  class BaseException < Exception;end;
+  class BaseException < StandardError
+    def initialize(message="Undefined LT Error Message")
+      if LT::logger.respond_to?(:error) then
+        LT::logger.error(message)
+      else
+        `echo Logging failure in LT BaseException at #{Time.now} >> /tmp/lt-log-failure.txt`
+      end
+      super(message)
+    end
+  end
   class ParameterMissing < BaseException;end
   class InvalidParameter < BaseException;end
-  class Critical < BaseException;end;
-  class LoginError < BaseException;end;
-  class UserNotFound < LoginError;end;
-  class PasswordInvalid < LoginError;end;
-  class FileNotFound < BaseException;end;
-  class PathNotFound < BaseException;end;
-  class ModelNotFound < BaseException;end;
-  class InvalidFileFormat < BaseException;end;
+  class Critical < BaseException;end
+  class LoginError < BaseException;end
+    class UserNotFound < LoginError;end
+    class PasswordInvalid < LoginError;end
+  class FileNotFound < BaseException;end
+  class PathNotFound < BaseException;end
+  class ModelNotFound < BaseException;end
+  class InvalidFileFormat < BaseException;end
 
   class << self
     def env?(type)

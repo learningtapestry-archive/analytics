@@ -1,4 +1,4 @@
-gem "minitest"
+gem 'minitest'
 require 'minitest/autorun'
 require 'rack/test'
 require 'nokogiri'
@@ -7,6 +7,7 @@ require 'capybara'
 require 'capybara/poltergeist'
 require 'capybara/webkit'
 require 'benchmark'
+require 'byebug'
 
 require File::join(LT::lib_path, 'webapp.rb')
 
@@ -20,6 +21,24 @@ class LTTestBase < Minitest::Test
     LT::logger.level = new_level
     yield
     LT::logger.level = orig_log_level
+  end
+  
+  # copied from ActiveSupport b/c they are deprecating (not threadsafe) - we don't need thread safety
+  def capture(stream)
+    stream = stream.to_s
+    captured_stream = Tempfile.new(stream)
+    stream_io = eval("$#{stream}")
+    origin_stream = stream_io.dup
+    stream_io.reopen(captured_stream)
+
+    yield
+
+    stream_io.rewind
+    return captured_stream.read
+  ensure
+    captured_stream.close
+    captured_stream.unlink
+    stream_io.reopen(origin_stream)
   end
 end
 

@@ -16,14 +16,14 @@ ActiveRecord::Schema.define(version: 20141118) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "api_keys", force: true do |t|
+  create_table "api_keys", force: :cascade do |t|
     t.string   "key",        null: false
     t.integer  "user_id",    null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "approved_sites", force: true do |t|
+  create_table "approved_sites", force: :cascade do |t|
     t.integer  "site_id",     null: false
     t.integer  "district_id"
     t.integer  "school_id"
@@ -34,7 +34,7 @@ ActiveRecord::Schema.define(version: 20141118) do
 
   add_index "approved_sites", ["site_id"], name: "index_approved_sites_on_site_id", using: :btree
 
-  create_table "course_offerings", force: true do |t|
+  create_table "course_offerings", force: :cascade do |t|
     t.integer  "course_id",  null: false
     t.string   "sis_id"
     t.string   "other_id"
@@ -44,7 +44,7 @@ ActiveRecord::Schema.define(version: 20141118) do
     t.datetime "updated_at"
   end
 
-  create_table "courses", force: true do |t|
+  create_table "courses", force: :cascade do |t|
     t.string   "course_code"
     t.string   "sis_id"
     t.string   "other_id"
@@ -56,7 +56,7 @@ ActiveRecord::Schema.define(version: 20141118) do
     t.datetime "updated_at"
   end
 
-  create_table "districts", force: true do |t|
+  create_table "districts", force: :cascade do |t|
     t.string   "state_id"
     t.string   "nces_id"
     t.string   "sis_id"
@@ -72,7 +72,7 @@ ActiveRecord::Schema.define(version: 20141118) do
     t.datetime "updated_at"
   end
 
-  create_table "emails", force: true do |t|
+  create_table "emails", force: :cascade do |t|
     t.string   "email"
     t.boolean  "primary"
     t.integer  "user_id"
@@ -80,7 +80,7 @@ ActiveRecord::Schema.define(version: 20141118) do
     t.datetime "updated_at"
   end
 
-  create_table "organizations", force: true do |t|
+  create_table "organizations", force: :cascade do |t|
     t.string   "name"
     t.string   "org_api_key"
     t.string   "org_secret_key"
@@ -90,7 +90,7 @@ ActiveRecord::Schema.define(version: 20141118) do
     t.datetime "updated_at"
   end
 
-  create_table "page_clicks", force: true do |t|
+  create_table "page_clicks", force: :cascade do |t|
     t.datetime "date_visited"
     t.text     "url_visited"
     t.integer  "user_id"
@@ -99,16 +99,16 @@ ActiveRecord::Schema.define(version: 20141118) do
     t.datetime "updated_at"
   end
 
-  create_table "page_visits", force: true do |t|
+  create_table "page_visits", force: :cascade do |t|
     t.datetime "date_visited"
-    t.string   "time_active",  limit: nil
+    t.string   "time_active"
     t.integer  "user_id"
     t.integer  "page_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "pages", force: true do |t|
+  create_table "pages", force: :cascade do |t|
     t.text     "url",          null: false
     t.string   "display_name"
     t.integer  "site_id"
@@ -118,14 +118,14 @@ ActiveRecord::Schema.define(version: 20141118) do
 
   add_index "pages", ["url"], name: "index_pages_on_url", unique: true, using: :btree
 
-  create_table "raw_message_logs", force: true do |t|
+  create_table "raw_message_logs", force: :cascade do |t|
     t.string   "action"
     t.integer  "raw_message_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "raw_messages", force: true do |t|
+  create_table "raw_messages", force: :cascade do |t|
     t.string   "api_key"
     t.string   "org_api_key"
     t.integer  "user_id"
@@ -141,7 +141,7 @@ ActiveRecord::Schema.define(version: 20141118) do
     t.integer  "organization_id"
   end
 
-  create_table "schools", force: true do |t|
+  create_table "schools", force: :cascade do |t|
     t.string   "state_id"
     t.string   "nces_id"
     t.string   "sis_id"
@@ -158,7 +158,7 @@ ActiveRecord::Schema.define(version: 20141118) do
     t.datetime "updated_at"
   end
 
-  create_table "section_users", force: true do |t|
+  create_table "section_users", force: :cascade do |t|
     t.string   "user_type"
     t.integer  "section_id"
     t.integer  "user_id"
@@ -166,7 +166,7 @@ ActiveRecord::Schema.define(version: 20141118) do
     t.datetime "updated_at"
   end
 
-  create_table "sections", force: true do |t|
+  create_table "sections", force: :cascade do |t|
     t.string   "section_code"
     t.integer  "course_offering_id"
     t.string   "sis_id"
@@ -176,7 +176,7 @@ ActiveRecord::Schema.define(version: 20141118) do
     t.datetime "updated_at"
   end
 
-  create_table "site_actions", force: true do |t|
+  create_table "site_actions", force: :cascade do |t|
     t.string   "action_type",  null: false
     t.text     "url_pattern",  null: false
     t.string   "css_selector"
@@ -185,7 +185,7 @@ ActiveRecord::Schema.define(version: 20141118) do
     t.datetime "updated_at"
   end
 
-  create_table "sites", force: true do |t|
+  create_table "sites", force: :cascade do |t|
     t.text     "url",            null: false
     t.string   "display_name"
     t.uuid     "site_uuid",      null: false
@@ -197,7 +197,7 @@ ActiveRecord::Schema.define(version: 20141118) do
 
   add_index "sites", ["url"], name: "index_sites_on_url", unique: true, using: :btree
 
-  create_table "staff_members", force: true do |t|
+  create_table "staff_members", force: :cascade do |t|
     t.string   "state_id"
     t.string   "sis_id"
     t.string   "other_id"
@@ -207,7 +207,7 @@ ActiveRecord::Schema.define(version: 20141118) do
     t.datetime "updated_at"
   end
 
-  create_table "students", force: true do |t|
+  create_table "students", force: :cascade do |t|
     t.string   "state_id"
     t.string   "sis_id"
     t.string   "other_id"
@@ -217,7 +217,7 @@ ActiveRecord::Schema.define(version: 20141118) do
     t.datetime "updated_at"
   end
 
-  create_table "users", force: true do |t|
+  create_table "users", force: :cascade do |t|
     t.string   "first_name"
     t.string   "middle_name"
     t.string   "last_name"

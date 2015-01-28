@@ -1,0 +1,13 @@
+require 'yaml'
+require 'logger'
+require 'active_record'
+require 'pg'
+require 'sinatra/activerecord'
+require 'sinatra/activerecord/rake'
+
+
+##Source:  http://exposinggotchas.blogspot.com/2011/02/activerecord-migrations-without-rails.html
+
+task :default do
+  system "rake --tasks"
+end

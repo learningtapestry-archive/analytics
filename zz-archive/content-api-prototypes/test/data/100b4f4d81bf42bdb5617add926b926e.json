@@ -1,0 +1,157 @@
+{
+  "doc_ID": "100b4f4d81bf42bdb5617add926b926e",
+  "resource_data_description": {
+    "doc_type": "resource_data",
+    "resource_locator": "http://dnalc02.cshl.edu/mydnalc/?a=dnai:1294",
+    "digital_signature": {
+      "key_location": [
+        "http://pool.sks-keyservers.net:11371/pks/lookup?op=get&fingerprint=on&search=0x51FAAF9F2067F0CE"
+      ],
+      "key_owner": "National Science Digital Library (NSDL) <nsdlpersona@nsdl.ucar.edu>",
+      "signing_method": "LR-PGP.1.0",
+      "signature": "-----BEGIN PGP SIGNED MESSAGE-----\nHash: SHA1\n\n9088dd03b60e6b29ca9532b370520bdd5ee8390d5bc37f5786bdebc848355bce\n-----BEGIN PGP SIGNATURE-----\nVersion: GnuPG v1.4.5 (GNU/Linux)\n\niD8DBQFTu1IYUfqvnyBn8M4RAkz9AKCRWpytgt5y02gR6Ppd3nEiJ/9h9gCeMwvd\nxcI5YeC5GvxpK0BSjnFCzlU=\n=60as\n-----END PGP SIGNATURE-----\n"
+    },
+    "resource_data": {
+      "inLanguage": [
+        "en"
+      ],
+      "about": [
+        "homo erectus",
+        "multiregionalism",
+        "common ancestor",
+        "africa theory",
+        "biological elements",
+        "phylogenetic trees",
+        "oyt",
+        "ooa",
+        "two theories",
+        "mrca",
+        "out of africa",
+        "mya",
+        "migrations",
+        "ancestors",
+        "ya",
+        "relationships",
+        "Life Science",
+        "Social Sciences",
+        "Chemistry"
+      ],
+      "description": [
+        "Two theories are discussedfor the descendancy of modern humans: the Out Of Africa (OOA) and the Multiregionalism (MRT) theories. Both theories describe modern humans to relate back to common ancestors that came from Africa. However, the MRT assumes the Most recent common ancestor (MRCA) to have left Africa some 2 MYa. The OOA locates the MRCA in Africa much more recently at about 0.2 MYa (200,000 ya)."
+      ],
+      "publisher": [
+        {
+          "name": "David Micklos (Cold Spring Harbor Laboratory;DNA Learning Center X-AUDIENCE)"
+        }
+      ],
+      "url": "http://dnalc02.cshl.edu/mydnalc/?a=dnai:1294",
+      "dateCreated": [
+        "2009-04-10"
+      ],
+      "learningResourceType": [
+        "Image/Image Set",
+        "Audio/Visual"
+      ],
+      "encodings": [
+        {
+          "name": "application/x-shockwave-flash"
+        },
+        {
+          "name": "application"
+        }
+      ],
+      "contributor": [
+        {
+          "name": "David Micklos (Cold Spring Harbor Laboratory;DNA Learning Center X-AUDIENCE)"
+        },
+        {
+          "name": "Jan Witkowski (Cold Spring Harbor Laboratory;Banbury Center X-AUDIENCE)"
+        },
+        {
+          "name": "Garland Allen (Washington University at St. Louis;Biology Department X-AUDIENCE)"
+        },
+        {
+          "name": "Elof Carlson (SUNY at Stony Brook;Biology Department X-AUDIENCE)"
+        },
+        {
+          "name": "Paul Lombardo (University of Virginia;Center for Biomedical Ethics X-AUDIENCE)"
+        },
+        {
+          "name": "Steven Selden (University of Maryland;Education Policy and Leadership Department X-AUDIENCE)"
+        }
+      ],
+      "@context": [
+        {
+          "url": {
+            "@type": "@id"
+          },
+          "audience": {
+            "@id": "audience",
+            "@type": "@EducationalAudience"
+          },
+          "@vocab": "http://schema.org/"
+        },
+        {
+          "lrmi": "http://lrmi.net/the-specification#",
+          "useRightsUrl": {
+            "@id": "lrmi:useRightsUrl",
+            "@type": "@id"
+          }
+        }
+      ],
+      "@id": "oai:nsdl.org:2200/20090420201519898T",
+      "@type": "CreativeWork",
+      "name": [
+        "Out of Africa versus MultiregionalismSite: DNA Interactive (www.dnai.org)"
+      ]
+    },
+    "keys": [
+      "multiregionalism",
+      "NSDL",
+      "two theories",
+      "mrca",
+      "phylogenetic trees",
+      "mya",
+      "ooa",
+      "oai:nsdl.org:2200/20090420201519898T",
+      "Social Sciences",
+      "relationships",
+      "ancestors",
+      "oyt",
+      "migrations",
+      "biological elements",
+      "Life Science",
+      "homo erectus",
+      "NSDL_SetSpec_BEN",
+      "ya",
+      "africa theory",
+      "common ancestor",
+      "Chemistry",
+      "out of africa"
+    ],
+    "TOS": {
+      "submission_attribution": "The National Science Digital Library(NSDL) and its network of partners.",
+      "submission_TOS": "http://nsdl.org/help/terms-of-use"
+    },
+    "_rev": "1-8cd1b4e87474cc01eb77d6e1b30ee4fe",
+    "resource_data_type": "metadata",
+    "payload_placement": "inline",
+    "payload_schema": [
+      "LRMI",
+      "JSON-LD"
+    ],
+    "node_timestamp": "2014-07-08T02:06:20.744748Z",
+    "doc_version": "0.49.0",
+    "create_timestamp": "2014-07-08T02:06:20.744748Z",
+    "update_timestamp": "2014-07-08T02:06:20.744748Z",
+    "active": true,
+    "publishing_node": "bf3e2bf1e40e4b9db68325fa4269b55b",
+    "_id": "100b4f4d81bf42bdb5617add926b926e",
+    "doc_ID": "100b4f4d81bf42bdb5617add926b926e",
+    "identity": {
+      "submitter": "National Science Digital Library (NSDL)<nsdlsupport@nsdl.ucar.edu>",
+      "submitter_type": "agent",
+      "curator": "BiosciEdNet (BEN): Digital Library Portal for Teaching and Learning in the Biological Sciences"
+    }
+  }
+}

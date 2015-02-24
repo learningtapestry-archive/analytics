@@ -9,7 +9,7 @@ module LT
       #   Extract metadata from HTTP/API call to a Learning Registry extraction endpoint(sandbox.learningregistry.org) for a range of dates
 
       NODE = 'sandbox.learningregistry.org'
-      DEFAULT_START_DATE = Date.parse('2015-02-24')
+      DEFAULT_START_DATE = Date.parse('2015-02-01') # TODO: we need to change this default date
       HTTP_MAX_RETRIES_COUNT = 3
 
       # start point
@@ -26,13 +26,13 @@ module LT
 
           cnt = retrive_records_by_date(date)
 
-          LT::logger.info("#{self.name}: #{cnt} records are extracted at #{date}.")
+          LT::logger.info("#{self.name}: #{cnt} records were extracted at #{date}.")
 
           total_count += cnt
           on_date = date
         end
         
-        LT::logger.info("#{self.name}: Total #{total_count} records are extracted.")
+        LT::logger.info("#{self.name}: Total #{total_count} records were extracted.")
 
         # create raw_document_log
         row_document_log = RawDocumentLog.create(
@@ -78,7 +78,7 @@ module LT
               if resource['resource_data'].kind_of?(Hash) # it's json data
                 raw_document_attrs['resource_data_json'] = resource['resource_data'].to_json
 
-              elsif Nokogiri::XML(resource['resource_data']).errors.empty? # check whether it's xml or not
+              elsif Nokogiri::XML(resource['resource_data']).errors.empty? and !resource['resource_data'].include?('!DOCTYPE') # check whether it's xml or not
                 raw_document_attrs['resource_data_xml'] = resource['resource_data']
 
               else

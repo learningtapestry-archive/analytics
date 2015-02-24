@@ -5,10 +5,10 @@ class CreateRawDocuments < ActiveRecord::Migration
       t.boolean :active
       t.string  :doc_type
       t.string  :doc_version
-      t.string  :identity
-      t.string  :keys
+      t.text    :identity
+      t.text    :keys
       t.string  :payload_placement
-      t.string  :payload_schema
+      t.text    :payload_schema
       t.json    :resource_data_json
       t.xml     :resource_data_xml
       t.text    :resource_data_string

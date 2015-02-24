@@ -8,6 +8,7 @@ class UserIndex < ActiveRecord::Migration
     add_index :users, :username, :unique => true, where: "organization_id IS NULL"
     add_column :raw_messages, :organization_id, :integer
   end
+  
   def down
     remove_index :users, [:username, :organization_id]
     remove_index :users, :username

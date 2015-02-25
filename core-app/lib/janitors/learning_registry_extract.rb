@@ -6,14 +6,13 @@ module LT
   module Janitors
     module LearningRegistryExtract class << self
       # Purpose: 
-      #   Extract metadata from HTTP/API call to a Learning Registry extraction endpoint(sandbox.learningregistry.org) for a range of dates
+      #   Extract metadata from HTTP/API call to a Learning Registry extraction endpoint for a range of dates
 
-      NODE = 'sandbox.learningregistry.org'
-      DEFAULT_START_DATE = Date.parse('2015-02-01') # TODO: we need to change this default date
+      DEFAULT_START_DATE = Date.parse('2015-02-24') # TODO: we need to change this default date
       HTTP_MAX_RETRIES_COUNT = 3
 
       # start point
-      def retrive
+      def retrieve(options = {})
         LT::logger.info("#{self.name}: Starting...")
 
         total_count = 0
@@ -24,7 +23,7 @@ module LT
         (start_date..Date.today).each do |date|
           LT::logger.info("#{self.name}: Start to extract records at #{date}.")
 
-          cnt = retrive_records_by_date(date)
+          cnt = retrieve_records_by_date(date, options)
 
           LT::logger.info("#{self.name}: #{cnt} records were extracted at #{date}.")
 
@@ -43,18 +42,20 @@ module LT
         LT::logger.info("#{self.name}: Row document log was created.")
 
         LT::logger.info("#{self.name}: Success.")
-      end # retrive
+      end # retrieve
 
-      def retrive_records_by_date(date)
+      def retrieve_records_by_date(date, options = {})
         cnt = 0
         token = nil
 
         while true
-          target_url = harvest_url(date, token)
+          target_url = harvest_url(date, token, options)
 
           json_data = get_json_data(target_url)
-          break unless json_data
-          break unless json_data['documents'].kind_of?(Array)
+          if !json_data or !json_data.kind_of?(Hash) or !json_data['documents'].kind_of?(Array)
+            LT::logger.error("#{self.name}: Failed to parse JSON data at #{date}.")
+            break
+          end
 
           json_data['documents'].each do |doc|
             resource = doc['resource_data_description']
@@ -97,7 +98,7 @@ module LT
         end # while true
 
         cnt
-      end # retrive_records_by_date
+      end # retrieve_records_by_date
 
       # save attributes to the raw_documents table
       def process_raw_document(attrs)
@@ -115,11 +116,11 @@ module LT
         begin
           buffer = open(url).read
         rescue OpenURI::HTTPError => e
-          LT::logger.error("LearningRegistryExtract: Failed to open #{url}, message: #{e.message}.")
+          LT::logger.error("#{self.name}: Failed to open #{url}, message: #{e.message}.")
           tries += 1
 
           if tries > HTTP_MAX_RETRIES_COUNT
-            LT::logger.error("LearningRegistryExtract: Failed to extract data at #{date}.")
+            LT::logger.error("#{self.name}: Failed to extract data at #{date}.")
             return
           end
         end
@@ -128,7 +129,7 @@ module LT
         begin
           json_data = JSON.parse(buffer)  
         rescue JSON::ParserError
-          LT::logger.error("LearningRegistryExtract: Failed to parse JSON data at #{date}.")
+          LT::logger.error("#{self.name}: Failed to parse JSON data at #{date}.")
           return 
         end
 
@@ -136,8 +137,8 @@ module LT
       end
 
 
-      def harvest_url(from, token = nil)
-        url = "http://#{NODE}/slice?from=#{from.strftime('%Y-%m-%d')}"
+      def harvest_url(from, token = nil, options = {})
+        url = "#{options['node']}/slice?from=#{from.strftime('%Y-%m-%d')}"
         url = "#{url}&resumption_token=#{token}" if token
 
         url

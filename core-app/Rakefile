@@ -101,7 +101,7 @@ namespace :lt do
     task :extract_meta_data do # TODO: rename this rake task name.
       Rake::Task[:'lt:boot'].invoke
       require './lib/janitors/learning_registry_extract.rb'
-      LT::Janitors::LearningRegistryExtract.retrive
+      LT::Janitors::LearningRegistryExtract.retrieve({'node' => 'http://sandbox.learningregistry.org'})
     end
   end # namespace :janitors
 

@@ -96,6 +96,13 @@ namespace :lt do
       require './lib/janitors/redis_postgres_extract.rb'
       LT::Janitors::RawMessagesExtract.raw_messages_to_page_visits
     end
+
+    desc "Extract Learning Registry data to raw documents table from http://sandbox.learningregistry.org"
+    task :extract_meta_data do # TODO: rename this rake task name.
+      Rake::Task[:'lt:boot'].invoke
+      require './lib/janitors/learning_registry_extract.rb'
+      LT::Janitors::LearningRegistryExtract.retrieve({'node' => 'http://sandbox.learningregistry.org'})
+    end
   end # namespace :janitors
 
   namespace :utility do

@@ -19,8 +19,8 @@ ActiveRecord::Schema.define(version: 20150223) do
   create_table "api_keys", force: true do |t|
     t.string   "key",        null: false
     t.integer  "user_id",    null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "approved_sites", force: true do |t|
@@ -28,8 +28,8 @@ ActiveRecord::Schema.define(version: 20150223) do
     t.integer  "district_id"
     t.integer  "school_id"
     t.integer  "section_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
   end
 
   add_index "approved_sites", ["site_id"], name: "index_approved_sites_on_site_id", using: :btree
@@ -40,8 +40,8 @@ ActiveRecord::Schema.define(version: 20150223) do
     t.string   "other_id"
     t.date     "date_start"
     t.date     "date_end"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "courses", force: true do |t|
@@ -52,8 +52,8 @@ ActiveRecord::Schema.define(version: 20150223) do
     t.string   "description"
     t.string   "subject_area"
     t.boolean  "high_school_requirement"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
   end
 
   create_table "districts", force: true do |t|
@@ -68,16 +68,16 @@ ActiveRecord::Schema.define(version: 20150223) do
     t.string   "phone"
     t.string   "grade_low"
     t.string   "grade_high"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "emails", force: true do |t|
     t.string   "email"
     t.boolean  "primary"
     t.integer  "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "organizations", force: true do |t|
@@ -86,8 +86,8 @@ ActiveRecord::Schema.define(version: 20150223) do
     t.string   "org_secret_key"
     t.integer  "invalid_logins", default: 0
     t.boolean  "locked",         default: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
   end
 
   create_table "page_clicks", force: true do |t|
@@ -95,25 +95,25 @@ ActiveRecord::Schema.define(version: 20150223) do
     t.text     "url_visited"
     t.integer  "user_id"
     t.integer  "page_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
   end
 
   create_table "page_visits", force: true do |t|
     t.datetime "date_visited"
-    t.string   "time_active"
+    t.string   "time_active",  limit: nil
     t.integer  "user_id"
     t.integer  "page_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
   end
 
   create_table "pages", force: true do |t|
     t.text     "url",          null: false
     t.string   "display_name"
     t.integer  "site_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
   end
 
   add_index "pages", ["url"], name: "index_pages_on_url", unique: true, using: :btree
@@ -121,8 +121,8 @@ ActiveRecord::Schema.define(version: 20150223) do
   create_table "raw_document_logs", force: true do |t|
     t.string   "action"
     t.date     "newest_import_date"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",         null: false
+    t.datetime "updated_at",         null: false
   end
 
   create_table "raw_documents", force: true do |t|
@@ -140,8 +140,8 @@ ActiveRecord::Schema.define(version: 20150223) do
     t.string   "resource_data_type"
     t.string   "resource_locator"
     t.text     "raw_data"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
   end
 
   add_index "raw_documents", ["doc_id"], name: "index_raw_documents_on_doc_id", unique: true, using: :btree
@@ -149,8 +149,8 @@ ActiveRecord::Schema.define(version: 20150223) do
   create_table "raw_message_logs", force: true do |t|
     t.string   "action"
     t.integer  "raw_message_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
   end
 
   create_table "raw_messages", force: true do |t|
@@ -164,8 +164,8 @@ ActiveRecord::Schema.define(version: 20150223) do
     t.json     "action"
     t.text     "url"
     t.datetime "captured_at"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
     t.integer  "organization_id"
   end
 
@@ -182,16 +182,16 @@ ActiveRecord::Schema.define(version: 20150223) do
     t.string   "grade_low"
     t.string   "grade_high"
     t.integer  "district_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
   end
 
   create_table "section_users", force: true do |t|
     t.string   "user_type"
     t.integer  "section_id"
     t.integer  "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "sections", force: true do |t|
@@ -200,8 +200,8 @@ ActiveRecord::Schema.define(version: 20150223) do
     t.string   "sis_id"
     t.string   "other_id"
     t.string   "name",               null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",         null: false
+    t.datetime "updated_at",         null: false
   end
 
   create_table "site_actions", force: true do |t|
@@ -209,8 +209,8 @@ ActiveRecord::Schema.define(version: 20150223) do
     t.text     "url_pattern",  null: false
     t.string   "css_selector"
     t.integer  "site_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
   end
 
   create_table "sites", force: true do |t|
@@ -219,8 +219,8 @@ ActiveRecord::Schema.define(version: 20150223) do
     t.uuid     "site_uuid",      null: false
     t.text     "logo_url_small"
     t.text     "logo_url_large"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
   end
 
   add_index "sites", ["url"], name: "index_sites_on_url", unique: true, using: :btree
@@ -231,8 +231,8 @@ ActiveRecord::Schema.define(version: 20150223) do
     t.string   "other_id"
     t.string   "staff_member_type", null: false
     t.integer  "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",        null: false
+    t.datetime "updated_at",        null: false
   end
 
   create_table "students", force: true do |t|
@@ -241,8 +241,8 @@ ActiveRecord::Schema.define(version: 20150223) do
     t.string   "other_id"
     t.string   "grade_level"
     t.integer  "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
   end
 
   create_table "users", force: true do |t|
@@ -255,8 +255,8 @@ ActiveRecord::Schema.define(version: 20150223) do
     t.date     "date_of_birth"
     t.integer  "school_id"
     t.integer  "organization_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
   end
 
   add_index "users", ["username", "organization_id"], name: "index_users_on_username_and_organization_id", unique: true, using: :btree

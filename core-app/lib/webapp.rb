@@ -123,13 +123,15 @@ module LT
         # main selector to determine which javascript page to generate/send
         if params[:page] == 'collector' then
           erb :'collector.js', :layout => false, locals: locals
+        elsif params[:page] == 'collector_video' then
+          erb :'collector_video.js', :layout => false, locals: locals
         elsif params[:page] == 'loader' then
           # we are passed parameters to loader, asking which js pages
           # the loader should load async once it's booted. We pass
           # these files into the loader itself so that they will be loaded
           case params[:load]
             when 'collector'
-              locals[:lt_api_libs] = ['collector']
+              locals[:lt_api_libs] = ['collector', 'collector_video']
             else
               status 401
               return

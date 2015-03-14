@@ -78,9 +78,20 @@ module LT
       content_type :json
 
       redis_up = LT::RedisServer.ping
+      hashlist_length = LT::RedisServer.api_key_hashlist_length
+      org_api_key_hashlist_length = LT::RedisServer.org_api_key_hashlist_length
+      raw_message_queue_length = LT::RedisServer.raw_message_queue_length
+
       database_up = LT::ping_db
 
-      json({database: database_up, redis: redis_up, current_time: Time::now.to_s, env: LT::run_env})
+
+      json({database: database_up,
+            redis: redis_up,
+            hashlist_length: hashlist_length,
+            org_api_key_hashlist_length: org_api_key_hashlist_length,
+            raw_message_queue_length: raw_message_queue_length,
+            current_time: Time::now.to_s,
+            env: LT::run_env})
     end
 
     get '/api/v1/common.js' do
@@ -141,7 +152,7 @@ module LT
     # This route handles org_api_key assert messages
     #   '/api/v1/assert-org'
     get ORG_API_KEY_ASSERT_ROUTE do
-      content_type :javascript
+      #content_type :javascript
       org_api_key = params[:oak]
       if !org_api_key.nil? && LT::RedisServer::has_org_api_key?(org_api_key)
         msg_string = params[:msg]

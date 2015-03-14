@@ -26,8 +26,8 @@ module LT
   class InvalidParameter < BaseException;end
   class Critical < BaseException;end
   class LoginError < BaseException;end
-    class UserNotFound < LoginError;end
-    class PasswordInvalid < LoginError;end
+  class UserNotFound < LoginError;end
+  class PasswordInvalid < LoginError;end
   class FileNotFound < BaseException;end
   class PathNotFound < BaseException;end
   class ModelNotFound < BaseException;end
@@ -70,6 +70,7 @@ module LT
       LT::load_all_models
       LT::require_env_specific_files
       LT::boot_redis(File::join(LT::db_path, 'redis.yml'))
+      Organization.update_all_org_api_keys
       LT::logger.info("Core-app booted (mode: #{LT::run_env})")
     end
 

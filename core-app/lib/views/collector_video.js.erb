@@ -9,11 +9,12 @@ var firstScriptTag = document.getElementsByTagName('script')[0];
 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
 var ytplayer;
-function onYouTubeIframeAPIReady() {
 
-  //TODO:  wire up multiple players on a page
+function onYouTubeIframeAPIReady() {
+  console.log("onYouTubeIframeAPIReady");
 
   ytplayer = new YT.Player('player', {
+    autoplay: false,
     events: {
       'onReady': onYouTubePlayerReady,
       'onStateChange': onPlayerStateChange
@@ -21,17 +22,17 @@ function onYouTubeIframeAPIReady() {
   });
 }
 
+onYouTubeIframeAPIReady();
+
 function onYouTubePlayerReady(event) {
+  console.log("onYouTubePlayerReady");
   event.target.playVideo();
 }
 
-try {
-  onYouTubeIframeAPIReady()
-}
-catch (err)
-{}
 
 function onPlayerStateChange(newState) {
+  console.log("onPlayerStateChange");
+
   if(newState.data==5)
   { newState='video cued'; }
   else if(newState.data==3)
@@ -54,19 +55,17 @@ function onPlayerStateChange(newState) {
   var video_id = ytplayer.getVideoUrl();
 
   var action = {
+    verb: 'video-action',
     state: newState,
     username: ltG.userId,
-    verb: 'video-action',
     url: url,
     video_id: video_id,
     page_title: pageTitle,
     captured_at: ltG.toISOString(new Date(lt$.now()))
-  }
+  };
 
-  var msg = window.ltG.priv.fGenRawMsg(url, pageTitle, 'video-action' + newState, action);
-
+  var msg = window.ltG.priv.fGenRawMsg(url, pageTitle, 'video-action', action);
   window.ltG.priv.fSendMsg(msg);
-
 }
 
 function loadnewvideo(videoid)

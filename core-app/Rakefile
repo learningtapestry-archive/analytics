@@ -23,7 +23,7 @@ end
 spec = Gem::Specification.find_by_name("activerecord")
 load File.join(spec.gem_dir, "lib", "active_record", "railties", "databases.rake")
 
-# Overwrite the load config 
+# Overwrite the load config
 Rake::Task["db:load_config"].overwrite do
   Rake::Task[:'lt:boot'].invoke
 end
@@ -91,6 +91,12 @@ namespace :lt do
       Rake::Task[:'lt:boot'].invoke
       require './lib/janitors/redis_postgres_extract.rb'
       LT::Janitors::RawMessagesExtract.raw_messages_to_page_visits
+    end
+    desc "Convert raw_messages to video_views"
+    task :raw_messages_to_video_views do
+      Rake::Task[:'lt:boot'].invoke
+      require './lib/janitors/redis_postgres_extract.rb'
+      LT::Janitors::RawMessagesExtract.raw_messages_to_video_visits
     end
 
     desc "Extract Learning Registry data to raw documents table from http://sandbox.learningregistry.org"

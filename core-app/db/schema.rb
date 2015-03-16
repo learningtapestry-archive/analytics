@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150223) do
+ActiveRecord::Schema.define(version: 20140902210605) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -101,7 +101,7 @@ ActiveRecord::Schema.define(version: 20150223) do
 
   create_table "page_visits", force: true do |t|
     t.datetime "date_visited"
-    t.string   "time_active"
+    t.string   "time_active",  limit: nil
     t.integer  "user_id"
     t.integer  "page_id"
     t.datetime "created_at"
@@ -261,5 +261,33 @@ ActiveRecord::Schema.define(version: 20150223) do
 
   add_index "users", ["username", "organization_id"], name: "index_users_on_username_and_organization_id", unique: true, using: :btree
   add_index "users", ["username"], name: "index_users_on_username", unique: true, where: "(organization_id IS NULL)", using: :btree
+
+  create_table "video_views", force: true do |t|
+    t.datetime "time_started"
+    t.datetime "time_ended"
+    t.integer  "paused_count"
+    t.integer  "user_id"
+    t.integer  "video_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "videos", force: true do |t|
+    t.text     "service_id"
+    t.text     "external_id"
+    t.text     "url"
+    t.time     "video_length"
+    t.text     "title"
+    t.text     "views"
+    t.text     "likes"
+    t.text     "dislikes"
+    t.text     "publisher"
+    t.text     "category"
+    t.text     "license"
+    t.text     "published_on"
+    t.integer  "page_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
 end

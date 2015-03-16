@@ -4,6 +4,8 @@ var tag = document.createElement('script');
 var eventDate = new Date();
 var done = false;
 
+var session_id = guid();
+
 tag.src = "https://www.youtube.com/iframe_api";
 var firstScriptTag = document.getElementsByTagName('script')[0];
 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
@@ -11,8 +13,6 @@ firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 var ytplayer;
 
 function onYouTubeIframeAPIReady() {
-  console.log("onYouTubeIframeAPIReady");
-
   ytplayer = new YT.Player('player', {
     autoplay: false,
     events: {
@@ -25,51 +25,59 @@ function onYouTubeIframeAPIReady() {
 onYouTubeIframeAPIReady();
 
 function onYouTubePlayerReady(event) {
-  console.log("onYouTubePlayerReady");
-  event.target.playVideo();
+  //event.target.playVideo();
 }
 
 
 function onPlayerStateChange(newState) {
-  console.log("onPlayerStateChange");
+  var newStateWord='';
 
   if(newState.data==5)
-  { newState='video cued'; }
+  { newStateWord='video cued'; }
   else if(newState.data==3)
-  { newState='buffering'; }
+  { newStateWord='buffering'; }
   else if(newState.data==2)
-  { newState='paused'; }
+  { newStateWord='paused'; }
   else if(newState.data==1)
-  { newState='playing'; }
+  { newStateWord='playing'; }
   else if(newState.data==0)
-  { newState='ended'; }
+  { newStateWord='ended'; }
   else if(newState.data==-1)
-  { newState='unstarted'; }
+  { newStateWord='unstarted'; }
   else
-  { newState='Status uncertain'; }
+  { newStateWord='Status uncertain'; }
 
-  console.log("Player's new state: " + newState + " " + eventDate + " " + ytplayer.getVideoUrl());
+  if (newState.data != -1 && newState.data != 3 && newState.data != 5) { // don't send unstarted and buffering events
 
-  var url = window.ltG.priv.fGetCurURL();
-  var pageTitle = window.ltG.priv.fGetCurPageTitle();
-  var video_id = ytplayer.getVideoUrl();
+    console.log("Player's new state: " + newStateWord + " " + eventDate + " " + ytplayer.getVideoUrl());
 
-  var action = {
-    verb: 'video-action',
-    state: newState,
-    username: ltG.userId,
-    url: url,
-    video_id: video_id,
-    page_title: pageTitle,
-    captured_at: ltG.toISOString(new Date(lt$.now()))
-  };
+    var url = window.ltG.priv.fGetCurURL();
+    var pageTitle = window.ltG.priv.fGetCurPageTitle();
+    var video_id = ytplayer.getVideoUrl();
 
-  var msg = window.ltG.priv.fGenRawMsg(url, pageTitle, 'video-action', action);
-  window.ltG.priv.fSendMsg(msg);
+    var action = {
+      verb: 'video-action',
+      state: newStateWord,
+      username: ltG.userId,
+      url: url,
+      video_id: video_id,
+      page_title: pageTitle,
+      captured_at: ltG.toISOString(new Date(lt$.now())),
+      session_id: session_id
+    };
+
+    var msg = window.ltG.priv.fGenRawMsg(url, pageTitle, 'video-action', action);
+    window.ltG.priv.fSendMsg(msg);
+  }
 }
 
-function loadnewvideo(videoid)
-{
-  ytplayer.loadVideoById(""+videoid+"", 5, "large");
+function guid() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1);
+  }
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+          s4() + '-' + s4() + s4() + s4();
 }
 

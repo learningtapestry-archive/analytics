@@ -125,7 +125,6 @@ module LT
       begin
         boot_ar_config(config_file)
         dbconfig = YAML::load(File.open(config_file))
-        # TODO:  Need better error message of LT::run_env is not defined; occurred multiple times in testing
         ActiveRecord::Base.establish_connection(dbconfig[LT::run_env])
       rescue Exception => e
         LT::logger.error("Cannot connect to Postgres, connect string: #{dbconfig[LT::run_env]}, error: #{e.message}")
@@ -146,6 +145,7 @@ module LT
     end
     def boot_redis(config_file)
       LT::RedisServer::boot_redis(config_file)
+
     end
     def get_db_name
       return ActiveRecord::Base.connection_config[:database]

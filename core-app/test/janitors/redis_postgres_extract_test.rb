@@ -141,7 +141,13 @@ class RedisPostgresExtractTest < LTDBTestBase
   def test_extract_from_raw_messages_to_video_view
     csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/raw_messages.csv'))
     LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
+    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/organizations.csv'))
+    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
+    assert_equal 38, RawMessage.all.count
+
     LT::Janitors::RawMessagesExtract.raw_messages_to_video_visits
+    assert_equal 4, VideoView.all.count
+    assert_equal 2, Video.all.count
   end
 
   def teardown

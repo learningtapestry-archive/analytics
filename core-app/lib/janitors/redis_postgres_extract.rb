@@ -66,8 +66,6 @@ module LT
 
           RawMessage.find_new_video_visits.each do |raw_video_visit|
             begin
-              #puts "#{raw_video_visit['session_id']}  #{raw_video_visit['state']}  #{raw_video_visit['video_id']}  #{raw_video_visit['captured_at']}"
-
               if current_session_id != raw_video_visit['session_id']
                 if video_id
                   save_video_view(current_session_id, url, page_url, username, org_id, paused_count, started_time, end_time)
@@ -97,7 +95,6 @@ module LT
               # VideoView.create_from_raw_message(raw_video_visit)
               LT::logger.debug("RawMessagesExtract.raw_messages_to_video_visits: Successful extract PG raw message to video visit, raw msg ID: #{raw_video_visit['video_id']}")
             rescue Exception => e
-              puts e
               LT::logger.error("RawMessagesExtract.raw_messages_to_video_visits: Failed extract PG raw message to video visit, raw msg ID: #{raw_video_visit['video_id']}, exception: #{e.message}")
               num_failed += 1
             end
@@ -131,7 +128,7 @@ module LT
             vv.paused_count = paused_count
             vv.save
             LT::logger.debug("save_video_view: Finished extract PG raw message to video visits, url: #{url}")
-          rescue Expection => e
+          rescue Exception => e
             LT::logger.error("RawMessagesExtract.save_video_view: Failed insert PG video visit, url: #{url}, exception: #{e.message}")
           end
         end

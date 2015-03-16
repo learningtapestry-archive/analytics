@@ -48,6 +48,8 @@ module LT
     end
     
     set :public_folder, LT::web_root_path
+
+    Organization.update_all_org_api_keys
     
     include WebAppHelper
 

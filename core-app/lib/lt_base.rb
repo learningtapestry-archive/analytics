@@ -70,7 +70,6 @@ module LT
       LT::load_all_models
       LT::require_env_specific_files
       LT::boot_redis(File::join(LT::db_path, 'redis.yml'))
-      Organization.update_all_org_api_keys
       LT::logger.info("Core-app booted (mode: #{LT::run_env})")
     end
 

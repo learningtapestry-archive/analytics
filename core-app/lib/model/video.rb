@@ -6,7 +6,6 @@ class Video < ActiveRecord::Base
   def self.find_or_create_by_url(url)
     video = self.find_by_url(url)
     if video.nil?
-      puts "video is nil"
       video = Video.new
       video.url = url
       video.save

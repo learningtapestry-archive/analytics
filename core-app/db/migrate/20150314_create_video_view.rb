@@ -14,7 +14,7 @@ class CreateVideoView < ActiveRecord::Migration
       t.text :license
       t.text :published_on
 
-      t.timestamps
+      t.timestamps                    null: true
     end
 
     create_table :video_views, force: true do |t|
@@ -26,7 +26,7 @@ class CreateVideoView < ActiveRecord::Migration
       t.belongs_to :video
       t.belongs_to :page
 
-      t.timestamps
+      t.timestamps                    null: true
     end
   end
 end

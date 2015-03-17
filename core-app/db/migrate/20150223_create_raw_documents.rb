@@ -16,7 +16,7 @@ class CreateRawDocuments < ActiveRecord::Migration
       t.string  :resource_locator 
       t.text    :raw_data
 
-      t.timestamps
+      t.timestamps                    null: true
     end
 
     add_index :raw_documents, :doc_id, :unique => true
@@ -25,7 +25,7 @@ class CreateRawDocuments < ActiveRecord::Migration
       t.string  :action
       t.date    :newest_import_date
 
-      t.timestamps
+      t.timestamps                    null: true
     end
   end
 end

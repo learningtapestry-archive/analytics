@@ -19,7 +19,7 @@ end
 class LearningTapestryLibraryTest < WebAppJSTestBase
 
   API_KEY = '00000000-0000-4000-8000-000000000000'
-  API_SECRET = '0123456789abcdef0123456789abcdef0000'
+  API_SECRET = 'secret'
 
   def setup
     super

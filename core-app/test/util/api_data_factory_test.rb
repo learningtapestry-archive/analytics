@@ -8,6 +8,7 @@ class APIDataFactoryTest < LTDBTestBase
   def setup
     super
 
+    puts File::expand_path(File::join(LT::db_path, '/csv/test/organizations.csv'))
     csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/organizations.csv'))
     LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
 

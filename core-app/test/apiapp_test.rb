@@ -191,7 +191,6 @@ class ApiAppTest < WebAppTestBase
     params = { org_api_key: '00000000-0000-4000-8000-000000000000', org_secret_key: 'secret' }
     get '/api/v1/video_views', params  do
       response_json = JSON.parse(last_response.body, symbolize_names: true) if last_response.body and last_response.body != 'null'
-      puts response_json
       assert_equal 200, last_response.status
       assert response_json
       assert_equal 4, response_json.length

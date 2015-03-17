@@ -23,7 +23,7 @@ end
 spec = Gem::Specification.find_by_name("activerecord")
 load File.join(spec.gem_dir, "lib", "active_record", "railties", "databases.rake")
 
-# Overwrite the load config 
+# Overwrite the load config
 Rake::Task["db:load_config"].overwrite do
   Rake::Task[:'lt:boot'].invoke
 end
@@ -60,19 +60,15 @@ namespace :lt do
     end
     desc "Run WebApp server - this starts the webserver"
     task :start do 
-      path = File::expand_path(File::dirname(__FILE__))
-      rackup_file = File::join(path, 'lib', 'webapp.ru')
       # TODO - set port/server from environment var
-      run_cmd = "rackup -p 8080 -o localhost #{rackup_file}"
+      run_cmd = "rackup -p 8080 -o localhost config.ru"
       $stdout.sync = true
       Kernel.system(run_cmd)
     end
     desc "Run WebApp server - this starts the webserver in dev mode with rerun"
     task :start_dev do 
-      path = File::expand_path(File::dirname(__FILE__))
-      rackup_file = File::join(path, 'lib', 'webapp.ru')
       # TODO - set port/server from environment var
-      run_cmd = "rerun -- rackup -p 8080 -o localhost #{rackup_file}"
+      run_cmd = "rerun -- rackup -p 8080 -o localhost config.ru"
       $stdout.sync = true
       Kernel.system(run_cmd)
     end
@@ -95,6 +91,18 @@ namespace :lt do
       Rake::Task[:'lt:boot'].invoke
       require './lib/janitors/redis_postgres_extract.rb'
       LT::Janitors::RawMessagesExtract.raw_messages_to_page_visits
+    end
+    desc "Convert raw_messages to video_views"
+    task :raw_messages_to_video_views do
+      Rake::Task[:'lt:boot'].invoke
+      require './lib/janitors/redis_postgres_extract.rb'
+      LT::Janitors::RawMessagesExtract.raw_messages_to_video_visits
+    end
+    desc "Fill YouTube Information"
+    task :fill_video_youtube_information do
+      Rake::Task[:'lt:boot'].invoke
+      require './lib/janitors/web_extractor.rb'
+      LT::Janitors::WebExtractor.fill_youtube_info
     end
 
     desc "Extract Learning Registry data to raw documents table from http://sandbox.learningregistry.org"

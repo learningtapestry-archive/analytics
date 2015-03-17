@@ -1,0 +1,56 @@
+# Learning Tapestry API
+# as a demonstration of an API spec in YAML
+swagger: '2.0'
+info:
+  title: Learning Tapestry API
+  description: Move your app forward with the Uber API
+  version: "1.0.0"
+# the domain of the service
+host: localhost:8080
+# array of all schemes that your API supports
+schemes:
+  - https
+  - http
+# will be prefixed to all paths
+basePath: /api/v1
+produces:
+  - application/json
+paths:
+  /video_views:
+    get:
+      summary: Video Views
+      description: |
+        This API endpoint returns data on the video views 
+        from a web site.
+      parameters:
+        - name: org_api_key
+          in: query
+          description: Organization API Key
+          type: string
+          required: true
+        - name: org_secret_key
+          in: query
+          description: Organization Secret Key
+          type: string
+          required: true
+        - name: time_started
+          in: query
+          description: Optional - start date of video views
+          type: string
+        - name: time_ended
+          in: query
+          description: Optional - end date of video views
+          type: string
+        - name: usernames
+          in: query
+          description: Optional - usernames
+          type: string
+        - name: urls
+          in: query
+          description: Optional - video URLs
+          type: string
+      tags:
+        - Usage
+      responses:
+        200:
+          description: An array of products

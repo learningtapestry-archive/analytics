@@ -1,0 +1,83 @@
+'use strict';
+
+var tag = document.createElement('script');
+var eventDate = new Date();
+var done = false;
+
+var session_id = guid();
+
+tag.src = "https://www.youtube.com/iframe_api";
+var firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+var ytplayer;
+
+function onYouTubeIframeAPIReady() {
+  ytplayer = new YT.Player('player', {
+    autoplay: false,
+    events: {
+      'onReady': onYouTubePlayerReady,
+      'onStateChange': onPlayerStateChange
+    }
+  });
+}
+
+onYouTubeIframeAPIReady();
+
+function onYouTubePlayerReady(event) {
+  //event.target.playVideo();
+}
+
+
+function onPlayerStateChange(newState) {
+  var newStateWord='';
+
+  if(newState.data==5)
+  { newStateWord='video cued'; }
+  else if(newState.data==3)
+  { newStateWord='buffering'; }
+  else if(newState.data==2)
+  { newStateWord='paused'; }
+  else if(newState.data==1)
+  { newStateWord='playing'; }
+  else if(newState.data==0)
+  { newStateWord='ended'; }
+  else if(newState.data==-1)
+  { newStateWord='unstarted'; }
+  else
+  { newStateWord='Status uncertain'; }
+
+  if (newState.data != -1 && newState.data != 3 && newState.data != 5) { // don't send unstarted and buffering events
+
+    console.log("Player's new state: " + newStateWord + " " + eventDate + " " + ytplayer.getVideoUrl());
+
+    var url = window.ltG.priv.fGetCurURL();
+    var pageTitle = window.ltG.priv.fGetCurPageTitle();
+    var video_id = ytplayer.getVideoUrl();
+
+    var action = {
+      verb: 'video-action',
+      state: newStateWord,
+      username: ltG.userId,
+      url: url,
+      video_id: video_id,
+      page_title: pageTitle,
+      captured_at: ltG.toISOString(new Date(lt$.now())),
+      session_id: session_id
+    };
+
+    var msg = window.ltG.priv.fGenRawMsg(url, pageTitle, 'video-action', action);
+    window.ltG.priv.fSendMsg(msg);
+  }
+}
+
+function guid() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1);
+  }
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+          s4() + '-' + s4() + s4() + s4();
+}
+

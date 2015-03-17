@@ -31,6 +31,12 @@ module LT
               csv_file.each do |csv_line|
                 model = model_name.constantize.new
                 csv_line.each do |key, value|
+
+                  # If it's a date time, try to convert, otherwise ignore
+                  begin
+                    value = Time.strptime(value, '%m/%d/%Y %H:%M:%S')
+                  rescue
+                  end
                   model[key] = value
                 end # csv_line.each
                 model.save

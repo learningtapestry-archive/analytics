@@ -48,16 +48,24 @@ module LT
     end
     
     set :public_folder, LT::web_root_path
+
+    Organization.update_all_org_api_keys
     
     include WebAppHelper
 
     API_ERROR_MESSAGE ||= { status: 'unknown error' }.to_json
+
+    def allow_cross_domain_access
+      response.headers['Access-Control-Allow-Origin'] = '*'
+      response.headers['Access-Control-Allow-Methods'] = 'GET, PUT, POST, DELETE'
+    end
 
     # set up UI layout container
     # we need this container to set dynamic content in the layout template
     # we can set things like CSS templates, Javascript includes, etc.
     before do
       @layout = {}
+      allow_cross_domain_access
     end
 
     # This is used by js-collector testing to pull known page/data from server
@@ -78,9 +86,20 @@ module LT
       content_type :json
 
       redis_up = LT::RedisServer.ping
+      hashlist_length = LT::RedisServer.api_key_hashlist_length
+      org_api_key_hashlist_length = LT::RedisServer.org_api_key_hashlist_length
+      raw_message_queue_length = LT::RedisServer.raw_message_queue_length
+
       database_up = LT::ping_db
 
-      json({database: database_up, redis: redis_up, current_time: Time::now.to_s, env: LT::run_env})
+
+      json({database: database_up,
+            redis: redis_up,
+            hashlist_length: hashlist_length,
+            org_api_key_hashlist_length: org_api_key_hashlist_length,
+            raw_message_queue_length: raw_message_queue_length,
+            current_time: Time::now.to_s,
+            env: LT::run_env})
     end
 
     get '/api/v1/common.js' do
@@ -112,13 +131,15 @@ module LT
         # main selector to determine which javascript page to generate/send
         if params[:page] == 'collector' then
           erb :'collector.js', :layout => false, locals: locals
+        elsif params[:page] == 'collector_video' then
+          erb :'collector_video.js', :layout => false, locals: locals
         elsif params[:page] == 'loader' then
           # we are passed parameters to loader, asking which js pages
           # the loader should load async once it's booted. We pass
           # these files into the loader itself so that they will be loaded
           case params[:load]
             when 'collector'
-              locals[:lt_api_libs] = ['collector']
+              locals[:lt_api_libs] = ['collector', 'collector_video']
             else
               status 401
               return
@@ -141,7 +162,7 @@ module LT
     # This route handles org_api_key assert messages
     #   '/api/v1/assert-org'
     get ORG_API_KEY_ASSERT_ROUTE do
-      content_type :javascript
+      #content_type :javascript
       org_api_key = params[:oak]
       if !org_api_key.nil? && LT::RedisServer::has_org_api_key?(org_api_key)
         msg_string = params[:msg]
@@ -218,7 +239,6 @@ module LT
     end
 
     get '/api/v1/users' do
-      content_type :json
       if params[:org_api_key].nil? or params[:org_secret_key].nil?
         status 401 # = HTTP Unauthorized
         json error: 'Organization API key (org_api_key) and secret (org_secret_key) not provided'
@@ -234,6 +254,25 @@ module LT
         end
         json retval
       end
+    end
+
+    get '/api/v1/video_views' do
+      content_type :json
+      if params[:org_api_key].nil? or params[:org_secret_key].nil?
+        status 401 # = HTTP Unauthorized
+        { error: 'Organization API key (org_api_key) and secret (org_secret_key) not provided' }.to_json
+      else
+        begin
+          retval = LT::Utilities::APIDataFactory.video_visits(params)
+          status 200
+        rescue Exception => e
+          LT::logger.error "Unknown error in /api/v1/video_views: #{e.message}"
+          #LT::logger.error "- Backtrace: #{e.backtrace}"
+          status 500 # = HTTP Unknown Error
+          API_ERROR_MESSAGE
+        end
+      end
+      retval
     end
 
 

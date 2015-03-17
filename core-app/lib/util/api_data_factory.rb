@@ -154,6 +154,18 @@ module LT
         retval
       end
 
+      def self.video_visits(params = {})
+        throw ParameterMissing, 'Required org_api_key and org_secret_key not provided' unless params[:org_api_key] and params[:org_secret_key]
+        org = Organization.find_by_org_api_key(params[:org_api_key])
+
+        if org.nil? or org.locked or !org.verify_secret(params[:org_secret_key])
+          retval= { error: 'video_visits - org_api_key or org_secret_key invalid or locked' }.to_json
+        else
+          retval = VideoView.find(params).to_json
+        end
+
+        retval
+      end
 
       def self.process_filters(params)
 

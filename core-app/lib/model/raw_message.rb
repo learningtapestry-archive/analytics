@@ -1,8 +1,11 @@
+require 'pry'
+
 class RawMessage < ActiveRecord::Base
   has_many :raw_message_logs
   module Verbs
     VIEWED = 'viewed'
     CLICKED = 'clicked'
+    VIDEO_ACTION = 'video-action'
   end
 
   def self.create_from_json(raw_json_msg)
@@ -37,6 +40,14 @@ class RawMessage < ActiveRecord::Base
       .where(["#{RawMessageLog.table_name}.action = ?", RawMessageLog::Actions::FROM_REDIS])
       .where.not(id: RawMessageLog.select("raw_message_id").where(action: RawMessageLog::Actions::TO_PAGE_VISITS))
       .limit(limit)
+  end
+
+  def self.find_new_video_visits(limit = 100)
+    ActiveRecord::Base.connection.execute("select msg.id, msg.org_api_key, organizations.id as org_id, user_id, username, page_title, url, action->>'session_id' as session_id, action->>'state' as state, action->>'video_id' as video_id, captured_at from raw_messages msg inner join organizations on (organizations.org_api_key = msg.org_api_key) where verb='video-action' order by session_id, captured_at limit #{limit};")
+  end
+
+  def self.ExtractIDFromYouTube(url)
+    url
   end
 
 end

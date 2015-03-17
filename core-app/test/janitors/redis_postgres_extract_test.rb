@@ -3,6 +3,9 @@ require test_helper_file
 
 require 'date'
 require File::join(LT::janitor_path,'redis_postgres_extract.rb')
+require './lib/util/csv_database_loader.rb'
+
+
 
 class RedisPostgresExtractTest < LTDBTestBase
 
@@ -135,13 +138,24 @@ class RedisPostgresExtractTest < LTDBTestBase
     assert_equal scenario[:raw_messages].size, PageVisit.count
   end
 
+  def test_extract_from_raw_messages_to_video_view
+    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/raw_messages.csv'))
+    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
+    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/organizations.csv'))
+    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
+    assert_equal 38, RawMessage.all.count
+
+    LT::Janitors::RawMessagesExtract.raw_messages_to_video_visits
+    assert_equal 4, VideoView.all.count
+    assert_equal 2, Video.all.count
+  end
+
   def teardown
     super
   end
   def setup
     super
   end
-
 
 
   # we have two tests b/c one has to run before the other

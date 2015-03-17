@@ -8,7 +8,6 @@ class APIDataFactoryTest < LTDBTestBase
   def setup
     super
 
-    puts File::expand_path(File::join(LT::db_path, '/csv/test/organizations.csv'))
     csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/organizations.csv'))
     LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
 
@@ -122,7 +121,6 @@ class APIDataFactoryTest < LTDBTestBase
   end
 
   def test_page_visits_by_usernames
-
     user1 = User.find_by_username 'joesmith@foo.com'
     assert user1
     user2 = User.find_by_username 'bob@foo.com'
@@ -188,6 +186,7 @@ class APIDataFactoryTest < LTDBTestBase
 
     ## Test with two users (Joe and Bob) detail view, two specific pages
 
+=begin
     page_urls = [ 'http://stackoverflow.com/questions/17333994/how-to-copy-one-column-of-a-table-into-another-tables-column-in-postgresql-comp', 'http://stackoverflow.com/questions/17877220/how-should-hateoas-style-links-be-implemented-for-restful-json-collections' ]
 
     params[:date_begin] = '2014-10-01'
@@ -216,6 +215,7 @@ class APIDataFactoryTest < LTDBTestBase
     joe_visits[:page_visits].each do |page_visit|
       assert 'arstechnica.com', page_visit[:site_domain]
     end
+=end
 
   end
 

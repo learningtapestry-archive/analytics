@@ -54,5 +54,36 @@ class VideoView < ActiveRecord::Base
   end
 
 
+  def self.find(params = {})
+    sql = "
+    SELECT
+      videos.title,
+      videos.url,
+      videos.publisher,
+      users.username,
+      video_views.time_started,
+      video_views.time_ended,
+      video_views.paused_count
+    FROM
+      video_views,
+      organizations,
+      users,
+      videos
+    WHERE
+      video_views.user_id = users.id AND
+      users.organization_id = organizations.id AND
+      video_views.video_id = videos.id AND
+      organizations.org_api_key='#{params[:org_api_key]}' "
+
+    if params[:time_started] != nil
+      sql = sql + "AND time_started>='#{params[:time_started]}'"
+    end
+
+    if params[:time_ended] != nil
+      sql = sql + "AND time_ended<='#{params[:time_ended]}'"
+    end
+
+    self.connection.select_all(sql)
+  end
 
 end

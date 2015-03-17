@@ -154,22 +154,14 @@ module LT
         retval
       end
 
-      def self.video_visits(org_api_key, org_secret_key)
-        throw ParameterMissing, 'Required org_api_key and org_secret_key not provided' unless org_api_key and org_secret_key
+      def self.video_visits(params = {})
+        throw ParameterMissing, 'Required org_api_key and org_secret_key not provided' unless params[:org_api_key] and params[:org_secret_key]
+        org = Organization.find_by_org_api_key(params[:org_api_key])
 
-        retval = {}
-        ActiveRecord::Base.connection.execute("select msg.id, msg.org_api_key, organizations.id as org_id, user_id, username, page_title, url, action->>'session_id' as session_id, action->>'state' as state, action->>'video_id' as video_id, captured_at from raw_messages msg inner join organizations on (organizations.org_api_key = msg.org_api_key) where verb='video-action' order by session_id, captured_at;")
-
-        org = VideoView.find_by_org_api_key(org_api_key)
-        # TODO Security: Organization should take care of being locked internally
-        #   -- the .verify_secret method should check self.locked
-        if org.nil? or org.locked or !org.verify_secret(org_secret_key)
-          retval[:error] = 'org_api_key invalid or locked'
-          retval[:status] = 401
+        if org.nil? or org.locked or !org.verify_secret(params[:org_secret_key])
+          retval= { error: 'video_visits - org_api_key or org_secret_key invalid or locked' }.to_json
         else
-          # TODO: Jason check this line - is this always a 200 response?
-          retval[:status] = 200
-          retval[:results] = org.users.select(:id, :first_name, :last_name, :username).order(:username)
+          retval = VideoView.find(params).to_json
         end
 
         retval

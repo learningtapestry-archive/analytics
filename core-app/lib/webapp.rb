@@ -55,11 +55,17 @@ module LT
 
     API_ERROR_MESSAGE ||= { status: 'unknown error' }.to_json
 
+    def allow_cross_domain_access
+      response.headers['Access-Control-Allow-Origin'] = '*'
+      response.headers['Access-Control-Allow-Methods'] = 'GET, PUT, POST, DELETE'
+    end
+
     # set up UI layout container
     # we need this container to set dynamic content in the layout template
     # we can set things like CSS templates, Javascript includes, etc.
     before do
       @layout = {}
+      allow_cross_domain_access
     end
 
     # This is used by js-collector testing to pull known page/data from server
@@ -233,7 +239,6 @@ module LT
     end
 
     get '/api/v1/users' do
-      content_type :json
       if params[:org_api_key].nil? or params[:org_secret_key].nil?
         status 401 # = HTTP Unauthorized
         json error: 'Organization API key (org_api_key) and secret (org_secret_key) not provided'
@@ -255,19 +260,19 @@ module LT
       content_type :json
       if params[:org_api_key].nil? or params[:org_secret_key].nil?
         status 401 # = HTTP Unauthorized
-        json error: 'Organization API key (org_api_key) and secret (org_secret_key) not provided'
+        { error: 'Organization API key (org_api_key) and secret (org_secret_key) not provided' }.to_json
       else
         begin
-          retval = LT::Utilities::APIDataFactory.users(params[:org_api_key], params[:org_secret_key])
-          status retval[:status]
+          retval = LT::Utilities::APIDataFactory.video_visits(params)
+          status 200
         rescue Exception => e
-          LT::logger.error "Unknown error in /api/v1/users: #{e.message}"
-          LT::logger.error "- Backtrace: #{e.backtrace}"
+          LT::logger.error "Unknown error in /api/v1/video_views: #{e.message}"
+          #LT::logger.error "- Backtrace: #{e.backtrace}"
           status 500 # = HTTP Unknown Error
           API_ERROR_MESSAGE
         end
-        json retval
       end
+      retval
     end
 
 

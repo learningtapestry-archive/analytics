@@ -98,6 +98,12 @@ namespace :lt do
       require './lib/janitors/redis_postgres_extract.rb'
       LT::Janitors::RawMessagesExtract.raw_messages_to_video_visits
     end
+    desc "Fill YouTube Information"
+    task :fill_video_youtube_information do
+      Rake::Task[:'lt:boot'].invoke
+      require './lib/janitors/web_extractor.rb'
+      LT::Janitors::WebExtractor.fill_youtube_info
+    end
 
     desc "Extract Learning Registry data to raw documents table from http://sandbox.learningregistry.org"
     task :extract_meta_data do # TODO: rename this rake task name.

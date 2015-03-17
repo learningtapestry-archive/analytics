@@ -251,6 +251,25 @@ module LT
       end
     end
 
+    get '/api/v1/video_views' do
+      content_type :json
+      if params[:org_api_key].nil? or params[:org_secret_key].nil?
+        status 401 # = HTTP Unauthorized
+        json error: 'Organization API key (org_api_key) and secret (org_secret_key) not provided'
+      else
+        begin
+          retval = LT::Utilities::APIDataFactory.users(params[:org_api_key], params[:org_secret_key])
+          status retval[:status]
+        rescue Exception => e
+          LT::logger.error "Unknown error in /api/v1/users: #{e.message}"
+          LT::logger.error "- Backtrace: #{e.backtrace}"
+          status 500 # = HTTP Unknown Error
+          API_ERROR_MESSAGE
+        end
+        json retval
+      end
+    end
+
 
     def map_obtain_params(http_params)
       retval = {}

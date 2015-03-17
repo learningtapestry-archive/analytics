@@ -53,4 +53,6 @@ class VideoView < ActiveRecord::Base
     {video_view: video_view}
   end
 
+
+
 end

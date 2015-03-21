@@ -172,7 +172,6 @@ class ApiAppTest < WebAppTestBase
   end
 
   def test_video_views
-
     csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/raw_messages.csv'))
     LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
     csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/organizations.csv'))
@@ -186,10 +185,9 @@ class ApiAppTest < WebAppTestBase
     assert_equal 4, VideoView.all.count
     assert_equal 2, Video.all.count
 
-
     ## Valid test, receive two users
     params = { org_api_key: '00000000-0000-4000-8000-000000000000', org_secret_key: 'secret' }
-    get '/api/v1/video_views', params  do
+    get '/api/v1/video_views', params do
       response_json = JSON.parse(last_response.body, symbolize_names: true) if last_response.body and last_response.body != 'null'
       assert_equal 200, last_response.status
       assert response_json

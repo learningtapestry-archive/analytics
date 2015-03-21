@@ -53,43 +53,48 @@ module LT
       def raw_messages_to_video_visits
         num_transactions = 0; num_failed = 0
         RawMessage.transaction do
-
-          current_session_id = ''
-          started_time = ''
-          paused_count = 0
-          end_time = ''
-          video_id = ''
-          username = ''
-          url = ''
-          page_url = ''
-          org_id = 0
+          params = {}
+          params[:current_session_id] = nil
 
           RawMessage.find_new_video_visits.each do |raw_video_visit|
             begin
-              if current_session_id != raw_video_visit['session_id']
-                if video_id
-                  save_video_view(current_session_id, url, page_url, username, org_id, paused_count, started_time, end_time)
+              if params[:current_session_id] != raw_video_visit['session_id']
+                if params[:video_id]
+                  save_video_view(params)
+                  params[:time_started] = nil
                 end
 
-                current_session_id = raw_video_visit['session_id']
-                paused_count = 0
-
-                user = User.find_or_create_by(username: username, organization_id: org_id)
+                params[:current_session_id] = raw_video_visit['session_id']
+                params[:username] = raw_video_visit['username']
+                params[:paused_count] = 0
               end
 
-              org_id = raw_video_visit['org_id']
-              video_id = raw_video_visit['video_id']
-              username = raw_video_visit['username']
-              url = raw_video_visit['video_id']
-              page_url = raw_video_visit['url']
+              params[:org_id] = raw_video_visit['org_id']
+              params[:video_id] = raw_video_visit['video_id']
+              params[:url] = raw_video_visit['video_id']
+              params[:page_url] = raw_video_visit['url']
 
               case raw_video_visit['state']
                 when 'playing'
-                  started_time = raw_video_visit['captured_at']
+                  if (!params[:time_started])
+                    params[:time_started] = raw_video_visit['captured_at']
+                  else
+                    if DateTime.parse(params[:time_started]) > DateTime.parse(raw_video_visit['captured_at'])
+                      params[:time_started] = raw_video_visit['captured_at']
+                    end
+                  end
+                  #end
                 when 'ended'
-                  end_time = raw_video_visit['captured_at']
+                  if (!params[:time_ended])
+                    params[:time_ended] = raw_video_visit['captured_at']
+                  else
+                    if DateTime.parse(params[:time_ended]) < DateTime.parse(raw_video_visit['captured_at'])
+                      params[:time_ended] = raw_video_visit['captured_at']
+                    end
+                  end
+                  params[:time_visited] = ((DateTime.parse(params[:time_ended]) - DateTime.parse(params[:time_started])) * 24 * 60 * 60).to_i
                 when 'paused'
-                  paused_count += 1
+                  params[:paused_count] += 1
               end
 
               # VideoView.create_from_raw_message(raw_video_visit)
@@ -102,34 +107,37 @@ module LT
             break if num_transactions > MAX_RAW_MESSAGE_TRANSACTION_LENGTH
           end # RawMessage.find_new_video_visits.each
 
-          save_video_view(current_session_id, url, page_url, username, org_id, paused_count, started_time, end_time)
+          save_video_view(params)
+          params[:time_started] = nil
 
         end # RawMessage.transaction
         LT::logger.info("RawMessagesExtract: Finished extract PG raw message to video visits, transactions: #{num_transactions}, failures: #{num_failed}")
         {number_of_records: num_transactions}
       end
 
-      def save_video_view(current_session_id, url, page_url, username, org_id, paused_count, started_time, end_time)
-        if current_session_id.length == 36
+      def save_video_view(params)
+        if params[:current_session_id].length == 36
           begin
-            user = User.find_or_create_by(username: username, organization_id: org_id)
-
-            v = Video.find_or_create_by_url(url)
+            user = User.find_or_create_by(username: params[:username], organization_id: params[:org_id])
+            v = Video.find_or_create_by_url(params[:url])
             data = {}
-            data[:url] = page_url
+            data[:url] = params[:page_url]
             page = Page.find_or_create_by_url(data)
+
 
             vv = VideoView.new
             vv.video_id = v.id
             vv.page_id = page.id
             vv.user_id = user.id
-            vv.time_started = started_time
-            vv.time_ended = end_time
-            vv.paused_count = paused_count
+            vv.time_started = params[:time_started]
+            vv.time_ended = params[:time_ended]
+            vv.time_viewed = params[:time_viewed]
+            vv.paused_count = params[:paused_count]
             vv.save
-            LT::logger.debug("save_video_view: Finished extract PG raw message to video visits, url: #{url}")
+
+            LT::logger.debug("save_video_view: Finished extract PG raw message to video visits, url: #{params[:url]}")
           rescue Exception => e
-            LT::logger.error("RawMessagesExtract.save_video_view: Failed insert PG video visit, url: #{url}, exception: #{e.message}")
+            LT::logger.error("RawMessagesExtract.save_video_view: Failed insert PG video visit, url: #{params[:url]}, exception: #{e.message}")
           end
         end
 

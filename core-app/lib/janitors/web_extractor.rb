@@ -7,7 +7,6 @@ module LT
     module WebExtractor class << self
 
       def fill_youtube_info
-        puts 'starting'
         Video.where('title IS NULL AND service_id IS NULL').each do | video |
           document = Nokogiri::HTML(open(video['url']))
 

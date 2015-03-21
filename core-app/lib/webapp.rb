@@ -119,14 +119,15 @@ module LT
       # reject this request unless org_api_key is found in Redis
       if LT::RedisServer::org_api_key_get(org_api_key).nil?
         status 401
-        return
+        return '// Invalid org_api_key'
       else
         lt_api_server = get_server_url
         locals = {
           org_api_key: CGI::escape(org_api_key),
           user_id: CGI::escape(username),
           assert_end_point: "#{lt_api_server}#{ORG_API_KEY_ASSERT_ROUTE}",
-          lt_api_server: lt_api_server
+          lt_api_server: lt_api_server,
+          autostart: false
         }
         # main selector to determine which javascript page to generate/send
         if params[:page] == 'collector' then
@@ -142,14 +143,14 @@ module LT
               locals[:lt_api_libs] = ['collector', 'collector_video']
             else
               status 401
-              return
+              return '// Invalid loader parameters'
           end
           # instruct loader to auto-start if request asks for this
           locals[:autostart] = true if params[:autostart] == 'true'
           erb :'loader.js', :layout => false, locals: locals
         else
           status 401
-          return
+          return '// Invalid page parameters'
         end
       end
     end

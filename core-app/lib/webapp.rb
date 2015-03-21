@@ -140,7 +140,7 @@ module LT
           # these files into the loader itself so that they will be loaded
           case params[:load]
             when 'collector'
-              locals[:lt_api_libs] = ['collector', 'collector_video']
+              locals[:lt_api_libs] = ['collector']
             else
               status 401
               return '// Invalid loader parameters'

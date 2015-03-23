@@ -33,6 +33,10 @@ module LT
   class ModelNotFound < BaseException;end
   class InvalidFileFormat < BaseException;end
 
+  module Constants
+    SERVICES_YOUTUBE = 'youtube'
+  end
+
   class << self
     def env?(type)
       (self.run_env == (type && ENV['RAILS_ENV'] = type))    

@@ -141,7 +141,7 @@ class WebAppJSTest < WebAppJSTestBase
     sleep 0.1
     message = LT::RedisServer.raw_message_pop
     refute_nil message, "No Redis message received from Ajax call via assert api."
-    message = JSON.parse(message)
+    message = JSON.parse(message.force_encoding('UTF-8'))
     assert_equal "0S", message["action"]["time"]
     assert_equal RawMessage::Verbs::VIEWED, message["verb"]
     assert_match page_title, message["page_title"]
@@ -159,7 +159,7 @@ class WebAppJSTest < WebAppJSTestBase
     page.execute_script(pageArrivalScript)
     sleep 0.1
     message = LT::RedisServer.raw_message_pop
-    message = JSON.parse(message)
+    message = JSON.parse(message.force_encoding('UTF-8'))
     assert_equal RawMessage::Verbs::CLICKED, message["verb"]
     # the first two chars are filled with junk for some reason
     assert_match page_title[2..50], message["page_title"][2..50]
@@ -208,7 +208,7 @@ class WebAppJSTest < WebAppJSTestBase
       html = wait_for_qunit(page)
     end
     message = LT::RedisServer.raw_message_pop
-    message = JSON.parse(message)
+    message = JSON.parse(message.force_encoding('UTF-8'))
     assert_equal RawMessage::Verbs::CLICKED, message["verb"]
 
     # we visit a new url in the same browser window, which kicks off

@@ -176,8 +176,6 @@ class ApiAppTest < WebAppTestBase
     LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
     csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/organizations.csv'))
     LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
-    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/users.csv'))
-    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
 
     assert_equal 38, RawMessage.all.count
 

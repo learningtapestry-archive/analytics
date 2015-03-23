@@ -219,12 +219,12 @@ class WebAppJSTest < WebAppJSTestBase
     end
     # first message on the stack will be a "viewed" as the previous page unloads
     message = LT::RedisServer.raw_message_pop
-    message = JSON.parse(message)
+    message = JSON.parse(message.force_encoding('UTF-8'))
     assert_equal RawMessage::Verbs::VIEWED, message["verb"]
 
     # next message on the stack will be a "click" from arrival onto the most recent page
     message = LT::RedisServer.raw_message_pop
-    message = JSON.parse(message)
+    message = JSON.parse(message.force_encoding('UTF-8'))
     assert_equal RawMessage::Verbs::CLICKED, message["verb"]
 
     #use_selenium

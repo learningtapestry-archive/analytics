@@ -16,10 +16,13 @@ class ApiKeyModelTest < LTDBTestBase
       ApiKey.create_api_key(nil)
     end
 
-    # Invalid JSON
-    assert_raises LT::InvalidParameter do
-      ApiKey.create_api_key("junk")
+    capture(:stderr) do
+      # Invalid JSON
+      assert_raises LT::InvalidParameter do
+        ApiKey.create_api_key("junk")
+      end
     end
+
   end
 
   def test_create_valid_api_key

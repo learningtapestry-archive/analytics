@@ -61,7 +61,7 @@ module LT
               if params[:current_session_id] != raw_video_visit['session_id']
                 if params[:video_id]
                   save_video_view(params)
-                  params[:time_started] = nil
+                  params[:date_started] = nil
                 end
 
                 params[:current_session_id] = raw_video_visit['session_id']
@@ -76,23 +76,23 @@ module LT
 
               case raw_video_visit['state']
                 when 'playing'
-                  if (!params[:time_started])
-                    params[:time_started] = raw_video_visit['captured_at']
+                  if (!params[:date_started])
+                    params[:date_started] = DateTime.parse(raw_video_visit['captured_at'])
                   else
-                    if DateTime.parse(params[:time_started]) > DateTime.parse(raw_video_visit['captured_at'])
-                      params[:time_started] = raw_video_visit['captured_at']
+                    if params[:date_started] > DateTime.parse(raw_video_visit['captured_at'])
+                      params[:date_started] = DateTime.parse(raw_video_visit['captured_at'])
                     end
                   end
                   #end
                 when 'ended'
-                  if (!params[:time_ended])
-                    params[:time_ended] = raw_video_visit['captured_at']
+                  if (!params[:date_ended])
+                    params[:date_ended] = DateTime.parse(raw_video_visit['captured_at'])
                   else
-                    if DateTime.parse(params[:time_ended]) < DateTime.parse(raw_video_visit['captured_at'])
-                      params[:time_ended] = raw_video_visit['captured_at']
+                    if params[:date_ended] < DateTime.parse(raw_video_visit['captured_at'])
+                      params[:date_ended] = DateTime.parse(raw_video_visit['captured_at'])
                     end
                   end
-                  params[:time_visited] = ((DateTime.parse(params[:time_ended]) - DateTime.parse(params[:time_started])) * 24 * 60 * 60).to_i
+                  params[:time_viewed] = ((params[:date_ended] - params[:date_started]) * 24 * 60 * 60).to_i
                 when 'paused'
                   params[:paused_count] += 1
               end
@@ -108,7 +108,7 @@ module LT
           end # RawMessage.find_new_video_visits.each
 
           save_video_view(params)
-          params[:time_started] = nil
+          params[:date_started] = nil
 
         end # RawMessage.transaction
         LT::logger.info("RawMessagesExtract: Finished extract PG raw message to video visits, transactions: #{num_transactions}, failures: #{num_failed}")
@@ -120,18 +120,16 @@ module LT
           begin
             user = User.find_or_create_by(username: params[:username], organization_id: params[:org_id])
             v = Video.find_or_create_by_url(params[:url])
-            data = {}
-            data[:url] = params[:page_url]
-            page = Page.find_or_create_by_url(data)
 
+            page = Page.find_or_create_by_url({url:  params[:page_url]})
 
             vv = VideoView.new
             vv.video_id = v.id
             vv.page_id = page.id
             vv.user_id = user.id
-            vv.time_started = params[:time_started]
-            vv.time_ended = params[:time_ended]
-            vv.time_viewed = params[:time_viewed]
+            vv.date_started = params[:date_started]
+            vv.date_ended = params[:date_ended]
+            #vv.time_viewed = params[:time_viewed]
             vv.paused_count = params[:paused_count]
             vv.save
 

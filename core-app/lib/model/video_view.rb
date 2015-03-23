@@ -61,8 +61,8 @@ class VideoView < ActiveRecord::Base
       videos.url,
       videos.publisher,
       users.username,
-      video_views.time_started,
-      video_views.time_ended,
+      video_views.date_started,
+      video_views.date_ended,
       video_views.paused_count
     FROM
       video_views,
@@ -75,12 +75,12 @@ class VideoView < ActiveRecord::Base
       video_views.video_id = videos.id AND
       organizations.org_api_key='#{params[:org_api_key]}' "
 
-    if params[:time_started] != nil
-      sql = sql + "AND time_started>='#{params[:time_started]}'"
+    if params[:date_started] != nil
+      sql = sql + "AND time_started>='#{params[:date_started]}'"
     end
 
-    if params[:time_ended] != nil
-      sql = sql + "AND time_ended<='#{params[:time_ended]}'"
+    if params[:date_ended] != nil
+      sql = sql + "AND time_ended<='#{params[:date_ended]}'"
     end
 
     self.connection.select_all(sql)

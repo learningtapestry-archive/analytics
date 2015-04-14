@@ -1,46 +1,61 @@
-lt-dev01.betaspaces.com
+### Requirements
 
-Postgres install (Debian/Ubuntu)
-  sudo apt-get install postgres-client
-  sudo apt-get install libpq-dev (develop libs)
+* Ruby: 2.2.1
+* Bundler
+* Postgresql 9.4
+* Redis
+* Phantomjs
 
-Chrome plugin
-  Zip
-  CRX extension
-  Drag/drop into Extensions folder in Chrome
-  Approved site list is loaded dynamically from http://lt-dev01.betaspaces.com/api/v1/user/approved-sites
+#### Bundler & Gemfiles
 
-Nginx
-  Install Lua module
+To use Gemfiles see [bundler.io](http://bundler.io). Bundler helps you ensure
+that you are using the correct versions of your gem dependencies.
 
-Ruby-Pg dequeue
-  Ruby: 1.9.3
-  Bundler: gem install bundler
-  Setup db/config.yml file with correct login info
-  rake db:create
-  rake db:migrate
+* Install bundler: `gem install bundler`.
+* Install Gemfile dependencies: `bundle install`.
+* Update Gemfile dependencies: `bundle update`.
+* Bundle gems excluding specific groups: `bundle install --without test`
 
-  https://github.com/science/learntaculous/blob/master/ruby-janitors/redis-to-postgres-html-dequeue.rb
-  # needs sql optimization for data load
+#### Postgresql (for Debian/Ubuntu)
 
-# Gemfiles
+* Installation
 
-To use Gemfiles see bundler.io
+```bash
+sudo apt-get install postgres-client
+sudo apt-get install libpq-dev # development libraries
+```
 
-To install: sudo gem install bundler
+* Setup to match example files information
 
-To use: bundler install or bundler update
+```bash
+sudo su - postgres
+psql -c "CREATE USER lt_dbo WITH PASSWORD 'lt_dev_xyz_123'"
+psql -c "ALTER USER lt_dbo WITH CREATEDB"
+psql -c "CREATE TABLESPACE learntaculous_ts OWNER lt_dbo LOCATION '/var/lib/postgresql/9.4/main'"
+```
 
-To remove all gems not required in this file:
+* Create and migrate the database
 
-  sudo bundle clean --force # Note: normally sudo isn't good for bundle but this is an exception
-  
-This helps ensure that you aren't depending on a gem that isn't installed from this list
+```
+bundle exec rake db:create
+bundle exec rake db:migrate
+```
 
-To bundle gems for production or staging, recommend:
-  
-  bundle install --without test
+#### Chrome plugins
 
-If you want to manage different ruby installations with different gemsets for different projects
+* Zip
+* CRX extension
+* Drag/drop into Extensions folder in Chrome
+* Approved site list is loaded dynamically from http://lt-dev01.betaspaces.com/api/v1/user/approved-sites
 
-Consider installing RVM to help manage that.
+#### Nginx
+
+* Install Lua module
+
+#### Config files
+
+* Use example config files
+
+```bash
+for f in `find -name '*-sample.yml'`; do cp "$f" "${f%-sample.yml}.yml"; done
+```

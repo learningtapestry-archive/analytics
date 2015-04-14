@@ -42,21 +42,21 @@ sudo reboot now
 ```
 1. Interact with application code:
 ```
-cd /opt/learningtapestry/core-app
+cd /opt/learningtapestry/analytics
 rake lt:console
 ```
 1. Update source code from git master
 ```
-cd /opt/learningtapestry/core-app
+cd /opt/learningtapestry/analytics
 git fetch origin
 # Github password is in LastPass under "LT prod Github PK"
 sudo git reset --hard origin/master
-sudo chown -R nobody:www-data /opt/learningtapestry/core-app
-sudo chmod -R ugoa-rwx /opt/learningtapestry/core-app
-sudo chmod -R ug+rx /opt/learningtapestry/core-app
-sudo chmod -R ug+w /opt/learningtapestry/core-app/log
-sudo chmod -R ug+w /opt/learningtapestry/core-app/tmp
-sudo chmod ug+w /opt/learningtapestry/core-app/db/schema.rb 
+sudo chown -R nobody:www-data /opt/learningtapestry/analytics
+sudo chmod -R ugoa-rwx /opt/learningtapestry/analytics
+sudo chmod -R ug+rx /opt/learningtapestry/analytics
+sudo chmod -R ug+w /opt/learningtapestry/analytics/log
+sudo chmod -R ug+w /opt/learningtapestry/analytics/tmp
+sudo chmod ug+w /opt/learningtapestry/analytics/db/schema.rb
 # needs to provide sudo password for unattended install
 bundle install
 rake db:migrate
@@ -73,7 +73,7 @@ o = Organization.create(name: 'Learning Tapestry', org_api_key: SecureRandom.uui
 ```
 1. Manually run Janitor raw message process:
 ```
-cd /opt/learningtapestry/core-app
+cd /opt/learningtapestry/analytics
 rake lt:console
 require File::join(LT::janitor_path,'redis_postgres_extract.rb')
 LT::Janitors::RedisPostgresExtract::redis_to_raw_messages
@@ -91,7 +91,8 @@ sudo -u postgres psql
 1. Cron job to run janitor
 ```
 sudo crontab -e
-*/5 * * * * sudo --user nobody --non-interactive echo && cd /opt/learningtapestry/core-app && /usr/local/bin/rake RAILS_ENV=production lt:janitors:process_redis_messages > /opt/learningtapestry/core-app/log/cron-redis-janitor.txt 2> /tmp/err-cron-redis-janitor.txt
+*/5 * * * * sudo --user nobody --non-interactive echo && cd
+/opt/learningtapestry/analytics && /usr/local/bin/rake RAILS_ENV=production lt:janitors:process_redis_messages > /opt/learningtapestry/analytics/log/cron-redis-janitor.txt 2> /tmp/err-cron-redis-janitor.txt
 ```
 # lt01-dev.betaspaces.com
 
@@ -116,7 +117,7 @@ sudo crontab -e
 
 ### To Dos
 
-* Improvement:  git can't pull down just sub-folders, so CCrb uses ./core-app/run-tests.rb to trigger builds.  Because not a sub-folder, builds will trigger on any LT git check-in.
+* Improvement:  git can't pull down just sub-folders, so CCrb uses ./run-tests.rb to trigger builds.  Because not a sub-folder, builds will trigger on any LT git check-in.
 
 * Improvement:  Start CCrb in a process monitor for better durability.
 
@@ -140,7 +141,7 @@ sudo crontab -e
     * Set virtualbox network adapter to NAT
 
 * To mess with the CI server go to this folder for the code:
-`/home/learntac/.cruise/projects/core-app`
+`/home/learntac/.cruise/projects/analytics`
 
 * byobu: multi-terminal window manager
   * byobu-enable/disable: turn this service on/off
@@ -154,10 +155,10 @@ sudo crontab -e
   * /home/learntac/Projects
     * ./cruisecontrol.rb: code for cruisecontrol
       * /home/learntac/.cruise: CI build of code
-  * /var/www/learntaculous/core-app: web server build of code
+  * /var/www/learntaculous/analytics: web server build of code
   * /etc/thin/webapp.yml: config for thin
     * sudo service thin restart: reboot thin
-    /home/learntac/core-app/log: thin logs
+    /home/learntac/analytics/log: thin logs
   * /etc/nginx/web-sites.confg: nginx configuration file
     * sudo service nginx restart
     * /var/log/nginx: nginx logs

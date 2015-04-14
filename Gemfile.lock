@@ -58,7 +58,7 @@ GEM
     debug_inspector (0.0.2)
     debugger-linecache (1.2.0)
     erubis (2.7.0)
-    eventmachine (1.0.3)
+    eventmachine (1.0.7)
     ffi (1.9.6)
     hitimes (1.2.2)
     htmlentities (4.3.2)

@@ -46,7 +46,6 @@ Java JRE
 *Git
 SmartGit
 Chrome
-cd ~/dev/learntaculous/core-app
 * bundle install
 * Install python 2.7 & dev libs
 ```

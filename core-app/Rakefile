@@ -59,14 +59,14 @@ namespace :lt do
       Rake::Task[:'lt:boot'].invoke
     end
     desc "Run WebApp server - this starts the webserver"
-    task :start do 
+    task :start do
       # TODO - set port/server from environment var
       run_cmd = "rackup -p 8080 -o localhost config.ru"
       $stdout.sync = true
       Kernel.system(run_cmd)
     end
     desc "Run WebApp server - this starts the webserver in dev mode with rerun"
-    task :start_dev do 
+    task :start_dev do
       # TODO - set port/server from environment var
       run_cmd = "rerun -- rackup -p 8080 -o localhost config.ru"
       $stdout.sync = true
@@ -79,7 +79,7 @@ namespace :lt do
     task :process_redis_messages => [:redis_to_raw_messages, :raw_messages_to_page_visits] do
       LT::logger.info("process_redis_analytics completed")
     end
-    
+
     desc "Convert Redis queue to raw_messages table"
     task :redis_to_raw_messages do
       Rake::Task[:'lt:boot'].invoke
@@ -164,15 +164,15 @@ namespace :lt do
       LT::logger.info("Test setup complete. Running all tests.")
       LT::run_tests
     end
-    
+
     desc "Run complete test suite w/out DB reset"
-    task :run_tests => [:'lt:test:boot', 
+    task :run_tests => [:'lt:test:boot',
       :'lt:test:db:migrate_tables'] do
       LT::run_tests
     end
 
     desc "Run single test file"
-    task :run_test, [:testfile] => [:'lt:test:boot', 
+    task :run_test, [:testfile] => [:'lt:test:boot',
       :'lt:test:db:migrate_tables'] do |t, args|
       arg_filename = args[:testfile]
       # if we are given a file with no path, search test folder for the file to run
@@ -284,4 +284,3 @@ namespace :lt do
     end # task :monitor
   end # test namesapce
 end # lt namespace
-

@@ -143,7 +143,7 @@ namespace :lt do
     binding.pry
   end
 
-  desc "Boot Core-app system"
+  desc "Boot analytics system"
   task :boot do
     LT::boot_all(File::dirname(__FILE__))
   end
@@ -185,7 +185,7 @@ namespace :lt do
     end
 
     task :boot do
-      # Force us into testing environment, then boot core-app
+      # Force us into testing environment, then boot analytics
       ENV['RAILS_ENV'] = 'test'
       Rake::Task[:'lt:boot'].invoke
       LT::testing!
@@ -287,8 +287,8 @@ end # lt namespace
 
 namespace :build do
   # Cruise Control will call this task if it exists
-  task :core_app do
-    puts "Building core-app project..."
+  task :analytics do
+    puts "Building analytics project..."
     puts "Running in dir: #{Dir::pwd}"
     puts "Running `sudo bundle install`"
     puts `sudo bundle install`

@@ -74,7 +74,7 @@ module LT
       LT::load_all_models
       LT::require_env_specific_files
       LT::boot_redis(File::join(LT::db_path, 'redis.yml'))
-      LT::logger.info("Core-app booted (mode: #{LT::run_env})")
+      LT::logger.info("Analytics booted (mode: #{LT::run_env})")
     end
 
     # app_root_dir is the path to the root of the application being booted

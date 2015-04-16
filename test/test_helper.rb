@@ -42,6 +42,20 @@ class LTTestBase < Minitest::Test
   end
 end
 
+class LTRedisTestBase < LTTestBase
+  def env
+    @env ||= LT::Environment.new(File.expand_path('../../', __FILE__))
+  end
+
+  def connection
+    env.redis.connection
+  end
+
+  def setup
+    env.boot_redis(File.expand_path('../../config/redis.yml', __FILE__))
+  end
+end
+
 # provides for transactional cleanup of activerecord activity
 class LTDBTestBase < LTTestBase
   def initialize(*opts)

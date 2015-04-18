@@ -3,7 +3,7 @@ require test_helper_file
 
 require 'utils/scenarios'
 
-class ApprovedSiteActionTest < LTDBTestBase
+class ApprovedSiteActionTest < LT::Test::DBTestBase
   def setup
     super
     @scenario = Analytics::Utils::Scenarios::Students::create_joe_smith_scenario

@@ -9,7 +9,7 @@ require 'utils/scenarios'
 
 require 'helpers/redis'
 
-class RedisPostgresExtractTest < LTDBTestBase
+class RedisPostgresExtractTest < LT::Test::DBTestBase
   include Analytics::Helpers::Redis
 
   def test_extract_from_redis_to_pg_scenario

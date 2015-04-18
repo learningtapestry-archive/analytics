@@ -3,7 +3,7 @@ require test_helper_file
 
 require 'utils/csv_database_loader'
 
-class CsvDatabaseLoaderTest < LTDBTestBase
+class CsvDatabaseLoaderTest < LT::Test::DBTestBase
   def test_InvalidCSVModelMatch
     csv_file_name = File::expand_path(File::join(LT.environment.db_path, '/csv/test/fail_cases/schools_invalid.csv'))
     suspend_log_level do

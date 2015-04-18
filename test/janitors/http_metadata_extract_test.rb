@@ -3,7 +3,7 @@ require test_helper_file
 
 require File::join(LT.environment.janitor_path,'http_metadata_extract.rb')
 
-class HttpMetadataExtractTest < LTDBTestBase
+class HttpMetadataExtractTest < LT::Test::DBTestBase
 
   def test_metadata_grab_youtube
     video = Video.new

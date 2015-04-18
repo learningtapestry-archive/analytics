@@ -3,7 +3,7 @@ require test_helper_file
 
 require 'utils/scenarios'
 
-class StudentModelTest < LTDBTestBase
+class StudentModelTest < LT::Test::DBTestBase
   def setup
     super
     LT::Seeds::seed!

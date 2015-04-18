@@ -4,7 +4,7 @@ require test_helper_file
 require File::join(LT.environment.janitor_path,'redis_postgres_extract.rb')
 require 'utils/scenarios'
 
-class PageVisitModelTest < LTDBTestBase
+class PageVisitModelTest < LT::Test::DBTestBase
   def setup
     super
     LT::Seeds::seed!

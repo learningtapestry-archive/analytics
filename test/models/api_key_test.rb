@@ -1,7 +1,7 @@
 test_helper_file = File::expand_path(File::join(LT.environment.test_path,'test_helper.rb'))
 require test_helper_file
 
-class ApiKeyModelTest < LTDBTestBase
+class ApiKeyModelTest < LT::Test::DBTestBase
   include Analytics::Helpers::Redis
 
   def test_create_api_key_invalid_user_id

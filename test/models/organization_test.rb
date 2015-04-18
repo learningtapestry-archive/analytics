@@ -3,7 +3,7 @@ require test_helper_file
 
 require 'helpers/redis'
 
-class OrganizationTest < LTDBTestBase
+class OrganizationTest < LT::Test::DBTestBase
   include Analytics::Helpers::Redis
 
   def test_create_simple

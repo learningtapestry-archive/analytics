@@ -3,7 +3,7 @@ require test_helper_file
 
 require 'utils/scenarios'
 
-class UserSecurityTest < LTDBTestBase
+class UserSecurityTest < LT::Test::DBTestBase
   def test_password_hashing_validation
     password = 'xyzabc'
     username = 'foobar-user'
@@ -17,7 +17,7 @@ class UserSecurityTest < LTDBTestBase
   end
 end
 
-class UserModelTest < LTDBTestBase
+class UserModelTest < LT::Test::DBTestBase
   def setup
     super
 

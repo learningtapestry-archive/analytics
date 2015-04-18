@@ -4,7 +4,7 @@ require test_helper_file
 require 'helpers/api_data_factory.rb'
 require 'utils/csv_database_loader'
 
-class APIDataFactoryTest < LTDBTestBase
+class APIDataFactoryTest < LT::Test::DBTestBase
   def setup
     super
 

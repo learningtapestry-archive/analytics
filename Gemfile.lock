@@ -1,6 +1,7 @@
 GIT
-  remote: https://792de6a69ea9f5e82e17ca9d46d920b19462cfe4@github.com/learningtapestry/core
-  revision: d05d0b66319943fa67ec4cfbe82ea697736bfa37
+  remote: git@github.com:learningtapestry/core.git
+  revision: 24ea11b7c3ca1d532f9df4dbcb49a402ff0b1b3f
+  branch: changes_for_analytics_migration
   specs:
     lt-core (0.1.0)
       activerecord (~> 4.2.0)

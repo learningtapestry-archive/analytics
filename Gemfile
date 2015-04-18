@@ -64,4 +64,6 @@ end
   gem 'pry-stack_explorer', '>=0.4.9.1'
  end
 
-gem 'lt-core', :git => 'https://792de6a69ea9f5e82e17ca9d46d920b19462cfe4@github.com/learningtapestry/core'
+# Until changes are merged into master, for easier testing
+gem 'lt-core', git: 'git@github.com:learningtapestry/core.git',
+               branch: 'changes_for_analytics_migration'

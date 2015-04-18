@@ -10,11 +10,9 @@ class ApiKeyModelTest < LT::Test::DBTestBase
       ApiKey.create_api_key(nil)
     end
 
-    capture(:stderr) do
-      # Invalid JSON
-      assert_raises LT::InvalidParameter do
-        ApiKey.create_api_key("junk")
-      end
+    # Invalid JSON
+    assert_raises LT::InvalidParameter do
+      ApiKey.create_api_key("junk")
     end
   end
 

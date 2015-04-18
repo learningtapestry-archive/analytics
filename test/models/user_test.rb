@@ -93,17 +93,15 @@ class UserModelTest < LT::Test::DBTestBase
     assert user.authenticate(@password)
     assert !retval[:exception]
 
-    capture(:stderr) do
-      retval = User.get_validated_user(@username, "bs password no worky")
-      user2 = retval[:user]
-      assert !user2
-      assert_equal LT::PasswordInvalid, retval[:exception].class
+    retval = User.get_validated_user(@username, "bs password no worky")
+    user2 = retval[:user]
+    assert !user2
+    assert_equal LT::PasswordInvalid, retval[:exception].class
 
-      retval = User.get_validated_user("bs username no worky", "pw doesn't matter")
-      user2 = retval[:user]
-      assert !user2
-      assert_equal LT::UserNotFound, retval[:exception].class
-    end
+    retval = User.get_validated_user("bs username no worky", "pw doesn't matter")
+    user2 = retval[:user]
+    assert !user2
+    assert_equal LT::UserNotFound, retval[:exception].class
   end
 
   def test_sites_visits

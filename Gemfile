@@ -12,13 +12,13 @@
 # Consider installing RVM to help manage that.
 source 'https://rubygems.org'
 gem 'rake'
+
 # core gems (need to be careful about version updating)
 gem 'actionpack', '~> 4.2.0'
 gem 'activesupport', '~> 4.2.0'
 gem 'activerecord', '~> 4.2.0'
 gem 'actionview', '~> 4.2.0'
 gem 'sinatra', '~> 1.4.5'
-gem 'sinatra-contrib', '~> 1.4.2'
 
 # additional gems (probably can accept new major versions without breaking)
 gem 'log4r', '>= 1.1.10'

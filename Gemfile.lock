@@ -223,7 +223,6 @@ DEPENDENCIES
   rerun (>= 0.10.0)
   selenium-webdriver (>= 2.43.0)
   sinatra (~> 1.4.5)
-  sinatra-contrib (~> 1.4.2)
   smarter_csv (>= 1.0.17)
   term-ansicolor (>= 1.3.0)
   thin (>= 1.6.3)

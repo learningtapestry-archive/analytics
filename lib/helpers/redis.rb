@@ -62,23 +62,24 @@ module Analytics
       #
       # A hash-like object for api keys
       #
-      def keys
-        @keys ||= HashWrapper.new(LT.env.redis.connection, 'hashlist_api_keys')
+      def keys_hash
+        @keys_hash ||=
+          HashWrapper.new(LT.env.redis.connection, 'hashlist_api_keys')
       end
 
       #
       # A hash-like object for org api keys
       #
-      def org_keys
-        @org_keys ||=
+      def org_keys_hash
+        @org_keys_hash ||=
           HashWrapper.new(LT.env.redis.connection, 'hashlist_org_api_keys')
       end
 
       #
       # A queue-like object for raw messages
       #
-      def messages
-        @messages ||=
+      def messages_queue
+        @messages_queue ||=
           QueueWrapper.new(LT.env.redis.connection, 'queue_raw_messages')
       end
     end

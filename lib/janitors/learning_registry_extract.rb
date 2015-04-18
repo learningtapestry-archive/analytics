@@ -13,7 +13,7 @@ module LT
 
       # start point
       def retrieve(options = {})
-        LT::logger.info("#{self.name}: Starting...")
+        LT.env.logger.info("#{self.name}: Starting...")
 
         total_count = 0
 
@@ -21,17 +21,17 @@ module LT
         on_date = start_date
 
         (start_date..Date.today).each do |date|
-          LT::logger.info("#{self.name}: Start to extract records at #{date}.")
+          LT.env.logger.info("#{self.name}: Start to extract records at #{date}.")
 
           cnt = retrieve_records_by_date(date, options)
 
-          LT::logger.info("#{self.name}: #{cnt} records were extracted at #{date}.")
+          LT.env.logger.info("#{self.name}: #{cnt} records were extracted at #{date}.")
 
           total_count += cnt
           on_date = date
         end
         
-        LT::logger.info("#{self.name}: Total #{total_count} records were extracted.")
+        LT.env.logger.info("#{self.name}: Total #{total_count} records were extracted.")
 
         # create raw_document_log
         row_document_log = RawDocumentLog.create(
@@ -39,9 +39,9 @@ module LT
           'newest_import_date'  => on_date,
         )
 
-        LT::logger.info("#{self.name}: Row document log was created.")
+        LT.env.logger.info("#{self.name}: Row document log was created.")
 
-        LT::logger.info("#{self.name}: Success.")
+        LT.env.logger.info("#{self.name}: Success.")
       end # retrieve
 
       def retrieve_records_by_date(date, options = {})
@@ -53,7 +53,7 @@ module LT
 
           json_data = get_json_data(target_url)
           if !json_data or !json_data.kind_of?(Hash) or !json_data['documents'].kind_of?(Array)
-            LT::logger.error("#{self.name}: Failed to parse JSON data at #{date}.")
+            LT.env.logger.error("#{self.name}: Failed to parse JSON data at #{date}.")
             break
           end
 
@@ -116,11 +116,11 @@ module LT
         begin
           buffer = open(url).read
         rescue OpenURI::HTTPError => e
-          LT::logger.error("#{self.name}: Failed to open #{url}, message: #{e.message}.")
+          LT.env.logger.error("#{self.name}: Failed to open #{url}, message: #{e.message}.")
           tries += 1
 
           if tries > HTTP_MAX_RETRIES_COUNT
-            LT::logger.error("#{self.name}: Failed to extract data at #{date}.")
+            LT.env.logger.error("#{self.name}: Failed to extract data at #{date}.")
             return
           end
         end
@@ -129,7 +129,7 @@ module LT
         begin
           json_data = JSON.parse(buffer)  
         rescue JSON::ParserError
-          LT::logger.error("#{self.name}: Failed to parse JSON data at #{date}.")
+          LT.env.logger.error("#{self.name}: Failed to parse JSON data at #{date}.")
           return 
         end
 

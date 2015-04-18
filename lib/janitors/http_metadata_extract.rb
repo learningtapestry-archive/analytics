@@ -2,18 +2,18 @@ require 'open-uri'
 require 'json'
 require 'nokogiri'
 
-module LT
+module Analytics
   module Janitors
     module HttpMetadataExtractor class << self
 
       def fill_youtube_info
-        Video.where("title IS NULL AND service_id = '#{LT::Constants::SERVICES_YOUTUBE}'").each do | video |
+        Video.where("title IS NULL AND service_id = 'youtube'").each do | video |
           document = Nokogiri::XML(open("http://gdata.youtube.com/feeds/api/videos/#{video.external_id}"))
 
           if document
             document.remove_namespaces!
             begin
-              video.service_id = LT::Constants::SERVICES_YOUTUBE
+              video.service_id = 'youtube'
               video.title = document.xpath('/entry/title')[0].text.strip
               video.description = document.xpath('/entry/group/description').text
               video_seconds = document.xpath('//duration')[0].attributes['seconds'].value.to_i
@@ -27,10 +27,10 @@ module LT
               video.updated_on = DateTime.parse(document.xpath('/entry/updated')[0].text)
               video.save
               rescue Exception => e
-                LT::logger.warn "Could not parse YouTube video #{video.url}", e
+                LT.env.logger.warn "Could not parse YouTube video #{video.url}", e
             end
           else
-            LT::logger.warn "YouTube did not return XML as expected during metadata extraction #{video.url}"
+            LT.env.logger.warn "YouTube did not return XML as expected during metadata extraction #{video.url}"
           end
         end
       end

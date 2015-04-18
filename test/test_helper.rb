@@ -1,4 +1,3 @@
-gem 'minitest'
 require 'minitest/autorun'
 require 'rack/test'
 require 'nokogiri'
@@ -9,20 +8,28 @@ require 'capybara/webkit'
 require 'benchmark'
 require 'byebug'
 
-require File::join(LT::lib_path, 'webapp.rb')
+require 'lt/core'
+LT::Environment.boot_all(File.expand_path('../..', __FILE__))
+
+require 'webapp'
+Analytics::WebApp.boot
 
 class LTTestBase < Minitest::Test
+  def setup
+    LT.env.logger.level = 3
+  end
+
   # method provides a block level way to temporarily set log level
   # to whatever level is desired, and automatically resets it
   # back to the original setting when finished
   def suspend_log_level(new_level = Log4r::FATAL)
     # set logging to critical to avoid reporting an error that is intended into the output
-    orig_log_level = LT::logger.level
-    LT::logger.level = new_level
+    orig_log_level = LT.env.logger.level
+    LT.env.logger.level = new_level
     yield
-    LT::logger.level = orig_log_level
+    LT.env.logger.level = orig_log_level
   end
-  
+
   # copied from ActiveSupport b/c they are deprecating (not threadsafe) - we don't need thread safety
   def capture(stream)
     stream = stream.to_s
@@ -63,6 +70,10 @@ class LTDBTestBase < LTTestBase
     clean_using_default
   end
 
+  def redis_connection
+    LT.env.redis.connection
+  end
+
   # call this method to use truncation *once* for current test method
   # system will reset to using default strategy after the test method executes
   def clean_using_truncation
@@ -85,7 +96,7 @@ class LTDBTestBase < LTTestBase
     DatabaseCleaner.clean
     DatabaseCleaner[:active_record].strategy = @pg_strategy
     DatabaseCleaner[:redis].strategy = @redis_strategy
-    DatabaseCleaner[:redis, {connection: LT::RedisServer.connection_string}] 
+    DatabaseCleaner[:redis, { connection: LT.env.redis.connection_string } ]
     # set database transaction, so we can revert seeds
     DatabaseCleaner.start
   end
@@ -94,6 +105,7 @@ class LTDBTestBase < LTTestBase
     super
     setup_db_cleaner
   end
+
   def teardown
     DatabaseCleaner.clean # cleanup of the database
     clean_using_default
@@ -102,11 +114,10 @@ end
 
 # provides for Sinatra compatibility
 class WebAppTestBase < LTDBTestBase
-  require File::join(LT::lib_path, 'webapp.rb')
   include Rack::Test::Methods
 
   def app
-    LT::WebApp
+    Analytics::WebApp
   end
 end
 
@@ -115,12 +126,33 @@ end
 class WebAppJSTestBase < WebAppTestBase
   include Capybara::DSL
 
+  def setup
+    super
+    Capybara.app = Analytics::WebApp
+    # we create a new driver which is the debug mode for poltergeist
+    Capybara.register_driver :poltergeist_debug do |app|
+      Capybara::Poltergeist::Driver.new(app, {:inspector => true, :timeout=>999})
+    end
+    # use_selenium
+    # use poltergeist
+    # use web_kit
+    use_poltergeist_debug
+  end
+
+  def teardown
+    super
+    Capybara.reset_sessions!
+    Capybara.current_session.driver.reset!
+    Capybara.use_default_driver
+  end
+
   def use_selenium
     Capybara.default_driver = :selenium
     Capybara.reset_sessions!
     Capybara.current_session.driver.reset!
     Capybara.use_default_driver
   end
+
   def use_poltergeist
     Capybara.current_driver = :poltergeist
     Capybara.javascript_driver = :poltergeist
@@ -158,23 +190,4 @@ class WebAppJSTestBase < WebAppTestBase
   end
 
 
-  def setup
-    super
-    Capybara.app = LT::WebApp
-    # we create a new driver which is the debug mode for poltergeist
-    Capybara.register_driver :poltergeist_debug do |app|
-      Capybara::Poltergeist::Driver.new(app, {:inspector => true, :timeout=>999})
-    end
-    # use_selenium
-    # use poltergeist
-    # use web_kit
-    use_poltergeist_debug
-
-  end
-  def teardown
-    super
-    Capybara.reset_sessions!
-    Capybara.current_session.driver.reset!
-    Capybara.use_default_driver
-  end
 end # WebAppJSTestBase

@@ -1,13 +1,15 @@
-test_helper_file = File::expand_path(File::join(LT::test_path,'test_helper.rb'))
-require test_helper_file
-require './lib/util/csv_database_loader.rb'
-require File::join(LT::janitor_path,'redis_postgres_extract.rb')
+require File::expand_path('../test_helper.rb', __FILE__)
+
+require File::join(LT.environment.janitor_path,'redis_postgres_extract.rb')
+require 'utils/csv_database_loader'
+require 'utils/scenarios'
 
 class ApiAppTest < WebAppTestBase
+
   def setup
     super
     LT::Seeds::seed!
-    @scenario = LT::Scenarios::Students::create_joe_smith_scenario
+    @scenario = Analytics::Utils::Scenarios::Students::create_joe_smith_scenario
     @joe_smith = @scenario[:student]
     @jane_doe = @scenario[:teacher]
     @section = @scenario[:section]
@@ -18,17 +20,13 @@ class ApiAppTest < WebAppTestBase
     @org = @scenario[:organizations][0]
   end
 
-  def teardown
-    super
-  end
-
   def test_approved_site_list
     request '/api/v1/approved-sites'
     response_json = JSON.parse(last_response.body, symbolize_names: true)
     khan_found = false ; codeacad_found = false
     response_json.each do |approved_site|
-      if approved_site[:url] == LT::Scenarios::Sites.khanacademy_data[:url] then khan_found = true end
-      if approved_site[:url] == LT::Scenarios::Sites.codeacademy_data[:url] then codeacad_found = true end
+      if approved_site[:url] == Analytics::Utils::Scenarios::Sites.khanacademy_data[:url] then khan_found = true end
+      if approved_site[:url] == Analytics::Utils::Scenarios::Sites.codeacademy_data[:url] then codeacad_found = true end
     end
 
     assert_equal 200, last_response.status
@@ -53,6 +51,7 @@ class ApiAppTest < WebAppTestBase
                org_secret_key: @org[:org_secret_key],
                usernames: [ @joe_smith[:username] ],
                entity: 'site_visits' }
+
     post '/api/v1/obtain', params.to_json, 'content_type' => 'application/json' do
       body = last_response.body
       response_json = JSON.parse(body, symbolize_names: true) if body and body != 'null'
@@ -73,7 +72,7 @@ class ApiAppTest < WebAppTestBase
       response_json = JSON.parse(body, symbolize_names: true) if body and body != 'null'
     end
 
-    ### Test a valid page_visit response (more tests avialable in LT::Utilities::APIDataFactory test suite)
+    ### Test a valid page_visit response (more tests avialable in Analytics::Utils::APIDataFactory test suite)
     assert_equal 200, last_response.status
     assert response_json
     assert_equal response_json[:entity], 'page_visits'
@@ -81,12 +80,11 @@ class ApiAppTest < WebAppTestBase
   end
 
   def test_obtain_fails
-
     ### No org_api_key or org_secret_key fail test
 
     response_json = nil
 
-    params = { test: 'test' }
+    params = { 'test' => 'test' }
     post '/api/v1/obtain', params.to_json, 'content_type' => 'application/json' do
       response_json = JSON.parse(last_response.body, symbolize_names: true)
     end
@@ -95,8 +93,7 @@ class ApiAppTest < WebAppTestBase
     assert_equal 'Organization API key (org_api_key) and secret (org_secret_key) not provided', response_json[:error]
 
     ### No usernames fail test
-
-    params = { org_api_key: 'test', org_secret_key: 'test' }
+    params = { 'org_api_key' => 'test', 'org_secret_key' => 'test' }
     post '/api/v1/obtain', params.to_json, 'content_type' => 'application/json' do
       response_json = JSON.parse(last_response.body, symbolize_names: true)
     end
@@ -129,7 +126,6 @@ class ApiAppTest < WebAppTestBase
   end
 
   def test_users
-
     ## No parameters test
     get '/api/v1/users' do
       response_json = JSON.parse(last_response.body, symbolize_names: true) if last_response.body and last_response.body != 'null'
@@ -172,19 +168,20 @@ class ApiAppTest < WebAppTestBase
   end
 
   def test_video_views
-    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/raw_messages.csv'))
-    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
-    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/organizations.csv'))
-    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
+    csv_file_name = File::expand_path(File::join(LT.environment.db_path, '/csv/test/raw_messages.csv'))
+    Analytics::Utils::CsvDatabaseLoader.load_file(csv_file_name)
+    csv_file_name = File::expand_path(File::join(LT.environment.db_path, '/csv/test/organizations.csv'))
+    Analytics::Utils::CsvDatabaseLoader.load_file(csv_file_name)
 
     assert_equal 38, RawMessage.all.count
 
-    LT::Janitors::RawMessagesExtract.raw_messages_to_video_visits
+    Analytics::Janitors::RawMessagesExtract.raw_messages_to_video_visits
     assert_equal 4, VideoView.all.count
     assert_equal 2, Video.all.count
 
     ## Valid test, receive two users
-    params = { org_api_key: '00000000-0000-4000-8000-000000000000', org_secret_key: 'secret' }
+    params = { org_api_key: '00000000-0000-4000-8000-000000000000',
+               org_secret_key: 'secret' }
     get '/api/v1/video_views', params do
       response_json = JSON.parse(last_response.body, symbolize_names: true) if last_response.body and last_response.body != 'null'
       assert_equal 200, last_response.status
@@ -200,5 +197,4 @@ class ApiAppTest < WebAppTestBase
       assert bob_found
     end
   end
-
 end

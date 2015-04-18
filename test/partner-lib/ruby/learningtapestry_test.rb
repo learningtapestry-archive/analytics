@@ -1,8 +1,8 @@
-test_helper_file = File::expand_path(File::join(LT::test_path,'test_helper.rb'))
+test_helper_file = File::expand_path(File::join(LT.environment.test_path,'test_helper.rb'))
 require test_helper_file
 
-require File::expand_path(File::join(LT::partner_lib_path,'ruby/lib/learning_tapestry.rb'))
-require './lib/util/csv_database_loader.rb'
+require File::expand_path(File::join(LT.environment.partner_lib_path,'ruby/lib/learning_tapestry.rb'))
+require 'utils/csv_database_loader'
 
 # cross-thread AR bug when Capybara is running a server alongside our testing code
 # disable connection pooling with this monkey patch
@@ -17,7 +17,6 @@ class ActiveRecord::Base
 end
 
 class LearningTapestryLibraryTest < WebAppJSTestBase
-
   API_KEY = '00000000-0000-4000-8000-000000000000'
   API_SECRET = 'secret'
 
@@ -29,16 +28,16 @@ class LearningTapestryLibraryTest < WebAppJSTestBase
 
     ## Load up a big test fixture
 
-    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/organizations.csv'))
-    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
-    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/users.csv'))
-    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
-    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/sites.csv'))
-    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
-    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/pages.csv'))
-    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
-    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/page_visits.csv'))
-    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
+    csv_file_name = File::expand_path(File::join(LT.environment.db_path, '/csv/test/organizations.csv'))
+    Analytics::Utils::CsvDatabaseLoader.load_file(csv_file_name)
+    csv_file_name = File::expand_path(File::join(LT.environment.db_path, '/csv/test/users.csv'))
+    Analytics::Utils::CsvDatabaseLoader.load_file(csv_file_name)
+    csv_file_name = File::expand_path(File::join(LT.environment.db_path, '/csv/test/sites.csv'))
+    Analytics::Utils::CsvDatabaseLoader.load_file(csv_file_name)
+    csv_file_name = File::expand_path(File::join(LT.environment.db_path, '/csv/test/pages.csv'))
+    Analytics::Utils::CsvDatabaseLoader.load_file(csv_file_name)
+    csv_file_name = File::expand_path(File::join(LT.environment.db_path, '/csv/test/page_visits.csv'))
+    Analytics::Utils::CsvDatabaseLoader.load_file(csv_file_name)
   end
 
   def teardown
@@ -123,7 +122,6 @@ class LearningTapestryLibraryTest < WebAppJSTestBase
       lt_agent.obtain
     end
     assert_equal 'Entity type not provided', exception.message
-
   end
 
   def test_obtain

@@ -1,9 +1,28 @@
 require 'open-uri'
-test_helper_file = File::expand_path(File::join(LT::test_path,'test_helper.rb'))
-require test_helper_file
+require File::expand_path('../test_helper.rb', __FILE__)
 
+require 'utils/scenarios'
+require 'helpers/redis'
 
 class WebAppJSTest < WebAppJSTestBase
+  include Analytics::Helpers::Redis
+
+  def setup
+    super
+    LT::Seeds::seed!
+    @scenario = Analytics::Utils::Scenarios::Students::create_joe_smith_scenario
+    @joe_smith = @scenario[:student]
+    @jane_doe = @scenario[:teacher]
+    @section = @scenario[:section]
+    @page_visits = @scenario[:page_visits]
+    @site_visits = @scenario[:site_visits]
+    @sites = @scenario[:sites]
+    @pages = @scenario[:pages]
+    @acme_org = @scenario[:organizations].first
+    @lt_host = "lt.test.learningtapestry.com"
+    @partner_host = "partner.lt.betaspaces.com"
+    @port = Capybara.current_session.server.port
+  end
 
   # PhantomJS outputs warnings to stdout that we don't want to see
   # particularly: we intentionally violate CORS and PhantomJS warns us of this
@@ -17,17 +36,16 @@ class WebAppJSTest < WebAppJSTestBase
     protocol = options[:protocol] || "http"
     Capybara.app_host = "#{protocol}://#{host}"
     Capybara.always_include_port = true
-    output = capture(:stdout) do
+    #output = capture(:stdout) do
       yield
-    end
-    suppress_needless_msgs(output)
+    #end
+    #suppress_needless_msgs(output)
     Capybara.app_host = orig_app_host
   end
 
   def test_js_loader_collector_via_qunit
-
     # set up data to make collector test work
-    joe_smith_username=CGI::escape(@joe_smith[:username])
+    joe_smith_username = CGI::escape(@joe_smith[:username])
     acme_org_api_key = CGI::escape(@acme_org[:org_api_key])
 
     loader_test_url = "/assets/tests/js-loader-collector-test.html"
@@ -35,12 +53,13 @@ class WebAppJSTest < WebAppJSTestBase
      "&org_api_key=#{acme_org_api_key}"+
      "&hostname=#{@lt_host}:#{@port}"
     test_url = "#{loader_test_url}#{loader_test_params}"
-    set_server(@partner_host) do 
+
+    set_server(@partner_host) do
       visit(test_url)
     end
     # wait for qunit tests to execute in phantomjs
     html = wait_for_qunit(page)
-    
+
     # verify that the collector script has been loaded by the loader script
     # ltG object is created by collector only and userId is a dynamic value inside it
     username_actual = page.evaluate_script("window.ltG.userId")
@@ -61,32 +80,36 @@ class WebAppJSTest < WebAppJSTestBase
   # It will try to open that screenshot in chrome
   def test_js_collector_via_qunit
     # set up data to make collector test work
-    joe_smith_username=CGI::escape(@joe_smith[:username])
+    joe_smith_username= CGI::escape(@joe_smith[:username])
     acme_org_api_key = CGI::escape(@acme_org[:org_api_key])
+
+   collector_js_url = "/api/v1/collector.js?username=#{joe_smith_username}&org_api_key=#{acme_org_api_key}"
+
+    # verify that we can get to the collector.js file itself without errors
+    set_server(@partner_host) do
+      get(collector_js_url)
+    end
+    assert_equal 200, last_response.status
+
+    # after confirming that the collector.js file is obtainable
+    # we can make the full headless browser call to the test file
     collector_test_url = "/assets/tests/js-collector-test.html"+
       "?username=#{joe_smith_username}"+
       "&org_api_key=#{acme_org_api_key}"+
       "&hostname=#{@lt_host}:#{@port}"
-    collector_js_url = "/api/v1/collector.js?username=#{joe_smith_username}&org_api_key=#{acme_org_api_key}"
-    # verify that we can get to the collector.js file itself without errors
-    set_server(@partner_host) do 
-      get(collector_js_url)
-    end
-    assert_equal 200, last_response.status
-    # after confirming that the collector.js file is obtainable
-    # we can make the full headless browser call to the test file
+
     html = nil
-    set_server(@partner_host) do 
+    set_server(@partner_host) do
       visit(collector_test_url)
       html = wait_for_qunit(page)
     end
+
     # verify tests passed in qunit
     verify_qunit_tests_passed(html)
 
     # show that an initial "on page load" click message has been sent
-    message = JSON.parse(LT::RedisServer.raw_message_pop)
+    message = JSON.parse(messages_queue.pop)
     assert_equal RawMessage::Verbs::CLICKED, message["verb"]
-
   end # test_js_collector_qunit
 
   def test_js_display_via_qunit
@@ -98,7 +121,7 @@ class WebAppJSTest < WebAppJSTestBase
       "?username=#{joe_smith_username}"+
       "&org_api_key=#{acme_org_api_key}"
     # verify that we can get to the collector.js file itself without errors
-    
+
     get(collector_js_url)
     assert_equal 200, last_response.status
     # after confirming that the collector.js file is obtainable
@@ -111,7 +134,7 @@ class WebAppJSTest < WebAppJSTestBase
     # verify tests passed in qunit
     verify_qunit_tests_passed(html)
     # if display.js were implemented, we'd expect to get a clicked message on page load
-    # message = JSON.parse(LT::RedisServer.raw_message_pop)
+    # message = JSON.parse(messages_queue.pop)
     # assert_equal RawMessage::Verbs::CLICKED, message["verb"]
 
   end # test_js_collector_qunit
@@ -130,7 +153,8 @@ class WebAppJSTest < WebAppJSTestBase
     end
 
     # clear raw messages queue (there's a clicked message that comes on page load)
-    LT::RedisServer::raw_messages_queue_clear
+    messages_queue.clear
+
     # validate that window.ltG.fSendMsg sends a message that is received by redis
     page_url = page.evaluate_script("window.ltG.priv.fGetCurURL();")
     page_title = page.evaluate_script("window.ltG.priv.fGetCurPageTitle();")
@@ -139,7 +163,7 @@ class WebAppJSTest < WebAppJSTestBase
     page.execute_script(pageViewScript)
     # we need to wait for the ajax call to complete
     sleep 0.1
-    message = LT::RedisServer.raw_message_pop
+    message = messages_queue.pop
     refute_nil message, "No Redis message received from Ajax call via assert api."
     message = JSON.parse(message.force_encoding('UTF-8'))
     assert_equal "0S", message["action"]["time"]
@@ -154,11 +178,11 @@ class WebAppJSTest < WebAppJSTestBase
     assert_equal valid_uri.query, test_uri.query
 
     # show that fSendClickMsg works
-    assert !LT::RedisServer.raw_message_pop
+    assert !messages_queue.pop
     pageArrivalScript = "window.ltG.fSendClickMsg();"
     page.execute_script(pageArrivalScript)
     sleep 0.1
-    message = LT::RedisServer.raw_message_pop
+    message = messages_queue.pop
     message = JSON.parse(message.force_encoding('UTF-8'))
     assert_equal RawMessage::Verbs::CLICKED, message["verb"]
     # the first two chars are filled with junk for some reason
@@ -178,7 +202,7 @@ class WebAppJSTest < WebAppJSTestBase
     #    Run Sinatra in development mode
     #    Run LT:console at terminal
     #      If dev database is not seeded with scenario already:
-    #        Execute: LT::Scenarios::Students::create_joe_smith_scenario
+    #        Execute: Analytics::Utils::Scenarios::Students::create_joe_smith_scenario
     #      if it is already seeded, run this to be sure Redis has the org keys
     #        Execute: Organization.update_all_org_api_keys
     #      Execute: Organization.first.org_api_key
@@ -193,6 +217,7 @@ class WebAppJSTest < WebAppJSTestBase
     #        with the correct time shown in the data structure:
     #        action: time: {"NNS"}
   end
+
   def test_window_close_events
     joe_smith_username=CGI::escape(@joe_smith[:username])
     acme_org_api_key = CGI::escape(@acme_org[:org_api_key])
@@ -201,14 +226,12 @@ class WebAppJSTest < WebAppJSTestBase
      "&org_api_key=#{acme_org_api_key}"+
      "&hostname=#{@lt_host}:#{@port}"
 
-    message = LT::RedisServer.raw_message_pop
-    assert_nil message
+    assert_nil messages_queue.pop
     set_server(@partner_host) do
       visit(collector_test_url)
       html = wait_for_qunit(page)
     end
-    message = LT::RedisServer.raw_message_pop
-    message = JSON.parse(message.force_encoding('UTF-8'))
+    message = JSON.parse(messages_queue.pop.force_encoding('UTF-8'))
     assert_equal RawMessage::Verbs::CLICKED, message["verb"]
 
     # we visit a new url in the same browser window, which kicks off
@@ -218,13 +241,11 @@ class WebAppJSTest < WebAppJSTestBase
       html = wait_for_qunit(page)
     end
     # first message on the stack will be a "viewed" as the previous page unloads
-    message = LT::RedisServer.raw_message_pop
-    message = JSON.parse(message.force_encoding('UTF-8'))
+    message = JSON.parse(messages_queue.pop.force_encoding('UTF-8'))
     assert_equal RawMessage::Verbs::VIEWED, message["verb"]
 
     # next message on the stack will be a "click" from arrival onto the most recent page
-    message = LT::RedisServer.raw_message_pop
-    message = JSON.parse(message.force_encoding('UTF-8'))
+    message = JSON.parse(messages_queue.pop.force_encoding('UTF-8'))
     assert_equal RawMessage::Verbs::CLICKED, message["verb"]
 
     #use_selenium
@@ -234,11 +255,7 @@ class WebAppJSTest < WebAppJSTestBase
     #   html = wait_for_qunit(page)
     # end
 
-    # msg = LT::RedisServer.raw_message_pop
-    # while (msg) do 
-    #   #puts msg
-    #   msg = LT::RedisServer.raw_message_pop
-    # end
+    # messages_queue.clear
 
     #webkit
     #page.execute_script("window.lt$(window).blur();")
@@ -267,14 +284,7 @@ class WebAppJSTest < WebAppJSTestBase
     # page.driver.close_window(orig_window)
     # sleep 0.5
 
-
-    # msg = LT::RedisServer.raw_message_pop
-    # while (msg) do 
-    #   puts msg
-    #   msg = LT::RedisServer.raw_message_pop
-    # end
-
-    
+    # messages_queue.clear
 
     #page.execute_script("window.lt$(window).blur();")
     #page.execute_script("window.open('');")
@@ -299,26 +309,6 @@ class WebAppJSTest < WebAppJSTestBase
     # Use page.driver.debug to debug JS in Chrome
   end
 
-  def setup
-    super
-    LT::Seeds::seed!
-    @scenario = LT::Scenarios::Students::create_joe_smith_scenario
-    @joe_smith = @scenario[:student]
-    @jane_doe = @scenario[:teacher]
-    @section = @scenario[:section]
-    @page_visits = @scenario[:page_visits]
-    @site_visits = @scenario[:site_visits]
-    @sites = @scenario[:sites]
-    @pages = @scenario[:pages]
-    @acme_org = @scenario[:organizations].first
-    @lt_host = "lt.test.learningtapestry.com"
-    @partner_host = "partner.lt.betaspaces.com"
-    @port = Capybara.current_session.server.port
-  end
-  def teardown
-    super
-  end
-
   def save_load_screenshot(page)
     file_screenshot = File::expand_path(File::join(LT::tmp_path, "collector_errors.png"))
     page.save_screenshot(file_screenshot)
@@ -332,7 +322,7 @@ class WebAppJSTest < WebAppJSTestBase
     # we are waiting for this element to appear on the page: <div id="qunit">
     sleep 0.1
     html = Nokogiri::HTML.parse(page.html)
-    while !html.at_css('div#qunit').child do 
+    while !html.at_css('div#qunit').child do
       # wait up to 2 seconds for page to fully load (including javascript)
       i+=1
       if i > 20 then
@@ -365,5 +355,4 @@ class WebAppJSTest < WebAppJSTestBase
     assert self.assertions >= 2, "An unknown failure has caused JS tests to not run. Results XML:\n"\
       "#{resultsXML.to_s}"
   end
-
 end

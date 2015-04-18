@@ -1,19 +1,20 @@
-test_helper_file = File::expand_path(File::join(LT::test_path,'test_helper.rb'))
+test_helper_file = File::expand_path(File::join(LT.environment.test_path,'test_helper.rb'))
 require test_helper_file
-require File::join(LT::janitor_path,'http_metadata_extract.rb')
+
+require File::join(LT.environment.janitor_path,'http_metadata_extract.rb')
 
 class HttpMetadataExtractTest < LTDBTestBase
 
   def test_metadata_grab_youtube
     video = Video.new
-    video.service_id = LT::Constants::SERVICES_YOUTUBE
+    video.service_id = 'youtube'
     video.url = 'https://www.youtube.com/watch?v=9bZkp7q19f0' # Test with YouTube's most viewed video
     video.external_id = '9bZkp7q19f0'
     video.save
 
     assert_equal 'https://www.youtube.com/watch?v=9bZkp7q19f0', video.url
 
-    LT::Janitors::HttpMetadataExtractor.fill_youtube_info
+    Analytics::Janitors::HttpMetadataExtractor.fill_youtube_info
 
     processed_video = Video.find_by(url: 'https://www.youtube.com/watch?v=9bZkp7q19f0')
     assert processed_video

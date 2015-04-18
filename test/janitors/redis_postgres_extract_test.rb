@@ -1,28 +1,31 @@
-test_helper_file = File::expand_path(File::join(LT::test_path,'test_helper.rb'))
+test_helper_file = File::expand_path(File::join(LT.environment.test_path,'test_helper.rb'))
 require test_helper_file
 
 require 'date'
-require File::join(LT::janitor_path,'redis_postgres_extract.rb')
-require './lib/util/csv_database_loader.rb'
+require File::join(LT.environment.janitor_path,'redis_postgres_extract.rb')
 
+require 'utils/csv_database_loader'
+require 'utils/scenarios'
 
+require 'helpers/redis'
 
 class RedisPostgresExtractTest < LTDBTestBase
+  include Analytics::Helpers::Redis
 
   def test_extract_from_redis_to_pg_scenario
     # basic setup checking that data are ready for export in redis
-    scenario = LT::Scenarios::RawMessages::create_raw_message_redis_to_pg_scenario
+    scenario = Analytics::Utils::Scenarios::RawMessages::create_raw_message_redis_to_pg_scenario
     joe_smith_username =scenario[:students][0][:username]
     joe_smith = User.find_by_username(joe_smith_username)
     joe_smith_id = joe_smith.id
     new_student_username = scenario[:new_student][:username]
     acme_org_api_key = scenario[:organizations].first[:org_api_key]
     assert_equal scenario[:students][0][:first_name], joe_smith.first_name
-    assert LT::RedisServer::raw_message_queue_length >=4
-    assert_equal scenario[:raw_messages].size, LT::RedisServer::raw_message_queue_length
+    assert messages_queue.length >=4
+    assert_equal scenario[:raw_messages].size, messages_queue.length
     # run janitor to pull from redis and push to pg raw_messages table
-    LT::Janitors::RedisPostgresExtract::redis_to_raw_messages
-    assert_equal 0, LT::RedisServer::raw_message_queue_length
+    Analytics::Janitors::RedisPostgresExtract::redis_to_raw_messages
+    assert_equal 0, messages_queue.length
     assert_equal scenario[:raw_messages].size, RawMessage.count
     test_msgs = RawMessage.where(:url => scenario[:raw_messages][0][:url])
       .where(:user_id => joe_smith_id)
@@ -70,14 +73,14 @@ class RedisPostgresExtractTest < LTDBTestBase
     raw_msg = RawMessage.where(:url => test_msg[:url])
       .where(['org_api_key = ?', test_msg[:org_api_key]])
       .where(:verb => 'viewed')
-      .where(:username => LT::Scenarios::Students::joe_smith_data[:username])
+      .where(:username => Analytics::Utils::Scenarios::Students::joe_smith_data[:username])
       .first
     refute_nil org.id
     refute_nil raw_msg.id
     assert_equal org.id, raw_msg.organization_id
 
     # convert raw_messages to appropriate page visits
-    LT::Janitors::RawMessagesExtract::raw_messages_to_page_visits
+    Analytics::Janitors::RawMessagesExtract::raw_messages_to_page_visits
     assert_equal scenario[:raw_messages].size, PageVisit.count
     # spot check data
     # verify that the correct user was attached to a page_visit record
@@ -126,7 +129,7 @@ class RedisPostgresExtractTest < LTDBTestBase
     # username should have been translated into user id
     assert_equal new_student.id, pv.user_id
     assert new_student.id > 0
-    org_api_key = LT::Scenarios::Organizations::acme_organization_data[:org_api_key]
+    org_api_key = Analytics::Utils::Scenarios::Organizations::acme_organization_data[:org_api_key]
     org = Organization.find_by_org_api_key(org_api_key)
     refute_nil org.id
     assert_equal org.id, new_student.organization_id
@@ -134,26 +137,19 @@ class RedisPostgresExtractTest < LTDBTestBase
     # re-running RawMessagesExtract should not process any records
     #  this confirms that RawMessages that were processed have been correctly
     #  tagged as having already been processed into page_visits
-    LT::Janitors::RawMessagesExtract::raw_messages_to_page_visits
+    Analytics::Janitors::RawMessagesExtract::raw_messages_to_page_visits
     assert_equal scenario[:raw_messages].size, PageVisit.count
   end
 
   def test_extract_from_raw_messages_to_video_view
-    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/raw_messages.csv'))
-    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
-    csv_file_name = File::expand_path(File::join(LT::db_path, '/csv/test/organizations.csv'))
-    LT::Utilities::CsvDatabaseLoader.load_file(csv_file_name)
+    csv_file_name = File::expand_path(File::join(LT.environment.db_path, '/csv/test/raw_messages.csv'))
+    Analytics::Utils::CsvDatabaseLoader.load_file(csv_file_name)
+    csv_file_name = File::expand_path(File::join(LT.environment.db_path, '/csv/test/organizations.csv'))
+    Analytics::Utils::CsvDatabaseLoader.load_file(csv_file_name)
     assert_equal 38, RawMessage.all.count
 
-    LT::Janitors::RawMessagesExtract.raw_messages_to_video_visits
+    Analytics::Janitors::RawMessagesExtract.raw_messages_to_video_visits
     assert_equal 4, VideoView.all.count
     assert_equal 2, Video.all.count
-  end
-
-  def teardown
-    super
-  end
-  def setup
-    super
   end
 end

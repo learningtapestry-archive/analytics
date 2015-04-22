@@ -41,7 +41,7 @@ module LearningTapestry
       raise LTAgentException, 'Organization API key not provided or not valid' unless validate_org_api_key
       raise LTAgentException, 'Organization API secret not provided or not valid' unless validate_org_secret_key
 
-      api_request :GET, LT_API_PATH_USERS, "org_api_key=#{@org_api_key.to_s}&org_secret_key=#{@org_secret_key.to_s}"
+      api_request :GET, LT_API_PATH_USERS, "org_api_key=#{@org_api_key}&org_secret_key=#{@org_secret_key}"
     end
 
     def obtain
@@ -50,7 +50,12 @@ module LearningTapestry
       raise LTAgentException, 'Username array not provided' unless @usernames and @usernames != []
       raise LTAgentException, 'Entity type not provided' unless @entity
 
-      params = {org_api_key: @org_api_key, org_secret_key: @org_secret_key, usernames: @usernames, entity: @entity, type: @type}
+      params = { org_api_key: @org_api_key,
+                 org_secret_key: @org_secret_key,
+                 usernames: @usernames,
+                 entity: @entity,
+                 type: @type }
+
       params[:date_begin] = @filters[:date_begin] if @filters[:date_begin]
       params[:date_end] = @filters[:date_end] if @filters[:date_end]
       params[:site_domains] = @filters[:site_domains] if @filters[:site_domains]
@@ -103,6 +108,5 @@ module LearningTapestry
       retval[:status] = response.code.to_i
       retval
     end
-
   end
 end

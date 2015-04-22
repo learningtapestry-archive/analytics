@@ -69,7 +69,7 @@
       var msg = window.ltG.fGenClickMsg(uRL, pageTitle);
       window.ltG.priv.fSendMsg(msg);
     };
-    
+
     window.ltG.fStartPageTimer = function() {
       window.ltG.priv.timerStartDate = new Date();
       // this var is used to hold accumulated time during timer pauses
@@ -220,10 +220,10 @@
 
           return str;
       }
+
     // ***********************
     // main event handler code
     // ***********************
-    
     window.ltG.priv.boot = function(){
       window.ltG.fSendClickMsg();
       window.ltG.fStartPageTimer();
@@ -255,6 +255,3 @@
   //our code on this page will run when jquery has finished loading
   document.getElementsByTagName('script')[0].appendChild(script);
 })();
-
-
-

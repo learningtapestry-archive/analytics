@@ -1,12 +1,18 @@
+$LOAD_PATH << File.expand_path('../lib', __FILE__)
+
 # Rackup file to load WebApp.rb server
 # To run from dev CLI:
 #   rackup -p 8080 config.ru
-require 'rubygems'
 require 'bundler'
-path = File::expand_path(File::dirname(__FILE__))
-require File::join(path, 'lib', 'lt_base.rb')
+Bundler.setup
 
-LT::boot_all
-require File::join(path, 'lib', 'webapp.rb')
-puts "Running in enviroment: #{LT::run_env}"
-run LT::WebApp
+require 'lt/core'
+
+path = File::expand_path(File::dirname(__FILE__))
+LT::Environment.boot_all(path)
+
+require 'webapp'
+puts "Running in enviroment: #{LT.environment.run_env}"
+
+Analytics::WebApp.boot
+run Analytics::WebApp

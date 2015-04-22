@@ -12,13 +12,13 @@
 # Consider installing RVM to help manage that.
 source 'https://rubygems.org'
 gem 'rake'
+
 # core gems (need to be careful about version updating)
-gem 'actionpack', '~> 4.1.6'
-gem 'activesupport', '~> 4.1.6'
-gem 'activerecord', '~> 4.1.6'
-gem 'actionview', '~> 4.1.6'
+gem 'actionpack', '~> 4.2.0'
+gem 'activesupport', '~> 4.2.0'
+gem 'activerecord', '~> 4.2.0'
+gem 'actionview', '~> 4.2.0'
 gem 'sinatra', '~> 1.4.5'
-gem 'sinatra-contrib', '~> 1.4.2'
 
 # additional gems (probably can accept new major versions without breaking)
 gem 'log4r', '>= 1.1.10'
@@ -63,3 +63,7 @@ end
   # gem 'pry-debugger', '>=0.2.3'
   gem 'pry-stack_explorer', '>=0.4.9.1'
  end
+
+# Until changes are merged into master, for easier testing
+gem 'lt-core', git: 'git@github.com:learningtapestry/core.git',
+               branch: 'changes_for_analytics_migration'

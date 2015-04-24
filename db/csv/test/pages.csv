@@ -21,29 +21,29 @@ id,url,display_name,site_id,created_at,updated_at
 70,http://stackoverflow.com/questions/10374871/no-secret-option-provided-to-racksessioncookie-warning,ruby on rails - No secret option provided to Rack::Session::Cookie warning? - Stack Overflow,11,10/12/2014 19:59:29,10/12/2014 19:59:29
 71,http://stackoverflow.com/questions/8475694/how-to-specify-in-crontab-by-what-user-to-run-script,ubuntu - How to specify in crontab by what user to run script? - Stack Overflow,11,10/12/2014 20:19:06,10/12/2014 20:19:06
 72,http://slashdot.org/,,1,10/12/2014 20:35:06,10/12/2014 20:35:06
+73,http://arstechnica.com/,Ars Technica,6,10/12/2014 20:35:07,10/12/2014 20:55:07
 74,http://arstechnica.com/science/2014/10/nurse-who-treated-dallas-ebola-patient-is-infected/,,6,10/12/2014 20:35:07,10/12/2014 20:35:07
+75,http://arstechnica.com/civis/,Ars Technica OpenForum,6,10/12/2014 20:35:07,10/12/2014 20:55:07
 76,http://arstechnica.com/civis/viewforum.php?f=6&sid=08acc6f3854d69b1335425b8d032b619,,6,10/12/2014 20:35:07,10/12/2014 20:35:07
 77,http://arstechnica.com/civis/viewtopic.php?f=6&t=1229549,,6,10/12/2014 20:35:07,10/12/2014 20:35:07
 78,http://arstechnica.com/civis/index.php,,6,10/12/2014 20:35:07,10/12/2014 20:35:07
 79,http://arstechnica.com/gadgets/2014/10/guitar-hero-ars-builds-the-loog-a-kickstarter-funded-mini-rocker-kit/,,6,10/12/2014 20:35:07,10/12/2014 20:35:07
+80,http://arstechnica.com/information-technology/,Technology Lab | Ars Technica,6,10/12/2014 20:35:07,10/13/2014 00:20:07
 81,http://arstechnica.com/security/2014/10/snapchat-images-stolen-from-third-party-web-app-using-hacked-api/,,6,10/12/2014 20:35:07,10/12/2014 20:35:07
+82,http://arstechnica.com/information-technology/2014/10/why-throw-early-and-catch-late/,Why throw early and catch late? | Ars Technica,6,10/12/2014 20:40:06,10/13/2014 00:20:07
+83,http://www.npr.org/,"NPR : National Public Radio : News & Analysis, World, US, Music & Arts : NPR",52,10/12/2014 20:45:06,10/12/2014 20:55:07
+84,http://www.npr.org/blogs/thetwo-way/2014/10/12/355537175/texas-health-care-worker-tests-positive-for-ebola,"CDC Cites 'Breach' In Ebola Protocol As Second Texas Case Emerges : The Two-Way : NPR",52,10/12/2014 20:45:06,10/12/2014 20:55:07
 85,http://www.npr.org/blogs/thetwo-way/2014/10/12/355614609/cyclone-hudhud-blasts-india-with-winds-topping-120-mph,,52,10/12/2014 20:45:06,10/12/2014 20:45:06
 86,http://www.theverge.com/,,53,10/12/2014 20:45:06,10/12/2014 20:45:06
 87,http://www.theverge.com/2014/10/9/6873263/automata-review,,53,10/12/2014 20:45:06,10/12/2014 20:45:06
 88,http://www.theverge.com/2014/10/7/6882427/king-of-keys,,53,10/12/2014 20:50:07,10/12/2014 20:50:07
-73,http://arstechnica.com/,Ars Technica,6,10/12/2014 20:35:07,10/12/2014 20:55:07
 89,http://arstechnica.com/business/,Ministry of Innovation | Ars Technica,6,10/12/2014 20:55:07,10/12/2014 20:55:07
 90,http://arstechnica.com/business/2014/10/slow-credit-card-verification-lands-florida-man-in-jail/,Slow credit card verification lands Florida man in jail | Ars Technica,6,10/12/2014 20:55:07,10/12/2014 20:55:07
-75,http://arstechnica.com/civis/,Ars Technica OpenForum,6,10/12/2014 20:35:07,10/12/2014 20:55:07
 91,http://arstechnica.com/tech-policy/2014/10/former-nsa-director-had-thousands-personally-invested-in-obscure-tech-firms/,Former NSA director had thousands personally invested in obscure tech firms | Ars Technica,6,10/12/2014 20:55:07,10/12/2014 20:55:07
 92,http://arstechnica.com/tech-policy/,Law & Disorder | Ars Technica,6,10/12/2014 20:55:07,10/12/2014 20:55:07
 93,http://arstechnica.com/tech-policy/2014/10/the-catch-22-predicament-of-silk-road-defendant-ross-ulbricht/,The catch-22 predicament of Silk Road defendant Ross Ulbricht | Ars Technica,6,10/12/2014 20:55:07,10/12/2014 20:55:07
-83,http://www.npr.org/,"NPR : National Public Radio : News & Analysis, World, US, Music & Arts : NPR",52,10/12/2014 20:45:06,10/12/2014 20:55:07
-80,http://arstechnica.com/information-technology/,Technology Lab | Ars Technica,6,10/12/2014 20:35:07,10/13/2014 00:20:07
-82,http://arstechnica.com/information-technology/2014/10/why-throw-early-and-catch-late/,Why throw early and catch late? | Ars Technica,6,10/12/2014 20:40:06,10/13/2014 00:20:07
 94,http://www.npr.org/blogs/thetwo-way/2014/10/12/355587809/in-st-louis-a-rally-and-protests-over-police-shootings,"In St. Louis, A Rally And Protests Over Police Shootings : The Two-Way : NPR",52,10/12/2014 20:55:07,10/12/2014 20:55:07
 95,http://www.npr.org/blogs/thetwo-way/127602331/economy/,Economy : NPR,52,10/12/2014 20:55:07,10/12/2014 20:55:07
-84,http://www.npr.org/blogs/thetwo-way/2014/10/12/355537175/texas-health-care-worker-tests-positive-for-ebola,"CDC Cites 'Breach' In Ebola Protocol As Second Texas Case Emerges : The Two-Way : NPR",52,10/12/2014 20:45:06,10/12/2014 20:55:07
 96,http://www.npr.org/blogs/thetwo-way/2014/10/03/353487113/how-tough-is-the-mortgage-market-even-bernanke-cant-get-refinanced,"How Tough Is The Mortgage Market? Even Former Fed Chairman Ben Bernanke Can't Get Refinanced : The Two-Way : NPR",52,10/12/2014 20:55:07,10/12/2014 20:55:07
 97,http://www.npr.org/blogs/thetwo-way/2014/10/11/355344204/kmart-says-its-store-registers-were-hacked-exposing-credit-cards,"Kmart Says Its Store Registers Were Hacked, Exposing Credit Cards : The Two-Way : NPR",52,10/12/2014 20:55:07,10/12/2014 20:55:07
 98,http://www.npr.org/blogs/thetwo-way/,The Two-Way: Breaking News From NPR : NPR,52,10/12/2014 20:55:07,10/12/2014 20:55:07
@@ -77,7 +77,6 @@ id,url,display_name,site_id,created_at,updated_at
 126,http://stackoverflow.com/questions/67699/how-to-clone-all-remote-branches-with-git,git branch - How to clone all remote branches with Git? - Stack Overflow,11,10/14/2014 14:40:07,10/14/2014 14:40:07
 127,http://stackoverflow.com/questions/5709687/what-are-the-loose-objects-that-the-git-gui-refers-to,"What are the ""loose objects"" that the Git GUI refers to? - Stack Overflow",11,10/14/2014 15:30:06,10/14/2014 15:30:06
 128,http://stackoverflow.com/questions/2100907/how-to-remove-delete-a-large-file-from-commit-history-in-git-repository,version control - How to remove/delete a large file from commit history in Git repository? - Stack Overflow,11,10/14/2014 15:35:06,10/14/2014 15:35:06
-310,http://stackoverflow.com/questions/11466988/ruby-convert-string-to-integer-or-float,ruby convert string to integer or float - Stack Overflow,11,10/26/2014 23:40:06,10/26/2014 23:40:06
 129,http://stackoverflow.com/questions/17482440/why-do-we-need-nginx-with-thin-on-production-setup,ruby on rails - Why do we need nginx with thin on production setup? - Stack Overflow,11,10/14/2014 16:15:07,10/14/2014 16:15:07
 130,http://stackoverflow.com/questions/11062533/cant-run-thin-web-server-as-a-service-thin-unrecognized-service,"can't run thin web server as a service - thin: unrecognized service - Stack Overflow",11,10/14/2014 16:30:06,10/14/2014 16:30:06
 131,http://stackoverflow.com/questions/5100149/how-to-start-thin-in-default-port,ruby - how to start thin in default port - Stack Overflow,11,10/14/2014 16:55:06,10/14/2014 16:55:06
@@ -259,6 +258,7 @@ id,url,display_name,site_id,created_at,updated_at
 307,http://stackoverflow.com/questions/16096859/dynamic-hash-ruby-on-rails,Dynamic hash - Ruby on Rails - Stack Overflow,11,10/26/2014 21:40:06,10/26/2014 21:40:06
 308,http://stackoverflow.com/questions/19781051/rendering-404-in-sinatra-if-file-not-found,ruby - Rendering 404 in sinatra if file not found - Stack Overflow,11,10/26/2014 21:45:07,10/26/2014 21:45:07
 309,http://stackoverflow.com/questions/4589968/ruby-rails-how-to-check-if-a-var-is-an-integer,"Ruby, Rails - how to check if a var is an Integer - Stack Overflow",11,10/26/2014 22:55:07,10/26/2014 22:55:07
+310,http://stackoverflow.com/questions/11466988/ruby-convert-string-to-integer-or-float,ruby convert string to integer or float - Stack Overflow,11,10/26/2014 23:40:06,10/26/2014 23:40:06
 311,http://stackoverflow.com/questions/16951894/paging-results-with-sequel-on-sinatra,will paginate - paging results with SEQUEL on Sinatra - Stack Overflow,11,10/27/2014 00:15:07,10/27/2014 00:15:07
 312,http://stackoverflow.com/questions/7109971/sinatra-access-control-allow-origin-for-sinatra-public-folder,html - Sinatra access-control-allow-origin for sinatra public folder - Stack Overflow,11,10/27/2014 01:30:07,10/27/2014 01:30:07
 313,http://stackoverflow.com/questions/4351904/sinatra-options-http-verb,Sinatra OPTIONS HTTP Verb - Stack Overflow,11,10/27/2014 01:40:07,10/27/2014 01:40:07

@@ -263,8 +263,48 @@ module Analytics
         end # create_joe_smith_seed
       end; end #Students
 
-      module RawMessages class << self
-        def raw_messages_scenario_data
+      module RawMessages
+        def base
+          {
+            username: 'steve@example.com',
+            url: 'http://stackoverflow.com/interesting',
+            captured_at: '01/01/2015 00:00:00',
+            processed_at: nil,
+            org_api_key: '00000000-0000-4000-8000-000000000000'
+          }
+        end
+
+        def video
+          base.merge(
+            verb: 'video_action',
+            action: {
+              video_id: 'http://youtube.com/?v=111111',
+              session_id: 'A' * 36
+            }
+          )
+        end
+
+        def page
+          base.merge(verb: 'viewed')
+        end
+
+        def unprocessed
+          object = send(%i(page video).sample)
+        end
+
+        def processed
+          unprocessed.merge(processed_at: Time.now)
+        end
+
+        def old
+          unprocessed.merge(captured_at: '01/01/2014 00:00:00')
+        end
+
+        def recent
+          unprocessed
+        end
+
+        def self.raw_messages_scenario_data
           new_student_username = "newuser@novel.com"
           scenario = {
             new_student: {username: new_student_username},
@@ -344,7 +384,7 @@ module Analytics
         require 'helpers/redis'
         include Analytics::Helpers::Redis
 
-        def create_raw_message_redis_to_pg_scenario
+        def self.create_raw_message_redis_to_pg_scenario
           scenario = raw_messages_scenario_data
           # this holds username=>id associations
           usernames_ids = {}
@@ -368,7 +408,7 @@ module Analytics
           end
           scenario
         end
-      end; end # RawMessages
+      end # RawMessages
     end
   end
 end

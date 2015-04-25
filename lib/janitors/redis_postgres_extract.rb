@@ -14,7 +14,7 @@ module Analytics
           while raw_json_msg = messages_queue.pop do
             break if total_msg_count > MAX_REDIS_RAW_MESSAGE_QUEUE
             begin
-              raw_message = RawMessage.create_from_json(raw_json_msg)
+              raw_message = RawMessage.create!(JSON.parse(raw_json_msg))
               LT.env.logger.info("RawMessagesExtract: Successful extract Redis to PG raw message, raw msg ID: #{raw_message.id}")
             rescue Exception => e
               LT.env.logger.error("RawMessagesExtract: Failed extract Redis to PG raw message, exception: #{e.message}")
@@ -53,97 +53,34 @@ module Analytics
         {number_of_records: num_transactions}
       end # raw_messages_to_page_visits
 
+      #
+      # Processes new video visit raw_message data
+      #
       def raw_messages_to_video_visits
-        num_transactions = 0; num_failed = 0
-        RawMessage.transaction do
-          params = {}
-          params[:current_session_id] = nil
+        visits, errors = RawMessage.video_messages, 0
 
-          RawMessage.find_new_video_visits.each do |raw_video_visit|
-            begin
-              if params[:current_session_id] != raw_video_visit['session_id']
-                if params[:video_id]
-                  save_video_view(params)
-                  params[:date_started] = nil
-                end
-
-                params[:current_session_id] = raw_video_visit['session_id']
-                params[:username] = raw_video_visit['username']
-                params[:paused_count] = 0
-              end
-
-              params[:org_id] = raw_video_visit['org_id']
-              params[:video_id] = raw_video_visit['video_id']
-              params[:url] = raw_video_visit['video_id']
-              params[:page_url] = raw_video_visit['url']
-
-              case raw_video_visit['state']
-                when 'playing'
-                  if (!params[:date_started])
-                    params[:date_started] = DateTime.parse(raw_video_visit['captured_at'])
-                  else
-                    if params[:date_started] > DateTime.parse(raw_video_visit['captured_at'])
-                      params[:date_started] = DateTime.parse(raw_video_visit['captured_at'])
-                    end
-                  end
-                  #end
-                when 'ended'
-                  if (!params[:date_ended])
-                    params[:date_ended] = DateTime.parse(raw_video_visit['captured_at'])
-                  else
-                    if params[:date_ended] < DateTime.parse(raw_video_visit['captured_at'])
-                      params[:date_ended] = DateTime.parse(raw_video_visit['captured_at'])
-                    end
-                  end
-                  params[:time_viewed] = ((params[:date_ended] - params[:date_started]) * 24 * 60 * 60).to_i
-                when 'paused'
-                  params[:paused_count] += 1
-              end
-
-              # VideoView.create_from_raw_message(raw_video_visit)
-              LT.env.logger.debug("RawMessagesExtract.raw_messages_to_video_visits: Successful extract PG raw message to video visit, raw msg ID: #{raw_video_visit['video_id']}")
-            rescue Exception => e
-              LT.env.logger.error("RawMessagesExtract.raw_messages_to_video_visits: Failed extract PG raw message to video visit, raw msg ID: #{raw_video_visit['video_id']}, exception: #{e.message}")
-              num_failed += 1
-            end
-            num_transactions += 1
-            break if num_transactions > MAX_RAW_MESSAGE_TRANSACTION_LENGTH
-          end # RawMessage.find_new_video_visits.each
-
-          save_video_view(params)
-          params[:date_started] = nil
-
-        end # RawMessage.transaction
-        LT.env.logger.info("RawMessagesExtract: Finished extract PG raw message to video visits, transactions: #{num_transactions}, failures: #{num_failed}")
-        {number_of_records: num_transactions}
-      end
-
-      def save_video_view(params)
-        if params[:current_session_id].length == 36
-          begin
-            user = User.find_or_create_by(username: params[:username], organization_id: params[:org_id])
-            v = Video.find_or_create_by_url(params[:url])
-
-            page = Page.find_or_create_by_url({url:  params[:page_url]})
-
-            vv = VideoView.new
-            vv.video_id = v.id
-            vv.page_id = page.id
-            vv.user_id = user.id
-            vv.date_started = params[:date_started]
-            vv.date_ended = params[:date_ended]
-            #vv.time_viewed = params[:time_viewed]
-            vv.paused_count = params[:paused_count]
-            vv.save
-
-            LT.env.logger.debug("save_video_view: Finished extract PG raw message to video visits, url: #{params[:url]}")
-          rescue Exception => e
-            LT.env.logger.error("RawMessagesExtract.save_video_view: Failed insert PG video visit, url: #{params[:url]}, exception: #{e.message}")
-          end
+        visits.each do |raw_msg|
+          errors += 1 if raw_message_to_video_visit(raw_msg)
         end
 
-      end # raw_messages_to_video_visits
+        logger.debug <<-EOM
+          RawMessage->VideoVisit: #{visits.size} processed / #{errors} failed
+        EOM
+      end
 
+      def raw_message_to_video_visit(raw_msg)
+        if raw_msg.process_as_video
+          logger.debug("Succesfully extracted VideoVisit from #{raw_msg}")
+          true
+        else
+          logger.debug("Error extracting VideoVisit from #{raw_msg}")
+          false
+        end
+      end
+
+      def logger
+        LT.env.logger
+      end
     end; end # RawMessagesExtract
   end # Janitors
 end

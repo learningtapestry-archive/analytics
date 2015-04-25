@@ -25,17 +25,12 @@ class InitSchema < ActiveRecord::Migration
       t.string        'username'
       t.string        'page_title'
       t.uuid          'site_uuid'
-      t.string        'verb'
+      t.integer       'verb'
       t.json          'action'
       t.text          'url'
       t.datetime      'captured_at'
+      t.datetime      'processed_at'
       t.belongs_to    :user
-      t.timestamps                    null: true
-    end
-
-    create_table 'raw_message_logs', force: true do |t|
-      t.string        'action'
-      t.belongs_to    :raw_message
       t.timestamps                    null: true
     end
 

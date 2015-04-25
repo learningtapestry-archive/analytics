@@ -31,7 +31,7 @@ class PageVisit < ActiveRecord::Base
   # This method does validate the raw message verb
   def self.create_from_raw_message(raw_message)
     retval = {}
-    if (raw_message[:verb] != RawMessage::Verbs::VIEWED) then
+    if (raw_message[:verb] != :viewed) then
       retval[:exception] = ActiveRecord::StatementInvalid
       retval[:error_msg] = "RawMessage verb is not suitable. Was: #{raw_message[:verb]} Expected: #{RawMessage::Verbs::VIEWED}"
       return retval
@@ -54,8 +54,9 @@ class PageVisit < ActiveRecord::Base
       url: raw_message["url"]
     }
     retval[:page_visit] = PageVisit.create_full(pv_data)[:page_visit]
-    # tag RawMessage record as having been processed for page_visit
-    raw_message.raw_message_logs << RawMessageLog.new_to_page_visits
+
+    # tag RawMessage record as having been processed
+    raw_message.processed_at = Time.now
     retval
   end
 

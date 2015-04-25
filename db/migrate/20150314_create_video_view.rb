@@ -20,8 +20,9 @@ class CreateVideoView < ActiveRecord::Migration
     create_table :video_views, force: true do |t|
       t.datetime 'date_started'
       t.datetime 'date_ended'
-      t.column 'time_viewed', :interval
-      t.integer 'paused_count'
+      t.datetime 'date_fragment_started'
+      t.integer 'time_viewed', default: 0
+      t.string 'session_id'
 
       t.belongs_to :user
       t.belongs_to :video

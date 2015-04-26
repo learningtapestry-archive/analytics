@@ -1,4 +1,4 @@
-require File::expand_path('../test_helper.rb', __FILE__)
+require 'test_helper'
 
 require File::join(LT.environment.janitor_path,'redis_postgres_extract.rb')
 require 'utils/csv_database_loader'

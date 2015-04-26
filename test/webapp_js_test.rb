@@ -1,6 +1,6 @@
-require 'open-uri'
-require File::expand_path('../test_helper.rb', __FILE__)
+require 'test_helper'
 
+require 'open-uri'
 require 'utils/scenarios'
 require 'helpers/redis'
 

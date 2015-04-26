@@ -1,5 +1,4 @@
-test_helper_file = File::expand_path(File::join(LT.environment.test_path,'test_helper.rb'))
-require test_helper_file
+require 'test_helper'
 
 require 'utils/csv_database_loader'
 

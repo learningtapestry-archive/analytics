@@ -70,4 +70,26 @@ class OrganizationTest < LT::Test::DBTestBase
 
     assert org.locked
   end
+
+  def test_find_or_create_user_returns_nil_if_api_key_does_not_exist
+    assert_nil Organization.find_or_create_user('madeupkey', 'anyuser')
+  end
+
+  def test_find_or_create_user_returns_a_new_user_if_username_does_not_exist
+    org = Organization.create!
+    user = Organization.find_or_create_user(org.org_api_key, 'anyuser')
+
+    assert_instance_of User, user
+    assert_equal 1, User.count
+  end
+
+  def test_find_or_create_user_returns_existing_user_if_username_exists
+    org = Organization.create!
+    usr = org.users.create!(username: 'anyuser')
+
+    found_usr = Organization.find_or_create_user(org.org_api_key, usr.username)
+
+    assert_equal usr, found_usr
+    assert_equal 1, User.count
+  end
 end

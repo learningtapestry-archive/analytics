@@ -2,19 +2,23 @@ require 'chronic'
 require 'chronic_duration'
 
 class VideoView < ActiveRecord::Base
-  #
-  # TODO: Add a validation on user?
-  #
   belongs_to :user
-
-  belongs_to :page
 
   has_one :student, through: :user
   has_one :staff_member, through: :user
   has_one :site, through: :page
   has_one :site_visited, through: :site
 
-  delegate :url, :to => :page
+  belongs_to :video
+
+  #
+  # TODO: Is this intentional or is this a copy/paste from the PageVisit model
+  # and it's supposed to link to a video? In the same message there's 2 urls
+  # for videos: 'url' and 'video_id', so it actually makes sense to link this
+  # to a page as well.
+  #
+  belongs_to :page
+  delegate :url, to: :page
 
   validates :session_id, presence: true, length: { is: 36 }
 

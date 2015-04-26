@@ -1,7 +1,10 @@
 require 'uri'
 
+#
+# A video on the Internet
+#
 class Video < ActiveRecord::Base
-  has_many :video_views
+  has_many :views, class_name: 'VideoView'
   belongs_to :site
 
   validates :url, presence: true
@@ -18,18 +21,6 @@ class Video < ActiveRecord::Base
       next unless param.split('=').size == 2 && param.split('=')[0] == 'v'
 
       self.external_id = param.split('=')[1]
-    end
-  end
-
-  def video_view_from_raw_message(msg)
-    video_views.find_or_create_by(session_id: msg.action['session_id']) do |vv|
-      vv.page = Page.find_or_create_by(url: msg.url) if msg.url
-
-      organization = Organization.find_by(org_api_key: msg.org_api_key)
-
-      if organization && organization.users.any?
-        vv.user = organization.users.find_or_create_by(username: msg.username)
-      end
     end
   end
 end

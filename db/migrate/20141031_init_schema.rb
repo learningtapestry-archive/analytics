@@ -81,7 +81,7 @@ class InitSchema < ActiveRecord::Migration
 
     create_table 'page_visits', force: true do |t|
       t.datetime      'date_visited'
-      t.column        'time_active',  :interval
+      t.integer       :time_active, default: 0
       t.belongs_to    :user
       t.belongs_to    :page
       t.timestamps                    null: true

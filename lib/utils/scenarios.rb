@@ -231,7 +231,7 @@ module Analytics
                 if p.url == page_visit[:url] then
                   page_visit.delete(:url)
                   pv = PageVisit.create(page_visit)
-                  p.page_visits << pv
+                  p.visits << pv
                   student.page_visits << pv
                 end
               end
@@ -285,7 +285,12 @@ module Analytics
         end
 
         def page
-          base.merge(verb: 'viewed')
+          base.merge(
+            verb: 'viewed',
+            action: {
+              time: '356S'
+            }
+          )
         end
 
         def unprocessed

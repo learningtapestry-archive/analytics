@@ -79,7 +79,7 @@ class InitSchema < ActiveRecord::Migration
 
     add_index :pages, :url, :unique => true
 
-    create_table 'page_visits', force: true do |t|
+    create_table 'visits', force: true do |t|
       t.datetime      'date_visited'
       t.integer       :time_active, default: 0
       t.belongs_to    :user
@@ -129,7 +129,7 @@ class InitSchema < ActiveRecord::Migration
       t.belongs_to    :district
       t.timestamps                    null: true
     end
-    
+
     create_table 'courses', force: true do |t|
       t.string        'course_code'
       t.string        'sis_id'
@@ -160,7 +160,6 @@ class InitSchema < ActiveRecord::Migration
     end
 
     create_table 'section_users', force: true do |t|
-      t.string        'user_type' # defines type of relationship user has to section (e.g.: 'teacher' 'student' 'TA' 'auditing')
       t.belongs_to    :section
       t.belongs_to    :user
       t.timestamps                    null: true
@@ -192,23 +191,15 @@ class InitSchema < ActiveRecord::Migration
       t.timestamps                    null: true
     end
 
-    create_table 'students', force: true do |t|
+    create_table 'profiles', force: true do |t|
       t.string        'state_id'
       t.string        'sis_id'
       t.string        'other_id'
+      t.string        'type'
       t.string        'grade_level'
       t.belongs_to    :user
       t.timestamps                    null: true
     end
-
-    create_table 'staff_members', force: true do |t|
-      t.string        'state_id'
-      t.string        'sis_id'
-      t.string        'other_id'
-      t.string        'staff_member_type', null: false
-      t.belongs_to    :user
-      t.timestamps                    null: true
-    end 
 
     ### End User Tables
 

@@ -1,269 +1,177 @@
-require 'models/user'
-
 module Analytics
   module Utils
     module Scenarios
-      module Schools class << self
+      module Schools
         def acme_high_school_data
-          {
-            :name=>"Acme High School"
-          }
+          { name: 'Acme High School' }
         end
-      end; end # Schools
+      end
 
-      module Teachers class << self
+      module Teachers
         def jane_doe_data
           {
-            :username=>"janedoe@bar.com",
-            :password=>"pass",
-            :first_name=>"Jane",
-            :last_name=>"Doe",
-            :email=> "janedoe@bar.com",
-            :staff_member=>{
-              :staff_member_type=>'Teacher'
-            }
+            username: 'janedoe@bar.com',
+            password: 'pass',
+            first_name: 'Jane',
+            last_name: 'Doe',
+            email: 'janedoe@bar.com',
+            profile_attributes: { type: 'Teacher' }
           }
         end
-      end; end # Teachers
+      end
 
-      module Sites class << self
-        def khanacademy_data
-          {:display_name=>"Khan Academy",
-          :url=>'http://www.khanacademy.org',
-          site_uuid: "dd584c3e-47ee-11e4-8939-164230d1df67"
-          }
-        end
-
-        def codeacademy_data
-          {:display_name=>"Code Academy",
-          :url=>'http://www.codeacademy.com',
-          site_uuid: "bc921bb1-c7ed-421a-8e8f-e3ece2a57e53"
-          }
-        end
-      end; end #Sites
-
-      module SiteActions class << self
-        def khanacademy_actions_data
-          {:action_type=>"PAGEVIEW",
-          :url_pattern=>"http(s)?://(.*\\.)?khanacademy\\.(com|org)(/\\S*)?",
-          :site_url=>'http://www.khanacademy.org'
+      module Sites
+        def khanacademy
+          {
+            display_name: 'Khan Academy',
+            url: 'www.khanacademy.org',
+            site_uuid: 'dd584c3e-47ee-11e4-8939-164230d1df67',
+            site_actions_attributes: [
+              {
+                action_type: 'PAGEVIEW',
+                url_pattern: 'http(s)?://(.*\\.)?khanacademy\\.(com|org)(/\\S*)?',
+              }
+            ]
           }
         end
 
-        def codeacademy_actions_data
-          {:action_type=>"CLICK",
-          :url_pattern=>"http(s)?://(.*\\.)?codeacademy\\.(com|org)(/\\S*)?",
-          :site_url=>'http://www.codeacademy.com'
+        def codeacademy
+          {
+            display_name: 'Code Academy',
+            url: 'www.codeacademy.com',
+            site_uuid: 'bc921bb1-c7ed-421a-8e8f-e3ece2a57e53',
+            site_actions_attributes: [
+              {
+                action_type: 'CLICK',
+                url_pattern: 'http(s)?://(.*\\.)?codeacademy\\.(com|org)(/\\S*)?',
+              }
+            ]
           }
         end
-      end; end #SiteActions
+      end
 
-      module ApprovedSites class << self
-        def approved_khanacademy_data
-          {:school_name=>'Acme High School',
-          :site_url=>'http://www.khanacademy.org'
+      module Pages
+        def khanacademy_page1
+          {
+            display_name: 'Converting Decimals to Fractions 2 (ex 1)',
+            url: 'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-decimals-to-fractions-2-ex-1',
+            visits_attributes: [
+              { date_visited: 1.day.ago, time_active: '15 minutes' },
+              { date_visited: 2.days.ago, time_active: '12 minutes' }
+            ]
           }
         end
 
-        def approved_codeacademy_data
-          {:school_name=>'Acme High School',
-          :site_url=>'http://www.codeacademy.com'
+        def khanacademy_page2
+          {
+            display_name: 'Converting a fraction to a repeating decimal',
+            url: 'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-a-fraction-to-a-repeating-decimal',
+            visits_attributes: [
+              { date_visited: 2.days.ago, time_active: '7 minutes' },
+              { date_visited: 2.weeks.ago, time_active: '7 minutes' }
+            ]
           }
         end
-      end; end #ApprovedSites
 
-      module Pages class << self
-        def khanacademy_data
-          [{:display_name=>"Converting Decimals to Fractions 2 (ex 1)",
-          :url=>'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-decimals-to-fractions-2-ex-1',
-          # this field is not part of the model - used to help seed below
-          :site_url=>'http://www.khanacademy.org'},
-          {:display_name=>"Converting a fraction to a repeating decimal",
-          :url=>'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-a-fraction-to-a-repeating-decimal',
-          :site_url=>'http://www.khanacademy.org'}]
+        def codeacademy_page
+          {
+            display_name: 'Access Array By Index',
+            url: 'http://www.codecademy.com/courses/ruby-beginner-en-F3loB/0/2?curriculum_id=5059f8619189a5000201fbcb',
+            visits_attributes: [
+              { date_visited: 3.days.ago, time_active: '9 minutes' },
+              { date_visited: 13.days.ago, time_active: '22 minutes' }
+            ]
+          }
         end
+      end
 
-        def codeacademy_data
-          [{:display_name=>"Access Array By Index",
-          :url=>'http://www.codecademy.com/courses/ruby-beginner-en-F3loB/0/2?curriculum_id=5059f8619189a5000201fbcb',
-          :site_url=>'http://www.codeacademy.com'}]
-        end
-      end; end # Pages
-
-      module Organizations class << self
-        @acme_org_api_key = nil
-        @acme_org_secret_key = nil
+      module Organizations
         def acme_organization_data
-          @acme_org_api_key = SecureRandom.uuid if !@acme_org_api_key
-          @acme_org_secret_key =  SecureRandom.hex(36) if !@acme_org_secret_key
           {
             name: 'Acme Organization',
-            org_api_key: @acme_org_api_key,
-            org_secret_key: @acme_org_secret_key
+            org_api_key: SecureRandom.uuid,
+            org_secret_key: SecureRandome.hex(36)
           }
         end
-      end; end # Organizations
+      end
 
       # create a user in a section
-      module Students class << self
+      module Students
+        include Schools
+        include Sites
+        include Organizations
+        include Teachers
+
         def joe_smith_data
           {
-          :username=>"joesmith@foo.com",
-          :password=>"pass",
-          :first_name=>"Joe",
-          :last_name=>"Smith",
-          :email=> "joesmith@foo.com",
-          :student=>{}
+            username: 'joesmith@foo.com',
+            password: 'pass',
+            first_name: 'Joe',
+            last_name: 'Smith',
+            profile_attributes: { type: 'Student' },
+            emails_attributes: [{ email: 'joesmith@foo.com' }]
           }
         end
 
         def bob_newhart_data
           {
-          :username=>"bob@foo.com",
-          :password=>"pass2",
-          :first_name=>"Bob",
-          :last_name=>"Newhart",
-          :email=> "bobnewhard@foo.com",
-          :student=>{}
+            username: 'bob@foo.com',
+            password: 'pass2',
+            first_name: 'Bob',
+            last_name: 'Newhart',
+            profile_attributes: { type: 'Student' },
+            emails_attributes: [{ email: 'bobnewhard@foo.com' }]
           }
         end
 
         def create_joe_smith_scenario
           scenario = {
-            :student=>joe_smith_data,
-            :student2=>bob_newhart_data,
-            :section=>{
-              :name=>"CompSci Period 2",
-              :section_code=>"Comp Sci Room 2"
+            student: joe_smith_data,
+            student2: bob_newhart_data,
+            section: {
+              name: 'CompSci Period 2', section_code: 'Comp Sci Room 2'
             },
-            :organizations=>[
-              Organizations::acme_organization_data
-            ],
-            :school=>Schools::acme_high_school_data,
-            :teacher=>Teachers::jane_doe_data,
-            :sites=>[
-              Sites::khanacademy_data,
-              Sites::codeacademy_data,
-            ],
-            :site_actions=>[
-              SiteActions::khanacademy_actions_data,
-              SiteActions::codeacademy_actions_data
-            ],
-            :approved_sites=>[
-              ApprovedSites::approved_khanacademy_data,
-              ApprovedSites::approved_codeacademy_data
-            ],
-            :pages=>(Pages::khanacademy_data+Pages::codeacademy_data),
-            :page_visits=>[{
-              # this field is not part of the model - used to help seed below
-              :url=>'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-decimals-to-fractions-2-ex-1',
-              :date_visited=>1.day.ago,
-              :time_active=>15.minutes.to_i
-              },
-              {
-              :url=>'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-decimals-to-fractions-2-ex-1',
-              :date_visited=>2.days.ago,
-              :time_active=>12.minutes.to_i
-              },
-              {
-              :url=>'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-a-fraction-to-a-repeating-decimal',
-              :date_visited=>2.days.ago,
-              :time_active=>7.minutes.to_i
-              },
-              {
-              :url=>'https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-numbers-operations/cc-8th-irrational-numbers/v/converting-a-fraction-to-a-repeating-decimal',
-              :date_visited=>2.weeks.ago,
-              :time_active=>7.minutes.to_i
-              },
-              {
-              :url=>'http://www.codecademy.com/courses/ruby-beginner-en-F3loB/0/2?curriculum_id=5059f8619189a5000201fbcb',
-              :date_visited=>3.days.ago,
-              :time_active=>8.minutes.to_i
-              },
-              {
-              :url=>'http://www.codecademy.com/courses/ruby-beginner-en-F3loB/0/2?curriculum_id=5059f8619189a5000201fbcb',
-              :date_visited=>13.days.ago,
-              :time_active=>22.minutes.to_i
-              }
-            ]
-          }
-          student = User.create_user(scenario[:student])[:user].student
-          student2 = User.create_user(scenario[:student2])[:user].student
-          teacher = User.create_user(scenario[:teacher])[:user].staff_member
-          section = Section.create(scenario[:section])
-          school = School.create(scenario[:school])
-          student.add_to_section(section)
-          student2.add_to_section(section)
-          teacher.add_to_section(section)
-          student.add_to_school(school)
-          student2.add_to_school(school)
-          teacher.add_to_school(school)
-          scenario[:organizations].each do |organization|
-            Organization.create!(organization)
-          end
-          organization = Organization.find_by_name(Organizations::acme_organization_data[:name])
-          student.organization = organization
-          student.save
-          student2.organization = organization
-          student2.save
+            organization: acme_organization_data,
+            school: acme_high_school_data,
+            teacher: jane_doe_data,
+            pages: [khanacademy_page1, khanacademy_page2, codeacademy_page],
+         }
 
-          # we add all user activity data to two students
-          # this is to make sure that we can find data associated with only student at a time
-          [student, student2].each do |student|
-            # create site records, and associated site_visited records
-            # we have to tie sites_visited to sites
-            # we have to tie sites_visited to users
-            scenario[:sites].each do |site|
-              site = site.dup
-              s = Site.find_or_create_by(site)
-            end
-            # create page records, and associated page_visited records
-            # we have to tie pages to sites as well as pages_visited
-            # we have to tie pages_visited to users
-            scenario[:pages].each do |page|
-              page = page.dup
-              s = Site.find_by_url(page[:site_url])
-              page.delete(:site_url)
-              p = Page.find_or_create_by(page)
-              s.pages << p
-              scenario[:page_visits].each do |page_visit|
-                page_visit = page_visit.dup
-                if p.url == page_visit[:url] then
-                  page_visit.delete(:url)
-                  pv = PageVisit.create(page_visit)
-                  p.visits << pv
-                  student.page_visits << pv
-                end
-              end
-            end
-          end #[student, student2].each do |student|
-          # create site actions and site approvals for the school
+          section = Section.create!(scenario[:section])
+          school = School.create!(scenario[:school])
 
-          # Attach site actions for each site
-          scenario[:site_actions].each do |site_action|
-            site_action = site_action.dup
-            site = Site.find_by_url(site_action[:site_url])
-            site_action.delete(:site_url)
-            sa = SiteAction.create(site_action)
-            site.site_actions << sa
-          end # scenario[:site_actions].each do |site_action|
+          student = User.create!(scenario[:student])
+          student2 = User.create!(scenario[:student2])
+          teacher = User.create!(scenario[:teacher])
 
-          # Attach approval for the two sites at the school level
-          scenario[:approved_sites].each do |approved_site|
-            approved_site = approved_site.dup
-            site = Site.find_by_url(approved_site[:site_url])
-            approved_site.delete(:site_url)
-            as = ApprovedSite.new
-            as.school_id = school.id
-            as.site_id = site.id
-            as.save
-          end # scenario[:approved_sites].each do |approved_site|
+          SectionUser.create!([ { user: student, section: section },
+                                { user: student2, section: section },
+                                { user: teacher, section: section }])
 
-          scenario
-        end # create_joe_smith_seed
-      end; end #Students
+
+          student.update!(school: school)
+          student2.update!(school: school)
+          teacher.update!(school: school)
+
+          organization = Organization.create!(scenario[:organization])
+
+          student.update!(organization: organization)
+          student2.update!(organization: organization)
+
+          Page.create!(scenario[:pages])
+          Visit.find_each { |visit| visit.update!(user: student1) }
+
+          ApprovedSite.create(school: school, site: site1)
+          ApprovedSite.create(school: school, site: site2)
+        end
+      end
 
       module RawMessages
+        include Sites
+        include Pages
+        include Students
+        include Organizations
+
         def base
           {
             username: 'steve@example.com',
@@ -313,78 +221,72 @@ module Analytics
           new_student_username = "newuser@novel.com"
           scenario = {
             new_student: {username: new_student_username},
-            students: [
-              Students::joe_smith_data,
-              Students::bob_newhart_data
-            ],
-            organizations: [
-              Organizations::acme_organization_data
-            ],
+            students: [joe_smith_data, bob_newhart_data],
+            organization: acme_organization_data,
             raw_messages: [
               {
-              username: Students::joe_smith_data[:username],
-              site_uuid: Sites::khanacademy_data[:site_uuid],
-              verb: "viewed",
-              action:
-                { time: "8M21S" },
-              captured_at: 8.days.ago.iso8601,
-              api_key: "2866b962-a7be-44f8-9a0c-66502fba7d31",
-              url: Pages::khanacademy_data[0][:url]
+                username: joe_smith_data[:username],
+                site_uuid: khanacademy[:site_uuid],
+                verb: "viewed",
+                action:
+                  { time: "8M21S" },
+                captured_at: 8.days.ago.iso8601,
+                api_key: "2866b962-a7be-44f8-9a0c-66502fba7d31",
+                url: khanacademy_page1[:url]
               },
               {
-              username: Students::joe_smith_data[:username],
-              site_uuid: Sites::khanacademy_data[:site_uuid],
-              verb: "viewed",
-              page_title: Pages::khanacademy_data[0][:display_name],
-              action:
-                { time: "12M1S" },
-              captured_at: 2.days.ago.iso8601,
-              api_key: "2866b962-a7be-44f8-9a0c-66502fba7d31",
-              url: Pages::khanacademy_data[0][:url]
+                username: joe_smith_data[:username],
+                site_uuid: khanacademy[:site_uuid],
+                verb: "viewed",
+                page_title: khanacademy_page1[:display_name],
+                action:
+                  { time: "12M1S" },
+                captured_at: 2.days.ago.iso8601,
+                api_key: "2866b962-a7be-44f8-9a0c-66502fba7d31",
+                url: khanacademy_page1[:url]
               },
               {
-              username: Students::joe_smith_data[:username],
-              site_uuid: Sites::khanacademy_data[:site_uuid],
-              verb: "viewed",
-              action:
-                {}, # note - we don't provide value/time key for this record
-              captured_at: 1.day.ago.iso8601,
-              api_key: "2866b962-a7be-44f8-9a0c-66502fba7d31",
-              url: Pages::khanacademy_data[1][:url]
+                username: joe_smith_data[:username],
+                site_uuid: khanacademy[:site_uuid],
+                verb: "viewed",
+                action:
+                  {}, # note - we don't provide value/time key for this record
+                captured_at: 1.day.ago.iso8601,
+                api_key: "2866b962-a7be-44f8-9a0c-66502fba7d31",
+                url: khanacademy_page2[:url]
               },
               {
-              username: Students::bob_newhart_data[:username],
-              site_uuid: Sites::khanacademy_data[:site_uuid],
-              verb: "viewed",
-              action:
-                { time: "2M1S" },
-              captured_at: 2.days.ago.iso8601,
-              api_key: "2866b962-a7be-44f8-9a0c-66502fba7d31",
-              url: Pages::khanacademy_data[0][:url]
+                username: bob_newhart_data[:username],
+                site_uuid: khanacademy[:site_uuid],
+                verb: "viewed",
+                action:
+                  { time: "2M1S" },
+                captured_at: 2.days.ago.iso8601,
+                api_key: "2866b962-a7be-44f8-9a0c-66502fba7d31",
+                url: khanacademy_page1[:url]
               },
               { # This is an org_api_key raw_message to validate that janitor handles both
                 # this message refers to a known user
-              username: Students::joe_smith_data[:username],
-              verb: "viewed",
-              action:
-                { time: "12M24S" },
-              captured_at: 4.days.ago.iso8601,
-              org_api_key: Organizations::acme_organization_data[:org_api_key],
-              url: Pages::khanacademy_data[0][:url]
+                username: joe_smith_data[:username],
+                verb: "viewed",
+                action:
+                  { time: "12M24S" },
+                captured_at: 4.days.ago.iso8601,
+                org_api_key: acme_organization_data[:org_api_key],
+                url: khanacademy_page1[:url]
               },
               {  # this message refers to a new user
-              username: new_student_username,
-              verb: "viewed",
-              action:
-                { time: "12M24S" },
-              captured_at: 4.5.days.ago.iso8601,
-              org_api_key: Organizations::acme_organization_data[:org_api_key],
-              url: Pages::khanacademy_data[0][:url]
+                username: new_student_username,
+                verb: "viewed",
+                action:
+                  { time: "12M24S" },
+                captured_at: 4.5.days.ago.iso8601,
+                org_api_key: acme_organization_data[:org_api_key],
+                url: khanacademy_page1[:url]
               }
             ]
           }
-          scenario
-        end #raw_messages_scenario_data
+        end
 
         require 'helpers/redis'
         include Analytics::Helpers::Redis
@@ -394,12 +296,10 @@ module Analytics
           # this holds username=>id associations
           usernames_ids = {}
           scenario[:students].each do |s|
-            user = User.create_user(s)[:user]
+            user = User.create!(s)
             usernames_ids[user.username] = user.id
           end
-          scenario[:organizations].each do |organization|
-            Organization.create!(organization)
-          end
+          Organization.create!(scenario[:organization])
           scenario[:raw_messages].each do |raw_message|
             # delete username and swap in the user_id
             # except for the org_api_key record which is supposed to have username

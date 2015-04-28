@@ -47,8 +47,8 @@ class RawMessageProcessAsPageTest < LT::Test::DBTestBase
   def test_process_as_page_when_page_does_not_exist_yet
     raw_msg.process_as_page
 
-    assert_equal 1, PageVisit.count
-    assert_visit_imported(PageVisit.first)
+    assert_equal 1, Visit.count
+    assert_visit_imported(Visit.first)
   end
 
   def test_process_as_page_when_page_already_exists
@@ -56,8 +56,8 @@ class RawMessageProcessAsPageTest < LT::Test::DBTestBase
 
     raw_msg.process_as_page
 
-    assert_equal 1, PageVisit.count
-    assert_visit_imported(PageVisit.first)
+    assert_equal 1, Visit.count
+    assert_visit_imported(Visit.first)
   end
 
   def test_process_as_page_when_page_visit_already_exists
@@ -66,8 +66,8 @@ class RawMessageProcessAsPageTest < LT::Test::DBTestBase
 
     raw_msg.process_as_page
 
-    assert_equal 2, PageVisit.count
-    assert_visit_imported(PageVisit.last)
+    assert_equal 2, Visit.count
+    assert_visit_imported(Visit.last)
   end
 
   def test_process_as_page_marks_message_as_processed

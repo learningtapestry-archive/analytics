@@ -3,16 +3,15 @@ require 'chronic_duration'
 
 class VideoView < ActiveRecord::Base
   belongs_to :user
+  has_one :profile, through: :user
 
-  has_one :student, through: :user
-  has_one :staff_member, through: :user
   has_one :site, through: :page
   has_one :site_visited, through: :site
 
   belongs_to :video
 
   #
-  # TODO: Is this intentional or is this a copy/paste from the PageVisit model
+  # TODO: Is this intentional or is this a copy/paste from the Visit model
   # and it's supposed to link to a video? In the same message there's 2 urls
   # for videos: 'url' and 'video_id', so it actually makes sense to link this
   # to a page as well.

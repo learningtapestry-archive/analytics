@@ -25,7 +25,7 @@ class RawMessage < ActiveRecord::Base
   end
 
   #
-  # Page visits yet to be processed into PageVisit objects
+  # Page visits yet to be processed into Visit objects
   #
   def self.page_msgs(limit = MAX_TRANSACTION_LENGTH)
     viewed.unprocessed(limit)
@@ -60,7 +60,7 @@ class RawMessage < ActiveRecord::Base
   end
 
   #
-  # Creates a PageVisit out of a RawMessage with the proper verb
+  # Creates a Visit out of a RawMessage with the proper verb
   #
   # @return true/false whether raw_message was/wasn't correctly processed
   #

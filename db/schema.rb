@@ -187,7 +187,6 @@ ActiveRecord::Schema.define(version: 20150314) do
   end
 
   create_table "section_users", force: :cascade do |t|
-    t.string   "user_type"
     t.integer  "section_id"
     t.integer  "user_id"
     t.datetime "created_at"
@@ -225,21 +224,12 @@ ActiveRecord::Schema.define(version: 20150314) do
 
   add_index "sites", ["url"], name: "index_sites_on_url", unique: true, using: :btree
 
-  create_table "staff_members", force: :cascade do |t|
-    t.string   "state_id"
-    t.string   "sis_id"
-    t.string   "other_id"
-    t.string   "staff_member_type", null: false
-    t.integer  "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "students", force: :cascade do |t|
+  create_table "profiles", force: :cascade do |t|
     t.string   "state_id"
     t.string   "sis_id"
     t.string   "other_id"
     t.string   "grade_level"
+    t.string   "type"
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"

@@ -1,4 +1,4 @@
 require 'models/profile'
 
-class Student < Profile
+class Teacher < Profile
 end

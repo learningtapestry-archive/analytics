@@ -1,3 +1,3 @@
 class SiteAction < ActiveRecord::Base
-  belongs_to :sites
+  belongs_to :site
 end

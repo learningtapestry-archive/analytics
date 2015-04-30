@@ -8,43 +8,49 @@ end
 
 namespace :lt do
   namespace :janitors do
-    desc "Process full workload from Redis to data tables"
-    task :process_redis_messages => [:redis_to_raw_messages, :raw_messages_to_page_visits] do
-      LT.environment.logger.info("process_redis_analytics completed")
+    desc 'Process page visits workload from Redis to data tables'
+    task process_redis_page_messages: [:import_raw_messages, :extract_page_visits] do
+      LT.env.logger.info('process_redis_page_messages')
     end
 
-    desc "Convert Redis queue to raw_messages table"
-    task :redis_to_raw_messages do
-      Rake::Task[:'lt:boot'].invoke
-      require 'janitors/redis_postgres_extract'
-      Analytics::Janitors::RedisPostgresExtract.redis_to_raw_messages
+    desc 'Process video views workload from Redis to data tables'
+    task process_redis_video_messages: [:import_raw_messages, :extract_video_views] do
+      LT.env.logger.info('process_redis_video_messages')
     end
-    desc "Convert raw_messages to page_views"
-    task :raw_messages_to_page_visits do
-      Rake::Task[:'lt:boot'].invoke
-      require 'janitors/redis_postgres_extract'
-      Analytics::Janitors::RawMessagesExtract.raw_messages_to_page_visits
+
+    desc 'Convert Redis queue to raw_messages table'
+    task import_raw_messages: :'lt:boot' do
+      require 'janitors/raw_message_importer'
+
+      Analytics::Janitors::RawMessageImporter.new(LT.env.logger, 2000).import
+    end
+
+    desc 'Extract page views from raw_messages'
+    task extract_page_visits: :'lt:boot' do
+      require 'janitors/visit_extractor'
+
+      Analytics::Janitors::VisitExtractor.new(LT.env.logger, 2000).extract
     end
     desc "Convert raw_messages to video_views"
-    task :raw_messages_to_video_views do
-      Rake::Task[:'lt:boot'].invoke
-      require 'janitors/redis_postgres_extract'
-      Analytics::Janitors::RawMessagesExtract.raw_messages_to_video_visits
+    task extract_video_views: :'lt:boot' do
+      require 'janitors/visualization_extractor'
+
+      Analytics::Janitors::VisualizationExtractor.new(LT.env.logger, 2000).extract
     end
+
     desc "Fill YouTube Information"
-    task :fill_video_youtube_information do
-      Rake::Task[:'lt:boot'].invoke
-      require 'janitors/web_extractor'
-      Analytics::Janitors::WebExtractor.fill_youtube_info
+    task fill_video_youtube_information: :'lt:boot' do
+      require 'janitors/http_metadata_importer'
+
+      Analytics::Janitors::HttpMetadataImporter.new(LT.env.logger, 2000).import
     end
 
     desc "Extract Learning Registry data to raw documents table from http://sandbox.learningregistry.org"
-    task :extract_meta_data do # TODO: rename this rake task name.
-      Rake::Task[:'lt:boot'].invoke
+    task extract_meta_data: :'lt:boot' do # TODO: rename this rake task name.
       require 'janitors/learning_registry_extract'
       Analytics::Janitors::LearningRegistryExtract.retrieve({'node' => 'http://sandbox.learningregistry.org'})
     end
-  end # namespace :janitors
+  end
 
   namespace :utility do
     desc "Loads a single CSV file into the corresponding database table"

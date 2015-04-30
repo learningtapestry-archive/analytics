@@ -6,6 +6,18 @@ LT::Environment.boot_all(File.expand_path('../..', __FILE__))
 require 'webapp'
 Analytics::WebApp.boot
 
+class TestLogger
+  attr_reader :debug_output
+
+  def initialize
+    @debug_output = StringIO.new
+  end
+
+  def debug(msg)
+    @debug_output.puts(msg)
+  end
+end
+
 module Analytics
   module Test
     module Application

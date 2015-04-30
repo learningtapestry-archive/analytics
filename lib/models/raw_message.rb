@@ -13,28 +13,23 @@ class RawMessage < ActiveRecord::Base
   end
 
   #
-  # Maximum number of messages to be processed by the same janitor
-  #
-  MAX_TRANSACTION_LENGTH = 2000
-
-  #
   # Video visits yet to be processed into VideoVisit objects
   #
-  def self.video_msgs(limit = MAX_TRANSACTION_LENGTH)
+  def self.video_msgs(limit)
     video_action.unprocessed(limit)
   end
 
   #
   # Page visits yet to be processed into Visit objects
   #
-  def self.page_msgs(limit = MAX_TRANSACTION_LENGTH)
+  def self.page_msgs(limit)
     viewed.unprocessed(limit)
   end
 
   #
   # Filters unprocessed raw_messages
   #
-  def self.unprocessed(limit = MAX_TRANSACTION_LENGTH)
+  def self.unprocessed(limit)
     where(processed_at: nil).order(:captured_at).limit(limit)
   end
 
@@ -44,19 +39,17 @@ class RawMessage < ActiveRecord::Base
   # @return true/false whether raw_message was/wasn't correctly processed
   #
   def process_as_video
-    video = Video.find_or_create_by(url: action['video_id'])
-    return false unless video.valid?
+    video = Video.find_or_create_by!(url: video_id)
 
-    view =
-      video.views.find_or_create_by(session_id: action['session_id']).tap do |v|
-        v.page = linked_page
-        v.user = linked_user
-      end
-    return false unless view.valid?
+    visualization =
+      video.visualizations.find_or_create_by!(session_id: session_id).tap do |v|
+      v.page = linked_page
+      v.user = linked_user
+    end
 
-    view.update_stats(captured_at, action['state'])
+    visualization.update_stats(captured_at, action['state'])
 
-    update(processed_at: Time.now)
+    update!(processed_at: Time.now)
   end
 
   #
@@ -65,16 +58,13 @@ class RawMessage < ActiveRecord::Base
   # @return true/false whether raw_message was/wasn't correctly processed
   #
   def process_as_page
-    page = Page.find_or_create_by(url: url) do |page|
+    page = Page.find_or_create_by!(url: url) do |page|
       page.display_name = page_title
     end
-    return false unless page.valid?
 
-    page_visit = page.visits.create(
-      time_active: action['time'],
-      date_visited: captured_at,
-      user: linked_user)
-    return false unless page_visit.valid?
+    page_visit = page.visits.create!(time_active: time,
+                                     date_visited: captured_at,
+                                     user: linked_user)
 
     update(processed_at: Time.now)
   end
@@ -87,5 +77,17 @@ class RawMessage < ActiveRecord::Base
 
   def linked_page
     Page.find_or_create_by(url: url)
+  end
+
+  def video_id
+    action['video_id']
+  end
+
+  def session_id
+    action['session_id']
+  end
+
+  def time
+    action['time']
   end
 end

@@ -1,9 +1,9 @@
-class CreateVideoView < ActiveRecord::Migration
+class CreateVideos < ActiveRecord::Migration
   def change
     create_table :videos, force: true do |t|
       t.text 'service_id'
       t.text 'external_id'
-      t.text 'url'
+      t.text 'url', null: false
       t.text 'title'
       t.text 'description'
       t.text 'publisher'
@@ -17,7 +17,7 @@ class CreateVideoView < ActiveRecord::Migration
       t.timestamps                    null: true
     end
 
-    create_table :video_views, force: true do |t|
+    create_table :visualizations, force: true do |t|
       t.datetime 'date_started'
       t.datetime 'date_ended'
       t.datetime 'date_fragment_started'

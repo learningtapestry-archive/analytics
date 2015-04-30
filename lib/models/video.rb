@@ -4,10 +4,12 @@ require 'uri'
 # A video on the Internet
 #
 class Video < ActiveRecord::Base
-  has_many :views, class_name: 'VideoView'
+  validates :url, presence: true
+
+  has_many :visualizations
   belongs_to :site
 
-  validates :url, presence: true
+  scope :unprocessed, -> { where(title: nil, service_id: 'youtube') }
 
   def url=(string)
     self[:url] = string

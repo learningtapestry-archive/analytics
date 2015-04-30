@@ -6,6 +6,8 @@ require 'models/concerns/summarizable'
 # A Web page
 #
 class Page < ActiveRecord::Base
+  validates :url, presence: true
+
   has_many :visits
   accepts_nested_attributes_for :visits
 

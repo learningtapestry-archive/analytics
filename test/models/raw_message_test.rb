@@ -7,21 +7,21 @@ class RawMessageModelTest < LT::Test::DBTestBase
   def test_each_visit_scope_returns_proper_messages
     video_msg, page_msg = RawMessage.create!(video), RawMessage.create!(page)
 
-    assert_equal [page_msg], RawMessage.page_msgs
-    assert_equal [video_msg], RawMessage.video_msgs
+    assert_equal [page_msg], RawMessage.page_msgs(100)
+    assert_equal [video_msg], RawMessage.video_msgs(100)
   end
 
-  def test_unprocessed_returns_only_message_not_imported_yet
+  def test_unprocessed_returns_only_messages_not_imported_yet
     unprocessed_msg = RawMessage.create!(unprocessed)
     RawMessage.create(processed)
 
-    assert_equal [unprocessed_msg], RawMessage.unprocessed
+    assert_equal [unprocessed_msg], RawMessage.unprocessed(100)
   end
 
   def test_unprocessed_returns_oldest_messages_first
     first_msg, last_msg = RawMessage.create!(old), RawMessage.create!(recent)
 
-    assert_equal [first_msg, last_msg], RawMessage.unprocessed
+    assert_equal [first_msg, last_msg], RawMessage.unprocessed(100)
   end
 
   def test_unprocessed_can_return_a_specific_number_of_messages
@@ -109,8 +109,8 @@ class RawMessageProcessAsVideoTest < LT::Test::DBTestBase
   def test_process_as_video_when_video_does_not_exist_yet
     raw_msg.process_as_video
 
-    assert_equal 1, VideoView.count
-    assert_view_imported(VideoView.first)
+    assert_equal 1, Visualization.count
+    assert_visualization_imported(Visualization.first)
   end
 
   def test_process_as_video_when_video_exists
@@ -118,18 +118,18 @@ class RawMessageProcessAsVideoTest < LT::Test::DBTestBase
 
     raw_msg.process_as_video
 
-    assert_equal 1, VideoView.count
-    assert_view_imported(VideoView.first)
+    assert_equal 1, Visualization.count
+    assert_visualization_imported(Visualization.first)
   end
 
-  def test_process_as_video_when_view_already_exists
+  def test_process_as_video_when_visualization_already_exists
     video = Video.create(url: raw_msg.action['video_id'])
-    video.views.create!(session_id: raw_msg.action['session_id'])
+    video.visualizations.create!(session_id: raw_msg.action['session_id'])
 
     raw_msg.process_as_video
 
-    assert_equal 1, VideoView.count
-    assert_view_imported(VideoView.first)
+    assert_equal 1, Visualization.count
+    assert_visualization_imported(Visualization.first)
   end
 
   def test_process_as_video_marks_message_as_processed
@@ -140,12 +140,12 @@ class RawMessageProcessAsVideoTest < LT::Test::DBTestBase
 
   private
 
-  def assert_view_imported(view)
-    assert_imported(view.video)
+  def assert_visualization_imported(visualization)
+    assert_imported(visualization.video)
 
-    assert_equal raw_msg.action['session_id'], view.session_id
-    assert_equal raw_msg.url, view.page.url
-    assert_equal raw_msg.username, view.user.username
+    assert_equal raw_msg.action['session_id'], visualization.session_id
+    assert_equal raw_msg.url, visualization.page.url
+    assert_equal raw_msg.username, visualization.user.username
   end
 
   def assert_imported(video)

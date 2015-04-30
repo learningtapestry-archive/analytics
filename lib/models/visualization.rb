@@ -1,7 +1,7 @@
 require 'chronic'
 require 'chronic_duration'
 
-class VideoView < ActiveRecord::Base
+class Visualization < ActiveRecord::Base
   belongs_to :user
   has_one :profile, through: :user
 
@@ -38,18 +38,17 @@ class VideoView < ActiveRecord::Base
       videos.url,
       videos.publisher,
       users.username,
-      video_views.date_started,
-      video_views.date_ended,
-      video_views.paused_count
+      visualizations.date_started,
+      visualizations.date_ended,
     FROM
-      video_views,
+      visualizations,
       organizations,
       users,
       videos
     WHERE
-      video_views.user_id = users.id AND
+      visualizations.user_id = users.id AND
       users.organization_id = organizations.id AND
-      video_views.video_id = videos.id AND
+      visualizations.video_id = videos.id AND
       organizations.org_api_key='#{params[:org_api_key]}' "
 
     if params[:date_started] != nil

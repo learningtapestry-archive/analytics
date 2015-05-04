@@ -8,7 +8,6 @@ class Visit < ActiveRecord::Base
   has_one :profile, through: :user
 
   has_one :site, through: :page
-  has_one :site_visited, through: :site
 
   belongs_to :page
   delegate :url, :display_name, to: :page

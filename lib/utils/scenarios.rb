@@ -287,33 +287,7 @@ module Analytics
             ]
           }
         end
-
-        require 'helpers/redis'
-        include Analytics::Helpers::Redis
-
-        def self.create_raw_message_redis_to_pg_scenario
-          scenario = raw_messages_scenario_data
-          # this holds username=>id associations
-          usernames_ids = {}
-          scenario[:students].each do |s|
-            user = User.create!(s)
-            usernames_ids[user.username] = user.id
-          end
-          Organization.create!(scenario[:organization])
-          scenario[:raw_messages].each do |raw_message|
-            # delete username and swap in the user_id
-            # except for the org_api_key record which is supposed to have username
-            if raw_message[:org_api_key].nil? then
-              raw_message[:user_id]=usernames_ids[raw_message.delete(:username)]
-            end
-            if raw_message[:user_id].nil? && raw_message[:org_api_key].nil? then
-              raise StandardError
-            end
-            messages_queue.push(raw_message.to_json)
-          end
-          scenario
-        end
-      end # RawMessages
+      end
     end
   end
 end

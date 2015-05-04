@@ -29,6 +29,9 @@ class Site < ActiveRecord::Base
     self[:display_name] || url
   end
 
+  #
+  # TODO: What's the point of this?
+  #
   def set_defaults
     # only set defaults for new records (ones not saved to db yet)
     return if persisted?

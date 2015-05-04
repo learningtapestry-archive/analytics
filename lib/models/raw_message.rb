@@ -79,6 +79,10 @@ class RawMessage < ActiveRecord::Base
     Page.find_or_create_by(url: url)
   end
 
+  #
+  # TODO: Why do we have this json 'action' column. Isn't it easier to user
+  # properly typed columns for each attribute?
+  #
   def video_id
     action['video_id']
   end

@@ -139,9 +139,7 @@ module Analytics
 
         retval = {}
         org = Organization.find_by_org_api_key(org_api_key)
-        # TODO Security: Organization should take care of being locked internally
-        #   -- the .verify_secret method should check self.locked
-        if org.nil? or org.locked or !org.verify_secret(org_secret_key)
+        if org.nil? or !org.verify_secret(org_secret_key)
           retval[:error] = 'org_api_key invalid or locked'
           retval[:status] = 401
         else

@@ -17,7 +17,7 @@ module Analytics
         vroute(:approved_sites, '/api/v1/approved-sites')
         vroute(:assert_key, '/api/v1/assert')
         vroute(:assert_org_key, '/api/v1/assert-org')
-        vroute(:obtain_key, '/api/v1/obtain')
+        vroute(:obtain, '/api/v1/obtain')
         vroute(:users, '/api/v1/users')
         vroute(:video_views, '/api/v1/video_views')
         vroute(:page, '/api/v1/:page')
@@ -88,7 +88,7 @@ module Analytics
           end
         end
 
-        post vroute(:obtain_key) do
+        post vroute(:obtain) do
           content_type :json
 
           # Get a key valued params hash from request's body

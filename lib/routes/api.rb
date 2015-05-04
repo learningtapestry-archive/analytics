@@ -64,7 +64,7 @@ module Analytics
         get vroute(:approved_sites) do
           content_type :json
 
-          ApprovedSite.get_all_with_actions.to_json
+          Site.get_all_with_actions.to_json
         end
 
         post vroute(:assert_key) do
@@ -88,74 +88,33 @@ module Analytics
           end
         end
 
-        post vroute(:obtain) do
-          content_type :json
+        authenticated :obtain, :video_views, :users
 
-          # Get a key valued params hash from request's body
-          # NOTE: If we start needing this in more places, consider using
-          # rack-contrib's Rack::PostBodyContentTypeParser
-          params = \
-            JSON.parse(request.body.read).map { |k, v| [k.to_sym, v] }.to_h
+        get vroute(:obtain) do
+          filters = parse_visit_params(params)
 
-          if params[:org_api_key].nil? or params[:org_secret_key].nil?
-            status 401 # = HTTP Unauthorized
-            json error: 'Organization API key (org_api_key) and secret (org_secret_key) not provided'
-          elsif params[:usernames].nil? or !params[:usernames].is_a?(Array) or params[:usernames].length == 0
-            status 400 # = HTTP Bad Request
-            json error: 'Username array (usernames) not provided'
-          elsif params[:entity].nil?
-            status 400 # = HTTP Bad Request
-            json error: 'Entity type (entity) not provided'
-          else
-            org = Organization.find_by_org_api_key(params[:org_api_key])
-            if !org or org.locked or !org.verify_secret(params[:org_secret_key])
-              LT.env.logger.warn 'Invalid org_api_key submitted or locked: ' + params[:org_api_key]
-              status 401 # = HTTP Unauthorized
-              json error: 'org_api_key invalid or locked'
-            else # We have a valid organization with validated secret and not locked out
-              case params[:entity]
-              when 'site_visits'
-                retval = site_visits(params)
-                status 200 # = HTTP Success
-              when 'page_visits'
-                retval = page_visits(params)
-                status 200 # = HTTP Success
-              else
-                LT.env.logger.warn "Unknown entity type in /api/v1/obtain, type: #{params[:entity]}"
-                retval = { error: "Unknown entity type: #{params[:entity]}" }
-                status 400 # = HTTP Bad Request
-              end
+          date_range = filters.slice(:date_begin, :date_end)
+          entity = filters[:entity]
 
-              json retval
-            end
-          end
-        end
+          summary = Visit.by_dates(*(date_range.values)).summary(entity)
+          results = @org.users.joins(:visits).merge(summary)
 
-        get vroute(:users) do
-          content_type :json
+          res = { entity: entity, date_range: date_range, results: results }
 
-          if params[:org_api_key].nil? or params[:org_secret_key].nil?
-            status 401 # = HTTP Unauthorized
-            json error: 'Organization API key (org_api_key) and secret (org_secret_key) not provided'
-          else
-            retval = users(params[:org_api_key], params[:org_secret_key])
-            status retval[:status]
-            json retval
-          end
+          [200, res.to_json]
         end
 
         get vroute(:video_views) do
-          content_type :json
+          date_range = parse_date_range(params)
 
-          if params[:org_api_key].nil? or params[:org_secret_key].nil?
-            retval = { error: 'Organization API key (org_api_key) and secret (org_secret_key) not provided' }.to_json
-            status 401 # = HTTP Unauthorized
-          else
-            retval = video_visits(params)
-            status 200
-          end
+          report = Visualization.by_dates(*(date_range.values)).summary
+          results = @org.users.joins(:visualizations).merge(report)
 
-          retval
+          [200, { date_range: date_range, results: results }.to_json]
+        end
+
+        get vroute(:users) do
+          [200, @org.users.summary.to_json]
         end
 
         # Creates Javascript pages based on incoming parameter input

@@ -15,6 +15,25 @@ class Visualization < ActiveRecord::Base
 
   validates :session_id, presence: true, length: { is: 36 }
 
+  scope :by_dates, lambda { |date_begin, date_end|
+    where("date_started >= '#{date_begin}'")
+      .where("date_ended <= '#{date_end}'")
+  }
+
+  scope :summary, lambda {
+    select('videos.title',
+           'videos.url',
+           'videos.publisher',
+           'videos.video_length',
+           'sum(time_viewed) as time_viewed')
+      .joins(:video)
+      .group( 'videos.title',
+             'videos.url',
+             'videos.publisher',
+             'videos.video_length')
+      .order('videos.url')
+  }
+
   def update_stats(captured_at, state)
     case state
     when 'playing' then on_playing(captured_at)
@@ -23,37 +42,6 @@ class Visualization < ActiveRecord::Base
     end
 
     save!
-  end
-
-  def self.find(params = {})
-    sql = "
-    SELECT
-      videos.title,
-      videos.url,
-      videos.publisher,
-      users.username,
-      visualizations.date_started,
-      visualizations.date_ended,
-    FROM
-      visualizations,
-      organizations,
-      users,
-      videos
-    WHERE
-      visualizations.user_id = users.id AND
-      users.organization_id = organizations.id AND
-      visualizations.video_id = videos.id AND
-      organizations.org_api_key='#{params[:org_api_key]}' "
-
-    if params[:date_started] != nil
-      sql = sql + "AND time_started>='#{params[:date_started]}'"
-    end
-
-    if params[:date_ended] != nil
-      sql = sql + "AND time_ended<='#{params[:date_ended]}'"
-    end
-
-    self.connection.select_all(sql)
   end
 
   private

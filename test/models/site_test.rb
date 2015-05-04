@@ -10,7 +10,7 @@ class SiteModelTest < LT::Test::DBTestBase
     super
 
     @codeacademy = Site.create!(display_name: 'Code Academy',
-                                url: 'http://codeacademy.com')
+                                url: 'codeacademy.com')
   end
 
   def create_click
@@ -38,15 +38,5 @@ class SiteModelTest < LT::Test::DBTestBase
     action = result.first['site_actions'][0]['action_type']
 
     assert_includes @codeacademy.site_actions.first.action_type, action
-  end
-
-  def test_summary
-    Site.create!(khanacademy)
-    Page.create!([khanacademy_page1, khanacademy_page2, codeacademy_page])
-
-    user = User.create!(joe_smith_data)
-    Visit.find_each { |visit| visit.update!(user: user) }
-
-    assert_equal 2, Site.summary(user).size
   end
 end

@@ -14,18 +14,6 @@ class PageModelTest < LT::Test::DBTestBase
     assert_equal 'wordpress.com', wordpress_page.site.url
   end
 
- def test_summary
-    site = Site.create!(khanacademy)
-    Site.create!(codeacademy)
-
-    Page.create!([khanacademy_page1, khanacademy_page2, codeacademy_page])
-
-    user = User.create!(joe_smith_data)
-    Visit.find_each { |visit| visit.update!(user: user) }
-
-    assert_equal 2, Page.summary(user, site: site).size
-  end
-
   private
 
   def wordpress_url

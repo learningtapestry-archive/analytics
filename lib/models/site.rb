@@ -1,7 +1,5 @@
 require 'uri'
 
-require 'models/concerns/summarizable'
-
 class Site < ActiveRecord::Base
   has_many :pages
 
@@ -42,15 +40,5 @@ class Site < ActiveRecord::Base
       include: { site_actions: site_action_opts },
       except: [:updated_at, :created_at, :id, :logo_url_small, :logo_url_large]
     )
-  end
-
-  extend Summarizable
-
-  def self.grouped_summary(user, opts)
-    base_grouped_summary(user, opts)
-  end
-
-  def self.join_visits
-    joins(pages: :visits)
   end
 end

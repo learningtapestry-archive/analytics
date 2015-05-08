@@ -152,7 +152,7 @@ module Analytics
         expected = {
           first_name: 'Joe', last_name: 'Smith', username: 'joesmith@foo.com' }
 
-        assert_equal [expected], resp
+        assert_equal [expected], resp[:results]
       end
 
       def test_video_views_returns_visualizations_by_specified_org_users

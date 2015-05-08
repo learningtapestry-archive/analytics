@@ -114,7 +114,7 @@ module Analytics
         end
 
         get vroute(:users) do
-          [200, @org.users.summary.to_json]
+          [200, { results: @org.users.summary }.to_json]
         end
 
         # Creates Javascript pages based on incoming parameter input

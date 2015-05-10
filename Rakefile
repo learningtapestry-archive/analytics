@@ -40,9 +40,10 @@ namespace :lt do
 
     desc "Fill YouTube Information"
     task fill_video_youtube_information: :'lt:boot' do
-      require 'janitors/http_metadata_importer'
+      require 'janitors/video_metadata_extractor'
 
-      Analytics::Janitors::HttpMetadataImporter.new(LT.env.logger, 2000).import
+      config = LT.env.load_optional_config('youtube.yml')
+      Analytics::Janitors::VideoMetadataExtractor.new(LT.env.logger, 2000, config).extract
     end
 
     desc "Extract Learning Registry data to raw documents table from http://sandbox.learningregistry.org"

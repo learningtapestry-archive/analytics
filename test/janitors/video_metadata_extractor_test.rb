@@ -9,7 +9,8 @@ class VideoMetadataExtractorTest < LT::Test::DBTestBase
     @video = Video.create!(url: 'https://www.youtube.com/watch?v=9bZkp7q19f0')
 
     @logger = TestLogger.new
-    @extractor = Analytics::Janitors::VideoMetadataExtractor.new(@logger, 1)
+    config = LT.env.load_optional_config('youtube.yml')
+    @extractor = Analytics::Janitors::VideoMetadataExtractor.new(@logger, 1, config)
   end
 
   def test_grabs_metadata_from_youtube_for_videos_without_title

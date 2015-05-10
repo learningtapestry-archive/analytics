@@ -10,8 +10,10 @@ class CreateVideos < ActiveRecord::Migration
       t.text 'category'
       t.column 'video_length', :interval
       t.column 'views', :bigint
-      t.float 'rating'
-      t.column 'raters', :bigint
+      t.column 'like_count', :bigint
+      t.column 'dislike_count', :bigint
+      t.column 'favorite_count', :bigint
+      t.column 'comment_count', :bigint
       t.datetime 'published_on'
       t.datetime 'updated_on'
       t.timestamps                    null: true

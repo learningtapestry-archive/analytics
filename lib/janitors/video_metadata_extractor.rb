@@ -1,6 +1,6 @@
 require 'janitors/extractor'
 
-require 'utils/youtube_adapter'
+require 'utils/youtube_data_adapter'
 
 module Analytics
   module Janitors
@@ -10,12 +10,18 @@ module Analytics
     class VideoMetadataExtractor
       include Extractor
 
+      def initialize(logger, batch_size, config)
+        super(logger, batch_size)
+
+        @config = config
+      end
+
       def unprocessed
         Video.unprocessed
       end
 
       def process_one(video)
-        Utils::YoutubeAdapter.new(video).import!
+        Utils::YoutubeDataAdapter.new(video, @config[:api_key]).import!
       end
     end
   end

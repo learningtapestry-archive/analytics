@@ -25,4 +25,12 @@ class Video < ActiveRecord::Base
       self.external_id = param.split('=')[1]
     end
   end
+
+  def rating
+    like_count - dislike_count
+  end
+
+  def raters
+    like_count + dislike_count
+  end
 end

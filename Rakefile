@@ -45,12 +45,6 @@ namespace :lt do
       config = LT.env.load_optional_config('youtube.yml')
       Analytics::Janitors::VideoMetadataExtractor.new(LT.env.logger, 2000, config).extract
     end
-
-    desc "Extract Learning Registry data to raw documents table from http://sandbox.learningregistry.org"
-    task extract_meta_data: :'lt:boot' do # TODO: rename this rake task name.
-      require 'janitors/learning_registry_extract'
-      Analytics::Janitors::LearningRegistryExtract.retrieve({'node' => 'http://sandbox.learningregistry.org'})
-    end
   end
 
   namespace :utility do

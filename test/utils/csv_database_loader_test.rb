@@ -1,62 +1,67 @@
 require 'test_helper'
 
 require 'utils/csv_database_loader'
+require 'lt/core/errors'
 
 class CsvDatabaseLoaderTest < LT::Test::DBTestBase
-  def test_InvalidCSVModelMatch
-    csv_file_name = File::expand_path(File::join(LT.environment.db_path, '/csv/test/fail_cases/schools_invalid.csv'))
+  include Analytics::Utils
+
+ def test_load_when_file_name_does_not_match_existing_model
     suspend_log_level do
       assert_raises LT::ModelNotFound do
-        Analytics::Utils::CsvDatabaseLoader.load_file(csv_file_name)
+        CsvDatabaseLoader.new(csv_full_path('fail_cases/schools_invalid.csv')).load
       end
     end
   end
 
-  def test_InvalidFilename
-    csv_file_name = File::expand_path(File::join(LT.environment.db_path, '/csv/test/fail_cases/schools_doesnotexist.csv'))
+  def test_load_when_file_name_does_not_exist
     suspend_log_level do
       assert_raises LT::FileNotFound do
-        Analytics::Utils::CsvDatabaseLoader.load_file(csv_file_name)
+        CsvDatabaseLoader.new(csv_full_path('fail_cases/schools_missing.csv')).load
       end
     end
   end
 
-  def test_InvalidCSVFile
-    csv_file_name = File::expand_path(File::join(LT.environment.db_path, '/csv/test/fail_cases/page_visits.csv'))
-
+  def test_load_when_csv_file_has_invalid_format
     suspend_log_level do
       assert_raises LT::InvalidFileFormat do
-        Analytics::Utils::CsvDatabaseLoader.load_file(csv_file_name)
+        CsvDatabaseLoader.new(csv_full_path('fail_cases/visualizations.csv')).load
       end
     end
   end
 
-  def test_CSVLoadFile
-    csv_file_name = File::expand_path(File::join(LT.environment.db_path, '/csv/test/schools.csv'))
+  def test_load_file_successfully
+    CsvDatabaseLoader.new(csv_full_path('schools.csv')).load
 
-    Analytics::Utils::CsvDatabaseLoader.load_file(csv_file_name)
-
-    assert_equal 2, School.all.length
-
-    school = School.find(1)
-    assert_equal 1, school.id
-    assert_equal "Acme School", school.name
+    assert_equal 1, School.count
+    assert_equal 1, School.first.id
+    assert_equal 'Acme School', School.first.name
   end
 
-  def test_InvalidCSVPath
+  def test_load_directory_with_a_folder_that_does_not_exist
+    dir = File.join(File.dirname(__FILE__), 'invalid')
+
     suspend_log_level do
       assert_raises LT::PathNotFound do
-        Analytics::Utils::CsvDatabaseLoader.load_directory(File::expand_path(File::join(LT.environment.db_path, '/invalid_path')))
+        CsvDatabaseLoader.load_directory(File.join(fixtures_path, 'invalid'))
       end
     end
   end
 
-  def test_CSVLoadFiles
-    file_path = File::expand_path(File::join(LT.environment.db_path, '/csv/test'))
-    Analytics::Utils::CsvDatabaseLoader.load_directory(file_path)
+  def test_cvs_load_directory_successfully
+    CsvDatabaseLoader.load_directory(fixtures_path)
 
-    assert_equal 1, District.all.length
-    assert_equal 2, School.all.length
-    assert_equal 3, User.all.length
+    assert_equal 1, School.count
+    assert_equal 1, Organization.count
+  end
+
+  private
+
+  def fixtures_path
+    File.join(File.dirname(__FILE__), '../fixtures')
+  end
+
+  def csv_full_path(file)
+    File.join(fixtures_path, file)
   end
 end

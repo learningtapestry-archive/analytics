@@ -1,74 +1,110 @@
-require 'smarter_csv'
+require 'active_support/inflector/methods'
+require 'csv'
 require 'lt/core'
 
 module Analytics
   module Utils
-    module CsvDatabaseLoader class << self
-      def load_file(filename)
-        raise LT::FileNotFound, "File not found: #{filename}" if !File.exist?(filename)
-        csv_file = SmarterCSV.process(filename)
-        if csv_file.length > 0 then
-          table_name = File.basename(filename, ".csv")
-          model_name = ActiveSupport::Inflector::classify(table_name)
-          begin
-            model = model_name.constantize.new
-          rescue Exception => e
-            LT.env.logger.error("CsvDatabaseLoader: Model not found for #{table_name}, exception: #{e.message}")
-            raise LT::ModelNotFound
+    module CsvErrors
+      def self.included(klass)
+        klass.extend(ClassMethods)
+      end
+
+      def requires_file!(file_name)
+        unless File.exist?(file_name)
+          raise LT::FileNotFound, "File not found #{file_name} not found"
+        end
+      end
+
+      def requires_model!(model_name)
+        unless ActiveRecord::Base.descendants.map(&:name).include?(model_name)
+          raise LT::ModelNotFound.new(model_name)
+        end
+      end
+
+      def check_file_format!(attributes, model)
+        unless attributes.all? { |k| model.new.has_attribute?(k) }
+          raise LT::InvalidFileFormat, "Header does not match a model #{model}"
+        end
+      end
+
+      module ClassMethods
+        def requires_directory!(dir)
+          unless File.directory?(dir)
+            raise LT::PathNotFound, "Directory not found: #{dir}"
           end
+        end
+      end
+    end
 
-          # Check to ensure the CSV file matches model, if not, invalid file could be loaded
-          all_attributes = true
-          csv_file[0].keys.each do |key|
-            all_attributes = all_attributes && model.has_attribute?(key)
-          end
+    #
+    # REVIEW: This "importer" has similarities with the Janitor base classes.
+    # Consider further refactoring.
+    #
+    class CsvDatabaseLoader
+      include CsvErrors
 
-          if all_attributes then
-            # Start a transaction for all inserts
+      attr_accessor :filename
 
-            num_inserts = 0;
-            ActiveRecord::Base.transaction do
-              csv_file.each do |csv_line|
-                model = model_name.constantize.new
-                csv_line.each do |key, value|
+      def initialize(filename)
+        @filename = filename
+      end
 
-                  # If it's a date time, try to convert, otherwise ignore
-                  begin
-                    value = Time.strptime(value, '%m/%d/%Y %H:%M:%S')
-                  rescue
-                  end
-                  model[key] = value
-                end # csv_line.each
-                model.save
-                num_inserts += 1
-                LT.env.logger.debug("CsvDatabaseLoader: Saved record type of #{model_name}, record id: #{model.id}")
-              end # csv_file.each
-            end # ActiveRecord::Base.transaction
-            ActiveRecord::Base.connection.reset_pk_sequence!(table_name) # Reset the sequence to highest after import, necessary for PG
-            LT.env.logger.info("CsvDatabaseLoader: Successfully saved #{num_inserts} of record type of #{model_name}")
-          else # all_attributes
-            LT.env.logger.error("CsvDatabaseLoader: Invalid file format, file: #{filename} does not match model: #{model_name}")
-            raise LT::InvalidFileFormat, "Invalid file format, file: #{filename} does not match model: #{model_name}"
-          end # all_attributes
-        end # if csv_file.length > 0 then
-      end # load_file
+      def load
+        requires_file!(filename)
+        requires_model!(model_name)
+        check_file_format!(attributes, model)
 
-      def load_directory(path)
-        raise LT::PathNotFound, "Path not found: #{path}" if !File.directory?(path)
+        CSV.foreach(@filename, headers: true,
+                               header_converters: :symbol,
+                               converters: :all) do |line|
+          model.create!(line.to_h)
+        end
+      end
 
-        success = 0; fail = 0
-        Dir.glob(File.join(path, "*.csv")) do |filename|
+      def self.load_directory(path)
+        requires_directory!(path)
+
+        success = 0
+        failures = 0
+
+        Dir.glob(File.join(path, '*.csv')) do |filename|
           begin
-            self.load_file(filename)
-            LT.env.logger.debug "CsvDatabaseLoader: successfully imported #{filename}"
+            new(filename).load
+
+            log("successfully imported #{filename}")
             success += 1
-          rescue Exception => e
-            LT.env.logger.error "CsvDatabaseLoader: cannot load #{filename}\n  #{e.message}"
-            fail += 1
-          end #begin
-        end # Dir.glob
-        LT.env.logger.info "CsvDatabaseLoader: #{success} successful, #{fail} failed."
-      end #load_all
-    end ; end # CsvDatabaseUtility and class
+          rescue => e
+            log("Error loading #{filename}: #{e.message}")
+            failures += 1
+          end
+        end
+
+        log("#{success} successful, #{failures} failed.")
+      end
+
+      def self.log(msg)
+        LT.env.logger.debug("[#{self.class.name}] #{msg}")
+      end
+
+      def attributes
+        header.chomp.split(',')
+      end
+
+      def model_name
+        @model_name  ||= ActiveSupport::Inflector.classify(basename)
+      end
+
+      def model
+        @model ||= model_name.constantize
+      end
+
+      def header
+        @header ||= File.open(@filename).gets
+      end
+
+      def basename
+        @basename ||= File.basename(@filename, '.csv')
+      end
+    end
   end
 end

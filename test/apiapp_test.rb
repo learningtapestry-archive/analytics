@@ -1,13 +1,8 @@
 require 'test_helper'
 
-require 'utils/scenarios'
-
 module Analytics
   module Test
     class ApiAppTest < WebAppTestBase
-      include Utils::Scenarios::Organizations
-      include Utils::Scenarios::Students
-
       #
       # Define what an ApprovedSite actually is... It seems like a join model
       # for 4 different models...
@@ -39,7 +34,7 @@ module Analytics
       end
 
       def test_obtain_page_visits_returns_meta_info
-        create_default_org_and_user
+        create_org_and_user
 
         params = { entity: 'page_visits',
                    date_begin: '2014-01-01',
@@ -56,7 +51,7 @@ module Analytics
       end
 
       def test_obtain_page_visits_uses_default_values_for_date_ranges
-        create_default_org_and_user
+        create_org_and_user
 
         params = { entity: 'page_visits' }.merge(default_params)
 
@@ -70,7 +65,7 @@ module Analytics
       end
 
       def test_obtain_page_visits_returns_page_visit_information
-        create_default_org_and_user
+        create_org_and_user
 
         page = Page.create!(url: 'http://page.com')
         @user.visits.create!(page: page, date_visited: 3.hours.ago.utc)
@@ -103,7 +98,7 @@ module Analytics
         end
 
         define_method("test_#{path}_returns_unauthorized_when_no_secret") do
-          create_default_org_and_user
+          create_org_and_user
 
           resp = auth_request(path, org_api_key: @org.org_api_key)
 
@@ -113,7 +108,7 @@ module Analytics
       end
 
       def test_obtain_returns_bad_request_when_no_usernames
-        create_default_org_and_user
+        create_org_and_user
 
         resp = auth_request('/api/v1/obtain',
                             org_api_key: @org.org_api_key,
@@ -124,7 +119,7 @@ module Analytics
       end
 
       def test_obtain_returns_bad_request_when_no_entity
-        create_default_org_and_user
+        create_org_and_user
 
         resp = auth_request('api/v1/obtain', default_params.merge(entity: nil))
 
@@ -133,7 +128,7 @@ module Analytics
       end
 
       def test_obtain_returns_bad_request_when_invalid_entity
-        create_default_org_and_user
+        create_org_and_user
 
         params = default_params.merge(entity: 'junk')
         resp = auth_request('/api/v1/obtain', params)
@@ -143,20 +138,20 @@ module Analytics
       end
 
       def test_users_reports_information_about_organization_users
-        create_default_org_and_user
+        create_org_and_user
 
         resp = auth_request('/api/v1/users', default_params)
 
         assert_equal 200, last_response.status
 
         expected = {
-          first_name: 'Joe', last_name: 'Smith', username: 'joesmith@foo.com' }
+          first_name: 'Joe', last_name: 'Smith', username: 'joesmith' }
 
         assert_equal [expected], resp[:results]
       end
 
       def test_video_views_returns_visualizations_by_specified_org_users
-        create_default_org_and_user
+        create_org_and_user
 
         vid = Video.create!(url: 'http://youtube.com?v=1')
         @user.visualizations.create!(video: vid,
@@ -172,9 +167,16 @@ module Analytics
 
       private
 
-      def create_default_org_and_user
-        @org = Organization.create!(acme_organization_data)
-        @user = @org.users.create!(joe_smith_data)
+      def create_org_and_user
+        @org = Organization.create!(
+          name: 'Acme Organization',
+          org_api_key: '00000000-0000-4000-8000-000000000000')
+
+        @user = @org.users.create!(
+          username: 'joesmith',
+          password: 'pass',
+          first_name: 'Joe',
+          last_name: 'Smith')
       end
 
       def default_params

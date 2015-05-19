@@ -2,10 +2,6 @@ $LOAD_PATH << File.expand_path('../lib', __FILE__)
 
 require 'lt/tasks'
 
-Rake::Task['lt:boot'].overwrite do
-  LT::Environment.boot_all(File::dirname(__FILE__))
-end
-
 namespace :lt do
   namespace :janitors do
     desc 'Process page visits workload from Redis to data tables'
@@ -49,32 +45,24 @@ namespace :lt do
 
   namespace :utility do
     desc "Loads a single CSV file into the corresponding database table"
-    task :load_file, [:csvfile] do |t,args|
-      Rake::Task[:'lt:boot'].invoke
+    task :load_file, [:csvfile] => :'lt:boot' do |t,args|
       require 'utils/csv_database_loader'
       Analytics::Utils::CsvDatabaseLoader.load_file(args[:csvfile])
     end
 
     desc "Loads all CSV files within a path into the corresponding database tables"
-    task :load_dir, [:csvpath] do |t,args|
-      Rake::Task[:'lt:boot'].invoke
+    task :load_dir, [:csvpath] => :'lt:boot' do |t,args|
       require 'utils/csv_database_loader'
       Analytics::Utils::CsvDatabaseLoader.load_directory(args[:csvpath])
     end
   end
 end
 
-#
-# Some shortcuts to core tasks
-#
-task :full_tests do
-  Rake::Task[:'lt:full_tests'].invoke
-end
+desc 'Shortcut to lt:full_tests task'
+task full_tests: 'lt:test:run_full_tests'
 
-task :tests do
-  Rake::Task[:'lt:tests'].invoke
-end
+desc 'Shortcut to lt:tests task'
+task tests: 'lt:test:run_tests'
 
-task :console do
-  Rake::Task[:'lt:console'].invoke
-end
+desc 'Shortcut to lt:console task'
+task console: 'lt:console'

@@ -1,7 +1,7 @@
 require 'lt/test'
 
 require 'lt/core'
-LT::Environment.boot_all(File.expand_path('../..', __FILE__))
+LT::Environment.boot_all(Dir.pwd, 'test')
 
 require 'webapp'
 Analytics::WebApp.boot

@@ -1,15 +1,3 @@
-# To use Gemfiles see bundler.io
-# To install: sudo gem install bundler
-# To use: bundler install or bundler update
-# To remove all gems not required in this file:
-#   sudo bundle clean --force # Note: normally sudo isn't good for bundle but this is an exception
-# To remove all gems in the system completely:
-#   sudo gem list | cut -d" " -f1 | sudo xargs gem uninstall -aIx
-# This helps ensure that you aren't depending on a gem that isn't installed from this list
-# To bundle gems for production or staging, recommend:
-#   bundle install --without test
-# If you want to manage different ruby installations with different gemsets for different projects
-# Consider installing RVM to help manage that.
 source 'https://rubygems.org'
 gem 'rake'
 
@@ -39,7 +27,6 @@ gem 'term-ansicolor', '>= 1.3.0'
 
 # gems for use only in non-production environments
 group :dev_test do
-  # gems requiring version control
   gem 'capybara', '>= 2.4.3'
   gem 'thin', '>= 1.6.3' # development
   # gems that probably don't need version control

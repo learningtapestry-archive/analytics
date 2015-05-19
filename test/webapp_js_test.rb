@@ -239,66 +239,6 @@ module Analytics
         # next message on the stack will be a "click" from arrival onto the most recent page
         message = JSON.parse(messages_queue.pop.force_encoding('UTF-8'))
         assert_equal RawMessage::Verbs::CLICKED, message["verb"]
-
-        #use_selenium
-        #use_webkit
-        # set_server(@partner_host) do
-        #   visit(collector_test_url)
-        #   html = wait_for_qunit(page)
-        # end
-
-        # messages_queue.clear
-
-        #webkit
-        #page.execute_script("window.lt$(window).blur();")
-        #page.execute_script("window.open('');")
-        # first_window = page.driver.current_window_handle
-        # second_window = page.driver.open_new_window
-        # first_window = page.driver.switch_to_window(first_window)
-        #page.driver.close_window(page.driver.current_window_handle)
-        # page.driver.window_handles.each do |handle|
-        #   #puts page.driver.methods.sort - Object.methods
-        #   #page.driver.switch_to_window(handle)
-        #   page.driver.close_window(handle)
-        #   #page.execute_script("window.close();")
-        # end
-
-        # selenium
-        # puts page.evaluate_script("window.ltG.debug.focus;")
-        # page.execute_script("window.open('');")
-        #orig_window = page.driver.current_window_handle
-        #second_window = page.driver.open_new_window
-        # sleep 0.5
-        #page.driver.switch_to_window(orig_window)
-        #page.execute_script("window.ltG.debug.focus+=1;")
-        # puts page.evaluate_script("window.ltG.debug.focus;")
-        # puts page.evaluate_script("window.ltG.debug.blur;")
-        # page.driver.close_window(orig_window)
-        # sleep 0.5
-
-        # messages_queue.clear
-
-        #page.execute_script("window.lt$(window).blur();")
-        #page.execute_script("window.open('');")
-        #page.driver.open_new_window
-        #page.driver.close_window(page.driver.current_window_handle)
-        # page.driver.window_handles.each do |handle|
-        #   #puts page.driver.methods.sort - Object.methods
-        #   #page.driver.switch_to_window(handle)
-        #   page.driver.close_window(handle)
-        #   #page.execute_script("window.close();")
-        # end
-
-        # NOTE: try using Capybara's function to close window instead of inside JS
-        # we don't seem to be able to blur or close windows
-        # and generate associated events in phantomjs
-        # page.execute_script("window.blur();")
-        # page.execute_script("window.focus();")
-        # page.driver.browser.window_handles.each do |handle|
-        #   page.driver.browser.switch_to.window(handle)
-        #   page.execute_script "window.close();"
-        # end
-        # Use page.driver.debug to debug JS in Chrome
       end
 
       def save_load_screenshot(page)

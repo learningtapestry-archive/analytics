@@ -34,18 +34,11 @@ group :dev_test do
   # poltgereist depends on phantomjs being installed on system
   # sudo apt-get install phantomjs
   gem 'poltergeist', '>= 1.5.1'
-  gem 'pry', '>=0.10.1'
   gem 'launchy' # required by capybara to open web browser automatically
   gem 'selenium-webdriver', '>=2.43.0'
   # capybara-webkit requires qt install
   # sudo apt-get install libqt4-dev
   gem 'capybara-webkit', '>=1.3.1'
 end
- group :debugger do
-  gem 'byebug'
-  # removed due to conflict with Ruby 2.1.5
-  # gem 'pry-debugger', '>=0.2.3'
-  gem 'pry-stack_explorer', '>=0.4.9.1'
- end
 
 gem 'lt-core', :git => 'https://792de6a69ea9f5e82e17ca9d46d920b19462cfe4@github.com/learningtapestry/core'

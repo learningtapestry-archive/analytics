@@ -1,4 +1,4 @@
-==Dev Box Config Checklist==
+== Dev Box Config Checklist ==
 _For setting up Lubuntu, which is a minimally configured Ubuntu)_
 
 vbox shared folder "[x]:\dev" to "/dev"

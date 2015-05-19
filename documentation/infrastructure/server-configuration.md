@@ -1,52 +1,73 @@
 Server Configuration
 ====================
+
 # Production Server Management notes
 
-1. Setup ssh public/private keys
-  1. Find keys in LastPass and follow instructions there
-1. Establish Pg tunnel:
-```
+* Setup ssh public/private keys
+
+  Find keys in LastPass and follow instructions there
+
+* Establish Pg tunnel:
+
+```shell
 ssh -i ~/.ssh/id_lt_admin ltdbadmin@db01.learningtapestry.com -L 5432:10.132.196.50:5432
 ```
-  1. Setup pgadmin3 to connect to localhost:5432 over ssl
-1. Establish connection to prod / Redis tunnel:
-```
+
+  - Setup pgadmin3 to connect to localhost:5432 over ssl
+
+* Establish connection to prod / Redis tunnel:
+
+```shell
 ssh -i ~/.ssh/id_lt_admin ltwebadmin@web01.learningtapestry.com -L 6378:localhost:6379
 ```
-  1. Setup Redis Desktop Manager to connect to localhost:6378
-  1. Open multiple terminals in byobu terminal manager
-    1. Ctrl-A C
-  1. Switch between open terminals 
-    1. Ctrl-A [0-9]
-1. How to edit postgres config files
-  1. Find conf files in: /etc/postgresql/9.3/main
-  1. When necessary, restart postgres to reload conf files
-```
+
+  - Setup Redis Desktop Manager to connect to localhost:6378
+  - Open multiple terminals in byobu terminal manager: Ctrl-A C
+  - Switch between open terminals: Ctrl-A [0-9]
+
+* How to edit postgres config files
+
+  - Find conf files in: /etc/postgresql/9.3/main
+  - When necessary, restart postgres to reload conf files
+
+```shell
 sudo /etc/init.d/postgresql restart 
 ```
-1. View nginx config file
-```
+
+* View nginx config file
+
+```shell
 sudo more /etc/nginx/nginx.conf
 ```
-1. Reload nginx config file
-```
+
+* Reload nginx config file
+
+```shell
 sudo nginx -s reload
 ```
-1. Restart nginx
+
+* Restart nginx
+
 ```
 sudo service nginx restart
 ```
-1. Restart server
+
+* Restart server
+
 ```
 sudo reboot now
 ```
-1. Interact with application code:
+
+* Interact with application code:
+
 ```
 cd /opt/learningtapestry/analytics
 rake lt:console
 ```
-1. Update source code from git master
-```
+
+* Update source code from git master
+
+```shell
 cd /opt/learningtapestry/analytics
 git fetch origin
 # Github password is in LastPass under "LT prod Github PK"
@@ -62,38 +83,50 @@ bundle install
 rake db:migrate
 sudo service unicorn restart
 ```
-1. Create a new Organization
-  1. From lt:console:
-```
+
+* Create a new Organization
+  - From lt:console:
+
+```ruby
 o = Organization.create(name: 'Learning Tapestry', org_api_key: SecureRandom.uuid)
 ```
-1. Sample client configuration script tag (for Learning Tapestry org in prod):
-```
+
+  - Sample client configuration script tag (for Learning Tapestry org in prod):
+
+```ruby
 <script src="https://api.learningtapestry.com/api/v1/loader.js?username=stevemidgley&org_api_key=5eb4766f-34db-41d5-a1a4-29dc73ac99e2&load=collector&autostart=true"></script>
 ```
-1. Manually run Janitor raw message process:
-```
+
+* Manually run Janitor raw message process:
+
+```shell
 cd /opt/learningtapestry/analytics
 rake lt:console
-require File::join(LT.environment.janitor_path,'redis_postgres_extract.rb')
-Analytics::Janitors::RedisPostgresExtract::redis_to_raw_messages
-Analytics::Janitors::RawMessagesExtract::raw_messages_to_page_visits
+rake lt:janitors:import_raw_messages
+rake lt:janitors:process_redis_page_messages
+rake lt:janitors:process_redis_video_messages
 ```
-1. Reload Postgres configuration
-  1. Login to db server
-```
+
+* Login to db server
+
+```shell
 sudo -u postgres /usr/lib/postgresql/9.4/bin/pg_ctl reload -D /var/lib/postgresql/9.3/main
 ```
-1. To interact with PG via psql on command line from server
-```
+
+* Interact with PG via psql on command line from server
+
+```shell
 sudo -u postgres psql
 ```
-1. Cron job to run janitor
-```
+
+* Cron job to run janitor
+
+```shell
 sudo crontab -e
 */5 * * * * sudo --user nobody --non-interactive echo && cd
 /opt/learningtapestry/analytics && /usr/local/bin/rake RAILS_ENV=production lt:janitors:process_redis_messages > /opt/learningtapestry/analytics/log/cron-redis-janitor.txt 2> /tmp/err-cron-redis-janitor.txt
 ```
+
 # lt01-dev.betaspaces.com
 
 ## Role: Test/Development Server
@@ -177,7 +210,3 @@ Thin-rack-ruby 502 failure
   Possible explanation: when ruby raises an exception, it causes thin to terminate which leaves sockets open from nginx but no handler to process requests
 
 Chrome: Advanced REST client
-
-
-
-

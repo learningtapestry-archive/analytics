@@ -16,6 +16,14 @@ that you are using the correct versions of your gem dependencies.
 * Update Gemfile dependencies: `bundle update`.
 * Bundle gems excluding specific groups: `bundle install --without test`
 
+#### Phantomjs for js tests
+
+* Installation
+
+```bash
+sudo apt-get install phantomjs
+```
+
 #### Postgresql (for Debian/Ubuntu)
 
 * Installation

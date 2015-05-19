@@ -66,3 +66,5 @@ task tests: 'lt:test:run_tests'
 
 desc 'Shortcut to lt:console task'
 task console: 'lt:console'
+
+task default: :tests

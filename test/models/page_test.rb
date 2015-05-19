@@ -2,9 +2,7 @@ require 'test_helper'
 require 'utils/scenarios'
 
 class PageModelTest < LT::Test::DBTestBase
-  include Analytics::Utils::Scenarios::Sites
   include Analytics::Utils::Scenarios::Pages
-  include Analytics::Utils::Scenarios::Students
 
   def test_url_attr_writer_sets_url_field
     assert_equal wordpress_url, wordpress_page.url

@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'utils/scenarios'
 
 class VideoModelTest < LT::Test::DBTestBase
   def setup

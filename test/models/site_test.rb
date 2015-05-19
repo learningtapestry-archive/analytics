@@ -1,11 +1,6 @@
 require 'test_helper'
-require 'utils/scenarios'
 
 class SiteModelTest < LT::Test::DBTestBase
-  include Analytics::Utils::Scenarios::Sites
-  include Analytics::Utils::Scenarios::Pages
-  include Analytics::Utils::Scenarios::Students
-
   def setup
     super
 

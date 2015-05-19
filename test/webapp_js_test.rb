@@ -193,11 +193,7 @@ module Analytics
         #  Manual test: The way I am manually testing this feature currently is:
         #    Run Sinatra in development mode
         #    Run LT:console at terminal
-        #      If dev database is not seeded with scenario already:
-        #        Execute: Utils::Scenarios::Students::create_joe_smith_scenario
-        #      if it is already seeded, run this to be sure Redis has the org keys
-        #        Execute: Organization.update_all_org_api_keys
-        #      Execute: Organization.first.org_api_key
+        #      Get a valid organization in Redis & DB
         #      Note the api-key uuid and paste it in the url below
         #    Visit the following URL in a browser
         #      http://localhost:8080/assets/tests/sandbox-test.html?username=joesmith@foo.com&org_api_key=[api_key]

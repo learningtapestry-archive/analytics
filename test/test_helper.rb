@@ -6,6 +6,8 @@ LT::Environment.boot_all(Dir.pwd, 'test')
 require 'webapp'
 Analytics::WebApp.boot
 
+LT.env.logger.level = Log4r::INFO
+
 class TestLogger
   attr_reader :debug_output
 

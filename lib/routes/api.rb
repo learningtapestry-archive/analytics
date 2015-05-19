@@ -137,7 +137,6 @@ module Analytics
             user_id: CGI::escape(params[:username]),
             assert_end_point: "#{api_server}#{vroute(:assert_org_key)}",
             lt_api_server: api_server,
-            autostart: false
           }
 
           # main selector to determine which javascript page to generate/send
@@ -156,9 +155,8 @@ module Analytics
               status 401
               json error: '// Invalid loader parameters'
             end
-            # instruct loader to auto-start if request asks for this
-            locals[:autostart] = true if params[:autostart] == 'true'
-            erb :'loader.js', :layout => false, locals: locals
+            locals[:autostart] = params[:autostart] == 'true'
+            erb :'loader.js', layout: false, locals: locals
           else
             status 401
             json error: '// Invalid page parameters'

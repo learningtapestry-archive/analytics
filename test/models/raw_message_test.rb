@@ -31,17 +31,20 @@ class RawMessageModelTest < LT::Test::DBTestBase
   end
 end
 
-class RawMessageProcessAsPageTest < LT::Test::DBTestBase
+class RawMessageProcessorTest < LT::Test::DBTestBase
+  def setup
+    super
+
+    Organization.create!(org_api_key: raw_msg.org_api_key,
+                         org_secret_key: SecureRandom.hex(36))
+  end
+end
+
+class RawMessageProcessAsPageTest < RawMessageProcessorTest
   include Analytics::Utils::Scenarios::RawMessages
 
   def raw_msg
     @raw_msg ||= RawMessage.create!(page)
-  end
-
-  def setup
-    super
-
-    Organization.create!(org_api_key: raw_msg.org_api_key)
   end
 
   def test_process_as_page_when_page_does_not_exist_yet
@@ -93,17 +96,11 @@ class RawMessageProcessAsPageTest < LT::Test::DBTestBase
   end
 end
 
-class RawMessageProcessAsVideoTest < LT::Test::DBTestBase
+class RawMessageProcessAsVideoTest < RawMessageProcessorTest
   include Analytics::Utils::Scenarios::RawMessages
 
   def raw_msg
     @raw_msg ||= RawMessage.create!(video)
-  end
-
-  def setup
-    super
-
-    Organization.create!(org_api_key: raw_msg.org_api_key)
   end
 
   def test_process_as_video_when_video_does_not_exist_yet

@@ -17,6 +17,7 @@ class Organization < ActiveRecord::Base
   before_validation :set_defaults, on: :create
 
   validates :org_api_key, format: { with: /#{UUIDV4}/i }
+  validates :org_secret_key, format: { with: /\A\h+\Z/ }
 
   def set_defaults
     if self.org_api_key.nil? then

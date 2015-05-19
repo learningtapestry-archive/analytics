@@ -6,7 +6,7 @@ require 'uri'
 class Page < ActiveRecord::Base
   validates :url, presence: true
 
-  has_many :visits
+  has_many :visits, inverse_of: :page
   accepts_nested_attributes_for :visits
 
   belongs_to :site

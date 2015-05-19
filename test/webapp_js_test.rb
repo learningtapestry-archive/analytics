@@ -8,19 +8,22 @@ module Analytics
   module Test
     class WebAppJSTest < WebAppJSTestBase
       include Helpers::Redis
+      include Utils::Scenarios::Pages
 
       def setup
         super
-        LT::Seeds::seed!
-        @scenario = Utils::Scenarios::Students::create_joe_smith_scenario
-        @joe_smith = @scenario[:student]
-        @jane_doe = @scenario[:teacher]
-        @section = @scenario[:section]
-        @page_visits = @scenario[:page_visits]
-        @site_visits = @scenario[:site_visits]
-        @sites = @scenario[:sites]
-        @pages = @scenario[:pages]
-        @acme_org = @scenario[:organizations].first
+
+        @acme_org = Organization.create!(
+          name: 'Acme Organization',
+          org_api_key: '00000000-0000-4000-8000-000000000000',
+          org_secret_key: SecureRandom.hex(36))
+
+        @joe_smith = User.create!(username: 'joesmith',
+                                  password: 'pass',
+                                  first_name: 'Joe',
+                                  last_name: 'Smith')
+
+        Page.create!([khanacademy_page1, khanacademy_page2, codeacademy_page])
         @lt_host = "lt.test.learningtapestry.com"
         @partner_host = "partner.lt.betaspaces.com"
         @port = Capybara.current_session.server.port
@@ -101,7 +104,7 @@ module Analytics
 
         # show that an initial "on page load" click message has been sent
         message = JSON.parse(messages_queue.pop)
-        assert_equal RawMessage::Verbs::CLICKED, message["verb"]
+        assert_equal 'clicked', message["verb"]
       end # test_js_collector_qunit
 
       def test_js_display_via_qunit
@@ -127,7 +130,7 @@ module Analytics
         verify_qunit_tests_passed(html)
         # if display.js were implemented, we'd expect to get a clicked message on page load
         # message = JSON.parse(messages_queue.pop)
-        # assert_equal RawMessage::Verbs::CLICKED, message["verb"]
+        # assert_equal 'clicked', message["verb"]
 
       end # test_js_collector_qunit
 
@@ -159,7 +162,7 @@ module Analytics
         refute_nil message, "No Redis message received from Ajax call via assert api."
         message = JSON.parse(message.force_encoding('UTF-8'))
         assert_equal "0S", message["action"]["time"]
-        assert_equal RawMessage::Verbs::VIEWED, message["verb"]
+        assert_equal 'viewed', message["verb"]
         assert_match page_title, message["page_title"]
         assert_equal page_url, message["url"]
         #validate url function
@@ -176,7 +179,7 @@ module Analytics
         sleep 0.1
         message = messages_queue.pop
         message = JSON.parse(message.force_encoding('UTF-8'))
-        assert_equal RawMessage::Verbs::CLICKED, message["verb"]
+        assert_equal 'clicked', message["verb"]
         # the first two chars are filled with junk for some reason
         assert_match page_title[2..50], message["page_title"][2..50]
         assert_equal page_url, message["url"]
@@ -220,7 +223,7 @@ module Analytics
           html = wait_for_qunit(page)
         end
         message = JSON.parse(messages_queue.pop.force_encoding('UTF-8'))
-        assert_equal RawMessage::Verbs::CLICKED, message["verb"]
+        assert_equal 'clicked', message["verb"]
 
         # we visit a new url in the same browser window, which kicks off
         # a js unload event
@@ -230,11 +233,11 @@ module Analytics
         end
         # first message on the stack will be a "viewed" as the previous page unloads
         message = JSON.parse(messages_queue.pop.force_encoding('UTF-8'))
-        assert_equal RawMessage::Verbs::VIEWED, message["verb"]
+        assert_equal 'viewed', message["verb"]
 
         # next message on the stack will be a "click" from arrival onto the most recent page
         message = JSON.parse(messages_queue.pop.force_encoding('UTF-8'))
-        assert_equal RawMessage::Verbs::CLICKED, message["verb"]
+        assert_equal 'clicked', message["verb"]
       end
 
       def save_load_screenshot(page)

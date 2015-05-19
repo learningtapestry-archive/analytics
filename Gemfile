@@ -1,9 +1,9 @@
 source 'https://rubygems.org'
 gem 'rake'
 
-# core gems (need to be careful about version updating)
-gem 'activesupport', '~> 4.2.0'
-gem 'activerecord', '~> 4.2.0'
+# Core gems
+gem 'activerecord', '~> 4.2.1'
+gem 'activesupport', '~> 4.2.1'
 gem 'sinatra', '~> 1.4.5'
 
 # additional gems (probably can accept new major versions without breaking)
@@ -28,7 +28,7 @@ group :dev_test do
   gem 'capybara', '>= 2.4.3'
   gem 'thin', '>= 1.6.3' # development
   # gems that probably don't need version control
-  gem 'minitest', '>= 5.4.0'
+  gem 'minitest', '>= 5.5.1'
   gem 'rerun', '>=0.10.0' # process reload agent, helpful for sinatra development
   gem 'database_cleaner', '>= 1.3.0'
   # poltgereist depends on phantomjs being installed on system

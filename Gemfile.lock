@@ -1,6 +1,7 @@
 GIT
   remote: https://792de6a69ea9f5e82e17ca9d46d920b19462cfe4@github.com/learningtapestry/core
-  revision: 50213a89c946dcee56596dd825a819d22135ea9b
+  revision: 4bf49eb739e552ceed6fc84a5f50993257df2da4
+  ref: 4bf49eb
   specs:
     lt-core (0.1.0)
       activerecord (~> 4.2.0)
@@ -67,8 +68,8 @@ GEM
     cliver (0.3.2)
     daemons (1.2.2)
     database_cleaner (1.4.1)
-    edge (0.4.1)
-      activerecord (>= 3.2.0)
+    edge (0.4.2)
+      activerecord (>= 4.0.0)
     erubis (2.7.0)
     eventmachine (1.0.7)
     ffi (1.9.8)

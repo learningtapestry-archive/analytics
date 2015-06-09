@@ -1,7 +1,7 @@
 GIT
   remote: https://792de6a69ea9f5e82e17ca9d46d920b19462cfe4@github.com/learningtapestry/core
-  revision: 4bf49eb739e552ceed6fc84a5f50993257df2da4
-  ref: 4bf49eb
+  revision: 2adc5ea34d5e13d92b55d6473fbba1c89de69c3f
+  ref: 2adc5ea34d5e13d92b55d6473fbba1c89de69c3f
   specs:
     lt-core (0.1.0)
       activerecord (~> 4.2.0)

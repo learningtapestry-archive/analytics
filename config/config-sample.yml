@@ -5,7 +5,7 @@ development:
   pool: 5
   host: 127.0.0.1
   port: 5432
-  username: lt
+  username: lt_dbo
   password: lt_dev_xyz_123
   tablespace: learntaculous_ts
 
@@ -16,7 +16,7 @@ test:
   pool: 5
   host: 127.0.0.1
   port: 5432
-  username: lt
+  username: lt_dbo
   password: lt_dev_xyz_123
   tablespace: learntaculous_ts
 
@@ -27,7 +27,7 @@ staging:
   pool: 5
   host: 127.0.0.1
   port: 5432
-  username: lt
+  username: lt_dbo
   password: lt_dev_xyz_123
   tablespace: learntaculous_ts
 
@@ -38,6 +38,6 @@ production:
   pool: 5
   host: 127.0.0.1
   port: 5432
-  username: lt
+  username: lt_dbo
   password: lt_dev_xyz_123
   tablespace: learntaculous_ts

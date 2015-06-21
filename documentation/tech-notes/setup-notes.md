@@ -65,5 +65,5 @@ bundle exec rake db:migrate
 * Use example config files
 
 ```bash
-for f in `find -name '*-sample.yml'`; do cp "$f" "${f%-sample.yml}.yml"; done
+for f in `find config -name '*-sample.yml'`; do cp "$f" "${f%-sample.yml}.yml"; done
 ```

@@ -1,18 +1,18 @@
 GIT
   remote: https://792de6a69ea9f5e82e17ca9d46d920b19462cfe4@github.com/learningtapestry/core
-  revision: df2ef3ac7b644ab1ac3fd1df47e3104feb38d7c9
-  ref: more_deployment_fixes
+  revision: 588a2fc0cdbc2e3ca1489edca55ec487572bdf37
+  branch: decouple_configuration_from_devops
   specs:
     lt-core (0.1.0)
       activerecord (~> 4.2.0)
       capybara (~> 2.4.4)
       capybara-webkit (>= 1.3.1)
       database_cleaner (>= 1.3.0)
+      dotenv (~> 2.0)
       edge
-      erubis (~> 2.7.0)
       launchy
       log4r (>= 1.1.10)
-      minitest (~> 5.5.1)
+      minitest (~> 5.5)
       nokogiri (~> 1.6.3)
       poltergeist (>= 1.5.1)
       rack-test (~> 0.6.3)
@@ -68,9 +68,9 @@ GEM
     cliver (0.3.2)
     daemons (1.2.2)
     database_cleaner (1.4.1)
+    dotenv (2.0.2)
     edge (0.4.2)
       activerecord (>= 4.0.0)
-    erubis (2.7.0)
     eventmachine (1.0.7)
     ffi (1.9.8)
     hitimes (1.2.2)
@@ -168,7 +168,7 @@ DEPENDENCIES
   htmlentities (>= 4.3.2)
   log4r (>= 1.1.10)
   lt-core!
-  minitest (>= 5.5.1)
+  minitest (~> 5.7)
   nokogiri (>= 1.6.3.1)
   pg (>= 0.17.1)
   poltergeist (>= 1.5.1)

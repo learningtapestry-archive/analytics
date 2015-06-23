@@ -59,11 +59,3 @@ bundle exec rake db:migrate
 #### Nginx
 
 * Install Lua module
-
-#### Config files
-
-* Use example config files
-
-```bash
-for f in `find config -name '*-sample.yml'`; do cp "$f" "${f%-sample.yml}.yml"; done
-```

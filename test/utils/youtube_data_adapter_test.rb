@@ -8,8 +8,8 @@ class YoutubeDataAdapterTest < LT::Test::DBTestBase
 
     @video = Video.create!(url: 'https://www.youtube.com/watch?v=9bZkp7q19f0')
 
-    config = LT.env.load_optional_config('youtube.yml')
-    Analytics::Utils::YoutubeDataAdapter.new(@video, config[:api_key]).import!
+    config = LT.env.load_file_config('youtube.yml')
+    Analytics::Utils::YoutubeDataAdapter.new(@video, config['api_key']).import!
   end
 
   def test_correctly_imports_video_information

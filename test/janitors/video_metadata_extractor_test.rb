@@ -9,7 +9,7 @@ class VideoMetadataExtractorTest < LT::Test::DBTestBase
     @video = Video.create!(url: 'https://www.youtube.com/watch?v=9bZkp7q19f0')
 
     @logger = TestLogger.new
-    config = LT.env.load_optional_config('youtube.yml')
+    config = LT.env.load_file_config('youtube.yml')
     @extractor = Analytics::Janitors::VideoMetadataExtractor.new(@logger, 1, config)
   end
 

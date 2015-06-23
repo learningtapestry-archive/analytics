@@ -21,7 +21,7 @@ module Analytics
       end
 
       def process_one(video)
-        Utils::YoutubeDataAdapter.new(video, @config[:api_key]).import!
+        Utils::YoutubeDataAdapter.new(video, @config['api_key']).import!
       end
     end
   end

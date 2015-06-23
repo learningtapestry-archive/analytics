@@ -28,12 +28,11 @@ gem 'term-ansicolor', '>= 1.3.0'
 group :dev_test do
   gem 'capybara', '>= 2.4.3'
   gem 'thin', '>= 1.6.3'
-  gem 'minitest', '>= 5.5.1'
+  gem 'minitest', '~> 5.7'
   gem 'rerun', '>= 0.10.0' # process reload agent
   gem 'database_cleaner', '>= 1.3.0'
   gem 'poltergeist', '>= 1.5.1'
 end
 
-gem 'lt-core',
-    git: 'https://792de6a69ea9f5e82e17ca9d46d920b19462cfe4@github.com/learningtapestry/core',
-    ref: 'more_deployment_fixes'
+gem 'lt-core', git: 'https://792de6a69ea9f5e82e17ca9d46d920b19462cfe4@github.com/learningtapestry/core',
+               branch: 'decouple_configuration_from_devops'

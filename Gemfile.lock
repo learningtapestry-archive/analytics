@@ -1,5 +1,5 @@
 GIT
-  remote: https://792de6a69ea9f5e82e17ca9d46d920b19462cfe4@github.com/learningtapestry/core
+  remote: git@github.com:learningtapestry/core.git
   revision: 588a2fc0cdbc2e3ca1489edca55ec487572bdf37
   branch: decouple_configuration_from_devops
   specs:

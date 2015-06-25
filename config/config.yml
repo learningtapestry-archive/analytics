@@ -6,4 +6,3 @@ host: <%= ENV['DB_HOST'] %>
 port: 5432
 username: <%= ENV['DB_USER'] %>
 password: <%= ENV['DB_PASS'] %>
-tablespace: learntaculous_ts

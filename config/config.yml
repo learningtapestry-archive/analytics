@@ -1,9 +1,9 @@
 adapter: postgresql
 encoding: UTF8
-database: <%= ENV['ANALYTICS_DB_NAME'] %>
+database: <%= ENV['DB_NAME'] %>
 pool: 5
-host: <%= ENV['ANALYTICS_DB_HOST'] %>
+host: <%= ENV['DB_HOST'] %>
 port: 5432
-username: <%= ENV['ANALYTICS_DB_USER'] %>
-password: <%= ENV['ANALYTICS_DB_PASS'] %>
+username: <%= ENV['DB_USER'] %>
+password: <%= ENV['DB_PASS'] %>
 tablespace: learntaculous_ts

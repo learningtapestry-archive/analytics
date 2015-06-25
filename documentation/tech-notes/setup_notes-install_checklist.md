@@ -1,4 +1,4 @@
-==Dev Box Config Checklist==
+== Dev Box Config Checklist ==
 _For setting up Lubuntu, which is a minimally configured Ubuntu)_
 
 vbox shared folder "[x]:\dev" to "/dev"
@@ -11,9 +11,6 @@ Install core tools:
 ```
 sudo apt-get install gcc
 sudo apt-get install make
-# next two lines required by capybara-webkit
-sudo apt-get install qt5-default
-sudo apt-get install libqt5webkit5-dev
 sudo apt-get -y install postgresql-9.4
 sudo apt-get -y install pgadmin3
 sudo apt-get -y  install autoconf bison build-essential libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libncurses5-dev libcurl4-openssl-dev libreadline-dev

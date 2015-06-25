@@ -57,6 +57,10 @@ module Analytics
         def length
           @redis.llen @queue
         end
+
+        def empty?
+          @redis.llen(@queue) == 0
+        end
       end
 
       #

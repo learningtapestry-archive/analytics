@@ -1,6 +1,6 @@
-require 'open-uri'
-require File::expand_path('../test_helper.rb', __FILE__)
+require 'test_helper'
 
+require 'open-uri'
 require 'utils/scenarios'
 require 'helpers/redis'
 
@@ -8,19 +8,22 @@ module Analytics
   module Test
     class WebAppJSTest < WebAppJSTestBase
       include Helpers::Redis
+      include Utils::Scenarios::Pages
 
       def setup
         super
-        LT::Seeds::seed!
-        @scenario = Utils::Scenarios::Students::create_joe_smith_scenario
-        @joe_smith = @scenario[:student]
-        @jane_doe = @scenario[:teacher]
-        @section = @scenario[:section]
-        @page_visits = @scenario[:page_visits]
-        @site_visits = @scenario[:site_visits]
-        @sites = @scenario[:sites]
-        @pages = @scenario[:pages]
-        @acme_org = @scenario[:organizations].first
+
+        @acme_org = Organization.create!(
+          name: 'Acme Organization',
+          org_api_key: '00000000-0000-4000-8000-000000000000',
+          org_secret_key: SecureRandom.hex(36))
+
+        @joe_smith = User.create!(username: 'joesmith',
+                                  password: 'pass',
+                                  first_name: 'Joe',
+                                  last_name: 'Smith')
+
+        Page.create!([khanacademy_page1, khanacademy_page2, codeacademy_page])
         @lt_host = "lt.test.learningtapestry.com"
         @partner_host = "partner.lt.betaspaces.com"
         @port = Capybara.current_session.server.port
@@ -101,7 +104,7 @@ module Analytics
 
         # show that an initial "on page load" click message has been sent
         message = JSON.parse(messages_queue.pop)
-        assert_equal RawMessage::Verbs::CLICKED, message["verb"]
+        assert_equal 'clicked', message["verb"]
       end # test_js_collector_qunit
 
       def test_js_display_via_qunit
@@ -127,7 +130,7 @@ module Analytics
         verify_qunit_tests_passed(html)
         # if display.js were implemented, we'd expect to get a clicked message on page load
         # message = JSON.parse(messages_queue.pop)
-        # assert_equal RawMessage::Verbs::CLICKED, message["verb"]
+        # assert_equal 'clicked', message["verb"]
 
       end # test_js_collector_qunit
 
@@ -159,7 +162,7 @@ module Analytics
         refute_nil message, "No Redis message received from Ajax call via assert api."
         message = JSON.parse(message.force_encoding('UTF-8'))
         assert_equal "0S", message["action"]["time"]
-        assert_equal RawMessage::Verbs::VIEWED, message["verb"]
+        assert_equal 'viewed', message["verb"]
         assert_match page_title, message["page_title"]
         assert_equal page_url, message["url"]
         #validate url function
@@ -176,7 +179,7 @@ module Analytics
         sleep 0.1
         message = messages_queue.pop
         message = JSON.parse(message.force_encoding('UTF-8'))
-        assert_equal RawMessage::Verbs::CLICKED, message["verb"]
+        assert_equal 'clicked', message["verb"]
         # the first two chars are filled with junk for some reason
         assert_match page_title[2..50], message["page_title"][2..50]
         assert_equal page_url, message["url"]
@@ -193,11 +196,7 @@ module Analytics
         #  Manual test: The way I am manually testing this feature currently is:
         #    Run Sinatra in development mode
         #    Run LT:console at terminal
-        #      If dev database is not seeded with scenario already:
-        #        Execute: Utils::Scenarios::Students::create_joe_smith_scenario
-        #      if it is already seeded, run this to be sure Redis has the org keys
-        #        Execute: Organization.update_all_org_api_keys
-        #      Execute: Organization.first.org_api_key
+        #      Get a valid organization in Redis & DB
         #      Note the api-key uuid and paste it in the url below
         #    Visit the following URL in a browser
         #      http://localhost:8080/assets/tests/sandbox-test.html?username=joesmith@foo.com&org_api_key=[api_key]
@@ -224,7 +223,7 @@ module Analytics
           html = wait_for_qunit(page)
         end
         message = JSON.parse(messages_queue.pop.force_encoding('UTF-8'))
-        assert_equal RawMessage::Verbs::CLICKED, message["verb"]
+        assert_equal 'clicked', message["verb"]
 
         # we visit a new url in the same browser window, which kicks off
         # a js unload event
@@ -234,71 +233,11 @@ module Analytics
         end
         # first message on the stack will be a "viewed" as the previous page unloads
         message = JSON.parse(messages_queue.pop.force_encoding('UTF-8'))
-        assert_equal RawMessage::Verbs::VIEWED, message["verb"]
+        assert_equal 'viewed', message["verb"]
 
         # next message on the stack will be a "click" from arrival onto the most recent page
         message = JSON.parse(messages_queue.pop.force_encoding('UTF-8'))
-        assert_equal RawMessage::Verbs::CLICKED, message["verb"]
-
-        #use_selenium
-        #use_webkit
-        # set_server(@partner_host) do
-        #   visit(collector_test_url)
-        #   html = wait_for_qunit(page)
-        # end
-
-        # messages_queue.clear
-
-        #webkit
-        #page.execute_script("window.lt$(window).blur();")
-        #page.execute_script("window.open('');")
-        # first_window = page.driver.current_window_handle
-        # second_window = page.driver.open_new_window
-        # first_window = page.driver.switch_to_window(first_window)
-        #page.driver.close_window(page.driver.current_window_handle)
-        # page.driver.window_handles.each do |handle|
-        #   #puts page.driver.methods.sort - Object.methods
-        #   #page.driver.switch_to_window(handle)
-        #   page.driver.close_window(handle)
-        #   #page.execute_script("window.close();")
-        # end
-
-        # selenium
-        # puts page.evaluate_script("window.ltG.debug.focus;")
-        # page.execute_script("window.open('');")
-        #orig_window = page.driver.current_window_handle
-        #second_window = page.driver.open_new_window
-        # sleep 0.5
-        #page.driver.switch_to_window(orig_window)
-        #page.execute_script("window.ltG.debug.focus+=1;")
-        # puts page.evaluate_script("window.ltG.debug.focus;")
-        # puts page.evaluate_script("window.ltG.debug.blur;")
-        # page.driver.close_window(orig_window)
-        # sleep 0.5
-
-        # messages_queue.clear
-
-        #page.execute_script("window.lt$(window).blur();")
-        #page.execute_script("window.open('');")
-        #page.driver.open_new_window
-        #page.driver.close_window(page.driver.current_window_handle)
-        # page.driver.window_handles.each do |handle|
-        #   #puts page.driver.methods.sort - Object.methods
-        #   #page.driver.switch_to_window(handle)
-        #   page.driver.close_window(handle)
-        #   #page.execute_script("window.close();")
-        # end
-
-        # NOTE: try using Capybara's function to close window instead of inside JS
-        # we don't seem to be able to blur or close windows
-        # and generate associated events in phantomjs
-        # page.execute_script("window.blur();")
-        # page.execute_script("window.focus();")
-        # page.driver.browser.window_handles.each do |handle|
-        #   page.driver.browser.switch_to.window(handle)
-        #   page.execute_script "window.close();"
-        # end
-        # Use page.driver.debug to debug JS in Chrome
+        assert_equal 'clicked', message["verb"]
       end
 
       def save_load_screenshot(page)

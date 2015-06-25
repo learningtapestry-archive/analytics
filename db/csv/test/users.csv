@@ -1,4 +1,0 @@
-id,organization_id,first_name,middle_name,last_name,gender,username,password_digest,date_of_birth,school_id,created_at,updated_at
-1,1,Joe,,Smith,,joesmith@foo.com,hashed$password,,,,
-2,1,Bob,,Newhart,,bob@foo.com,hashed$password,,,,
-3,1,Jane,,Doe,,janedoe@bar.com,hashed$password,,,,

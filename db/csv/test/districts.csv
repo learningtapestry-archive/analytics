@@ -1,2 +1,0 @@
-id,state_id,nces_id,sis_id,other_id,name,address,city,state,phone,grade_low,grade_high,created_at,updated_at
-1,100,10000000000,DISTRICT1,,Acme District,,,,,K,12,,

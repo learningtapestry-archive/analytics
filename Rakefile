@@ -2,78 +2,69 @@ $LOAD_PATH << File.expand_path('../lib', __FILE__)
 
 require 'lt/tasks'
 
-Rake::Task['lt:boot'].overwrite do
-  LT::Environment.boot_all(File::dirname(__FILE__))
-end
-
 namespace :lt do
   namespace :janitors do
-    desc "Process full workload from Redis to data tables"
-    task :process_redis_messages => [:redis_to_raw_messages, :raw_messages_to_page_visits] do
-      LT.environment.logger.info("process_redis_analytics completed")
+    desc 'Process page visits workload from Redis to data tables'
+    task process_redis_page_messages: [:import_raw_messages, :extract_page_visits] do
+      LT.env.logger.info('process_redis_page_messages')
     end
 
-    desc "Convert Redis queue to raw_messages table"
-    task :redis_to_raw_messages do
-      Rake::Task[:'lt:boot'].invoke
-      require 'janitors/redis_postgres_extract'
-      Analytics::Janitors::RedisPostgresExtract.redis_to_raw_messages
+    desc 'Process video views workload from Redis to data tables'
+    task process_redis_video_messages: [:import_raw_messages, :extract_video_views] do
+      LT.env.logger.info('process_redis_video_messages')
     end
-    desc "Convert raw_messages to page_views"
-    task :raw_messages_to_page_visits do
-      Rake::Task[:'lt:boot'].invoke
-      require 'janitors/redis_postgres_extract'
-      Analytics::Janitors::RawMessagesExtract.raw_messages_to_page_visits
+
+    desc 'Convert Redis queue to raw_messages table'
+    task import_raw_messages: :'lt:boot' do
+      require 'janitors/raw_message_importer'
+
+      Analytics::Janitors::RawMessageImporter.new(LT.env.logger, 2000).import
+    end
+
+    desc 'Extract page views from raw_messages'
+    task extract_page_visits: :'lt:boot' do
+      require 'janitors/visit_extractor'
+
+      Analytics::Janitors::VisitExtractor.new(LT.env.logger, 2000).extract
     end
     desc "Convert raw_messages to video_views"
-    task :raw_messages_to_video_views do
-      Rake::Task[:'lt:boot'].invoke
-      require 'janitors/redis_postgres_extract'
-      Analytics::Janitors::RawMessagesExtract.raw_messages_to_video_visits
-    end
-    desc "Fill YouTube Information"
-    task :fill_video_youtube_information do
-      Rake::Task[:'lt:boot'].invoke
-      require 'janitors/web_extractor'
-      Analytics::Janitors::WebExtractor.fill_youtube_info
+    task extract_video_views: :'lt:boot' do
+      require 'janitors/visualization_extractor'
+
+      Analytics::Janitors::VisualizationExtractor.new(LT.env.logger, 2000).extract
     end
 
-    desc "Extract Learning Registry data to raw documents table from http://sandbox.learningregistry.org"
-    task :extract_meta_data do # TODO: rename this rake task name.
-      Rake::Task[:'lt:boot'].invoke
-      require 'janitors/learning_registry_extract'
-      Analytics::Janitors::LearningRegistryExtract.retrieve({'node' => 'http://sandbox.learningregistry.org'})
+    desc "Fill YouTube Information"
+    task fill_video_youtube_information: :'lt:boot' do
+      require 'janitors/video_metadata_extractor'
+
+      config = LT.env.load_optional_config('youtube.yml')
+      Analytics::Janitors::VideoMetadataExtractor.new(LT.env.logger, 2000, config).extract
     end
-  end # namespace :janitors
+  end
 
   namespace :utility do
     desc "Loads a single CSV file into the corresponding database table"
-    task :load_file, [:csvfile] do |t,args|
-      Rake::Task[:'lt:boot'].invoke
+    task :load_file, [:csvfile] => :'lt:boot' do |t,args|
       require 'utils/csv_database_loader'
       Analytics::Utils::CsvDatabaseLoader.load_file(args[:csvfile])
     end
 
     desc "Loads all CSV files within a path into the corresponding database tables"
-    task :load_dir, [:csvpath] do |t,args|
-      Rake::Task[:'lt:boot'].invoke
+    task :load_dir, [:csvpath] => :'lt:boot' do |t,args|
       require 'utils/csv_database_loader'
       Analytics::Utils::CsvDatabaseLoader.load_directory(args[:csvpath])
     end
   end
 end
 
-#
-# Some shortcuts to core tasks
-#
-task :full_tests do
-  Rake::Task[:'lt:full_tests'].invoke
-end
+desc 'Shortcut to lt:full_tests task'
+task full_tests: 'lt:test:run_full_tests'
 
-task :tests do
-  Rake::Task[:'lt:tests'].invoke
-end
+desc 'Shortcut to lt:tests task'
+task tests: 'lt:test:run_tests'
 
-task :console do
-  Rake::Task[:'lt:console'].invoke
-end
+desc 'Shortcut to lt:console task'
+task console: 'lt:console'
+
+task default: :tests

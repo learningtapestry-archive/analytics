@@ -99,15 +99,6 @@ ActiveRecord::Schema.define(version: 20150314) do
     t.datetime "updated_at"
   end
 
-  create_table "page_visits", force: :cascade do |t|
-    t.datetime "date_visited"
-    t.string   "time_active"
-    t.integer  "user_id"
-    t.integer  "page_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "pages", force: :cascade do |t|
     t.text     "url",          null: false
     t.string   "display_name"
@@ -118,37 +109,13 @@ ActiveRecord::Schema.define(version: 20150314) do
 
   add_index "pages", ["url"], name: "index_pages_on_url", unique: true, using: :btree
 
-  create_table "raw_document_logs", force: :cascade do |t|
-    t.string   "action"
-    t.date     "newest_import_date"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "raw_documents", force: :cascade do |t|
-    t.string   "doc_id"
-    t.boolean  "active"
-    t.string   "doc_type"
-    t.string   "doc_version"
-    t.text     "identity"
-    t.text     "keys"
-    t.string   "payload_placement"
-    t.text     "payload_schema"
-    t.json     "resource_data_json"
-    t.xml      "resource_data_xml"
-    t.text     "resource_data_string"
-    t.string   "resource_data_type"
-    t.string   "resource_locator"
-    t.text     "raw_data"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "raw_documents", ["doc_id"], name: "index_raw_documents_on_doc_id", unique: true, using: :btree
-
-  create_table "raw_message_logs", force: :cascade do |t|
-    t.string   "action"
-    t.integer  "raw_message_id"
+  create_table "profiles", force: :cascade do |t|
+    t.string   "state_id"
+    t.string   "sis_id"
+    t.string   "other_id"
+    t.string   "type"
+    t.string   "grade_level"
+    t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -160,10 +127,11 @@ ActiveRecord::Schema.define(version: 20150314) do
     t.string   "username"
     t.string   "page_title"
     t.uuid     "site_uuid"
-    t.string   "verb"
+    t.integer  "verb"
     t.json     "action"
     t.text     "url"
     t.datetime "captured_at"
+    t.datetime "processed_at"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "organization_id"
@@ -187,7 +155,6 @@ ActiveRecord::Schema.define(version: 20150314) do
   end
 
   create_table "section_users", force: :cascade do |t|
-    t.string   "user_type"
     t.integer  "section_id"
     t.integer  "user_id"
     t.datetime "created_at"
@@ -225,26 +192,6 @@ ActiveRecord::Schema.define(version: 20150314) do
 
   add_index "sites", ["url"], name: "index_sites_on_url", unique: true, using: :btree
 
-  create_table "staff_members", force: :cascade do |t|
-    t.string   "state_id"
-    t.string   "sis_id"
-    t.string   "other_id"
-    t.string   "staff_member_type", null: false
-    t.integer  "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "students", force: :cascade do |t|
-    t.string   "state_id"
-    t.string   "sis_id"
-    t.string   "other_id"
-    t.string   "grade_level"
-    t.integer  "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "users", force: :cascade do |t|
     t.string   "first_name"
     t.string   "middle_name"
@@ -262,32 +209,44 @@ ActiveRecord::Schema.define(version: 20150314) do
   add_index "users", ["username", "organization_id"], name: "index_users_on_username_and_organization_id", unique: true, using: :btree
   add_index "users", ["username"], name: "index_users_on_username", unique: true, where: "(organization_id IS NULL)", using: :btree
 
-  create_table "video_views", force: :cascade do |t|
-    t.datetime "date_started"
-    t.datetime "date_ended"
-    t.string   "time_viewed"
-    t.integer  "paused_count"
-    t.integer  "user_id"
-    t.integer  "video_id"
-    t.integer  "page_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "videos", force: :cascade do |t|
     t.text     "service_id"
     t.text     "external_id"
-    t.text     "url"
+    t.text     "url",                      null: false
     t.text     "title"
     t.text     "description"
     t.text     "publisher"
     t.text     "category"
     t.string   "video_length"
-    t.integer  "views",        limit: 8
-    t.float    "rating"
-    t.integer  "raters",       limit: 8
+    t.integer  "views",          limit: 8
+    t.integer  "like_count",     limit: 8
+    t.integer  "dislike_count",  limit: 8
+    t.integer  "favorite_count", limit: 8
+    t.integer  "comment_count",  limit: 8
     t.datetime "published_on"
     t.datetime "updated_on"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "visits", force: :cascade do |t|
+    t.datetime "date_visited"
+    t.integer  "time_active",  default: 0
+    t.integer  "user_id"
+    t.integer  "page_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "visualizations", force: :cascade do |t|
+    t.datetime "date_started"
+    t.datetime "date_ended"
+    t.datetime "date_fragment_started"
+    t.integer  "time_viewed",           default: 0
+    t.string   "session_id"
+    t.integer  "user_id"
+    t.integer  "video_id"
+    t.integer  "page_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

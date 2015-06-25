@@ -1,53 +1,97 @@
-require 'pry'
-
+#
+# An event captured by the JS plugin into a Redis queue
+#
 class RawMessage < ActiveRecord::Base
-  has_many :raw_message_logs
+  enum verb: %i(viewed clicked video_action)
 
-  module Verbs
-    VIEWED = 'viewed'
-    CLICKED = 'clicked'
-    VIDEO_ACTION = 'video-action'
+  #
+  # Custom setter for captured_at attribute. Parses a string into a properly
+  # formatted DateTime object.
+  #
+  def captured_at=(value)
+    self[:captured_at] = DateTime.parse(value)
   end
 
-  def self.create_from_json(raw_json_msg)
-    message = JSON.parse(raw_json_msg)
-    # TODO - Optimize: this makes an org query per message
-    # It should be possible to locally cache org_id's somehow to speed this up
-    org_api_key = message["org_api_key"]
-    if org_api_key then
-      message["organization_id"] = Organization.find_by_org_api_key(org_api_key).id
+  #
+  # Video visits yet to be processed into VideoVisit objects
+  #
+  def self.video_msgs(limit)
+    video_action.unprocessed(limit)
+  end
+
+  #
+  # Page visits yet to be processed into Visit objects
+  #
+  def self.page_msgs(limit)
+    viewed.unprocessed(limit)
+  end
+
+  #
+  # Filters unprocessed raw_messages
+  #
+  def self.unprocessed(limit)
+    where(processed_at: nil).order(:captured_at).limit(limit)
+  end
+
+  #
+  # Creates a VideoVisit out of a RawMessage with the proper verb
+  #
+  # @return true/false whether raw_message was/wasn't correctly processed
+  #
+  def process_as_video
+    video = Video.find_or_create_by!(url: video_id)
+
+    visualization =
+      video.visualizations.find_or_create_by!(session_id: session_id).tap do |v|
+      v.page = linked_page
+      v.user = linked_user
     end
-    retval = new_with_log(message, RawMessageLog.new_from_redis)
-    retval.save
-    retval
+
+    visualization.update_stats(captured_at, action['state'])
+
+    update!(processed_at: Time.now)
   end
 
-  # create a new record with associated log_entry
-  def self.new_with_log(message, log_entry)
-    # TODO SECURITY verify that api_key and user_id in raw_message
-    #   are associated with a record in api_key table
-    #   We may want an option to skip validation of user_id/api_key
-    #   Or make sure that org_api_key is valid
-    record = new(message)
-    record.raw_message_logs << log_entry
-    record
+  #
+  # Creates a Visit out of a RawMessage with the proper verb
+  #
+  # @return true/false whether raw_message was/wasn't correctly processed
+  #
+  def process_as_page
+    page = Page.find_or_create_by!(url: url) do |page|
+      page.display_name = page_title
+    end
+
+    page_visit = page.visits.create!(time_active: time,
+                                     date_visited: captured_at,
+                                     user: linked_user)
+
+    update(processed_at: Time.now)
   end
 
-  def self.find_new_page_visits(limit = 100)
-    self
-      .select("#{table_name}.*")
-      .joins(:raw_message_logs)
-      .where(:verb => Verbs::VIEWED)
-      .where(["#{RawMessageLog.table_name}.action = ?", RawMessageLog::Actions::FROM_REDIS])
-      .where.not(id: RawMessageLog.select("raw_message_id").where(action: RawMessageLog::Actions::TO_PAGE_VISITS))
-      .limit(limit)
+  private
+
+  def linked_user
+    Organization.find_or_create_user(org_api_key, username)
   end
 
-  def self.find_new_video_visits(limit = 100)
-    ActiveRecord::Base.connection.execute("select msg.id, msg.org_api_key, organizations.id as org_id, user_id, username, page_title, url, action->>'session_id' as session_id, action->>'state' as state, action->>'video_id' as video_id, captured_at from raw_messages msg inner join organizations on (organizations.org_api_key = msg.org_api_key) where verb='video-action' order by session_id, captured_at limit #{limit};")
+  def linked_page
+    Page.find_or_create_by(url: url)
   end
 
-  def self.ExtractIDFromYouTube(url)
-    url
+  #
+  # TODO: Why do we have this json 'action' column. Isn't it easier to user
+  # properly typed columns for each attribute?
+  #
+  def video_id
+    action['video_id']
+  end
+
+  def session_id
+    action['session_id']
+  end
+
+  def time
+    action['time']
   end
 end

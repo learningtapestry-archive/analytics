@@ -16,6 +16,14 @@ that you are using the correct versions of your gem dependencies.
 * Update Gemfile dependencies: `bundle update`.
 * Bundle gems excluding specific groups: `bundle install --without test`
 
+#### Phantomjs for js tests
+
+* Installation
+
+```bash
+sudo apt-get install phantomjs
+```
+
 #### Postgresql (for Debian/Ubuntu)
 
 * Installation
@@ -29,9 +37,9 @@ sudo apt-get install libpq-dev # development libraries
 
 ```bash
 sudo su - postgres
-psql -c "CREATE USER lt_dbo WITH PASSWORD 'lt_dev_xyz_123'"
-psql -c "ALTER USER lt_dbo WITH CREATEDB"
-psql -c "CREATE TABLESPACE learntaculous_ts OWNER lt_dbo LOCATION '/var/lib/postgresql/9.4/main'"
+psql -c "CREATE USER lt WITH PASSWORD 'lt_dev_xyz_123'"
+psql -c "ALTER USER lt WITH CREATEDB"
+psql -c "CREATE TABLESPACE learntaculous_ts OWNER lt LOCATION '/var/lib/postgresql/9.4/main'"
 ```
 
 * Create and migrate the database
@@ -51,11 +59,3 @@ bundle exec rake db:migrate
 #### Nginx
 
 * Install Lua module
-
-#### Config files
-
-* Use example config files
-
-```bash
-for f in `find -name '*-sample.yml'`; do cp "$f" "${f%-sample.yml}.yml"; done
-```

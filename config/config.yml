@@ -4,6 +4,6 @@ database: <%= ENV['ANALYTICS_DB_NAME'] %>
 pool: 5
 host: <%= ENV['ANALYTICS_DB_HOST'] %>
 port: 5432
-username: lt_dbo
+username: <%= ENV['ANALYTICS_DB_USER'] %>
 password: <%= ENV['ANALYTICS_DB_PASS'] %>
 tablespace: learntaculous_ts

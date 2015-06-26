@@ -35,4 +35,4 @@ group :dev_test do
 end
 
 gem 'lt-core', git: 'git@github.com:learningtapestry/core.git',
-               branch: 'decouple_configuration_from_devops'
+               ref: '5db87cc49e6519ae2df9d2ec81e93fd323598031'

@@ -1,7 +1,7 @@
 GIT
   remote: git@github.com:learningtapestry/core.git
-  revision: 588a2fc0cdbc2e3ca1489edca55ec487572bdf37
-  branch: decouple_configuration_from_devops
+  revision: 5db87cc49e6519ae2df9d2ec81e93fd323598031
+  ref: 5db87cc49e6519ae2df9d2ec81e93fd323598031
   specs:
     lt-core (0.1.0)
       activerecord (~> 4.2.0)

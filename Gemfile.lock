@@ -1,5 +1,5 @@
 GIT
-  remote: git@github.com:learningtapestry/core.git
+  remote: https://792de6a69ea9f5e82e17ca9d46d920b19462cfe4@github.com/learningtapestry/core
   revision: 5db87cc49e6519ae2df9d2ec81e93fd323598031
   ref: 5db87cc49e6519ae2df9d2ec81e93fd323598031
   specs:

@@ -4,5 +4,6 @@ database: <%= ENV['DB_NAME'] %>
 pool: 5
 host: <%= ENV['DB_HOST'] %>
 port: 5432
+template: template0
 username: <%= ENV['DB_USER'] %>
 password: <%= ENV['DB_PASS'] %>

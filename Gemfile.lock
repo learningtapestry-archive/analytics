@@ -1,12 +1,11 @@
 GIT
   remote: https://792de6a69ea9f5e82e17ca9d46d920b19462cfe4@github.com/learningtapestry/core
-  revision: 4a54526f43bbd84d2cb12a285ecb2aefeed15099
-  ref: 4a54526f43bbd84d2cb12a285ecb2aefeed15099
+  revision: 2995c0dee9cf960a0c795c52a385719cc489f484
+  ref: 2995c0dee9cf960a0c795c52a385719cc489f484
   specs:
     lt-core (0.1.0)
       activerecord (~> 4.2.0)
       capybara (~> 2.4.4)
-      capybara-webkit (>= 1.3.1)
       database_cleaner (>= 1.3.0)
       dotenv (~> 2.0)
       edge
@@ -55,9 +54,6 @@ GEM
       rack (>= 1.0.0)
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
-    capybara-webkit (1.6.0)
-      capybara (>= 2.3.0, < 2.5.0)
-      json
     celluloid (0.16.0)
       timers (~> 4.0.0)
     childprocess (0.5.6)

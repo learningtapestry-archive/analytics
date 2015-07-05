@@ -29,11 +29,10 @@ group :dev_test do
   gem 'capybara', '>= 2.4.3'
   gem 'thin', '>= 1.6.3'
   gem 'minitest', '~> 5.7'
-  gem 'rerun', '>= 0.10.0' # process reload agent
   gem 'database_cleaner', '>= 1.3.0'
   gem 'poltergeist', '>= 1.5.1'
 end
 
 gem 'lt-core',
     git: 'https://792de6a69ea9f5e82e17ca9d46d920b19462cfe4@github.com/learningtapestry/core',
-    ref: '2995c0dee9cf960a0c795c52a385719cc489f484'
+    ref: '3b3199e39ded3b62b48e99fd8546b84fa8d5d658'

@@ -35,4 +35,6 @@ end
 
 gem 'lt-core',
     git: 'https://792de6a69ea9f5e82e17ca9d46d920b19462cfe4@github.com/learningtapestry/core',
-    ref: '3b3199e39ded3b62b48e99fd8546b84fa8d5d658'
+    ref: 'dcbc787e6286675626fbd79c1f3af0e2dabbc9d3'
+#    :path => "~/dev/core"
+

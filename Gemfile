@@ -31,10 +31,11 @@ group :dev_test do
   gem 'minitest', '~> 5.7'
   gem 'database_cleaner', '>= 1.3.0'
   gem 'poltergeist', '>= 1.5.1'
+  gem 'byebug'
 end
 
 gem 'lt-core',
     git: 'https://792de6a69ea9f5e82e17ca9d46d920b19462cfe4@github.com/learningtapestry/core',
-    ref: 'dcbc787e6286675626fbd79c1f3af0e2dabbc9d3'
-#    :path => "~/dev/core"
+    ref: '6c15235174da288cbfd2b886189f79316687776d'
+    # :path => "~/dev/core"
 

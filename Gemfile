@@ -17,6 +17,7 @@ gem 'bcrypt', '>= 3.1.7'
 
 gem 'chronic', '>= 0.10.2'
 gem 'chronic_duration', '>= 0.10.6'
+gem 'whenever', require: false
 
 # Allows printing with colors to terminal
 gem 'term-ansicolor', '>= 1.3.0'

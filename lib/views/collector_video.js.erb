@@ -29,31 +29,31 @@ function onYouTubePlayerReady(event) {
 }
 
 
-function onPlayerStateChange(newState) {
+function onPlayerStateChange(event) {
   var newStateWord='';
 
-  if(newState.data==5)
+  if(event.data==5)
   { newStateWord='video cued'; }
-  else if(newState.data==3)
+  else if(event.data==3)
   { newStateWord='buffering'; }
-  else if(newState.data==2)
+  else if(event.data==2)
   { newStateWord='paused'; }
-  else if(newState.data==1)
+  else if(event.data==1)
   { newStateWord='playing'; }
-  else if(newState.data==0)
+  else if(event.data==0)
   { newStateWord='ended'; }
-  else if(newState.data==-1)
+  else if(event.data==-1)
   { newStateWord='unstarted'; }
   else
   { newStateWord='Status uncertain'; }
 
-  if (newState.data != -1 && newState.data != 3 && newState.data != 5) { // don't send unstarted and buffering events
+  if (event.data != -1 && event.data != 3 && event.data != 5) { // don't send unstarted and buffering events
 
-    console.log("Player's new state: " + newStateWord + " " + eventDate + " " + newState.target.getVideoUrl());
+    console.log("Player's new state: " + newStateWord + " " + eventDate + " " + event.target.getVideoUrl());
 
     var url = window.ltG.priv.fGetCurURL();
     var pageTitle = window.ltG.priv.fGetCurPageTitle();
-    var video_id = newState.target.getVideoUrl();
+    var video_id = event.target.getVideoUrl();
 
     var action = {
       verb: 'video-action',

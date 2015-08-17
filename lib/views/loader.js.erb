@@ -22,6 +22,9 @@
 //     If autostart is not true, you can manually boot loader by calling
 //       window.lt.init(function(){//code to run when init is finished});
 //     Generally you would skip autostart if you need a callback when init is loaded
+//   tracking_interval (optional): time in seconds to wait between messages sent to track the current page visit.
+//     It only applies to the collector script
+//     If not specified the default is 60 seconds
 
 
 // javascript sdk
@@ -50,7 +53,11 @@
   //this function should be called to initiate the async load/boot process for LT libraries
   lt.init = function(callback) {
     <%lt_api_libs.each do |lt_api_lib|%>
-      lt.loadScript('<%=lt_api_server%>/api/v1/<%=lt_api_lib%>.js?username=<%=user_id%>&org_api_key=<%=org_api_key%>', callback);
+      var scriptUrl = '<%=lt_api_server%>/api/v1/<%=lt_api_lib%>.js?username=<%=user_id%>&org_api_key=<%=org_api_key%>';
+      <% if lt_api_lib == 'collector' %>
+        scriptUrl += '&tracking_interval=<%=tracking_interval%>';
+      <% end %>
+      lt.loadScript(scriptUrl, callback);
     <%end%>
   };
   <%

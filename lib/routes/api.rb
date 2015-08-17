@@ -137,6 +137,7 @@ module Analytics
             user_id: CGI::escape(params[:username]),
             assert_end_point: "#{api_server}#{vroute(:assert_org_key)}",
             lt_api_server: api_server,
+            tracking_interval: (Integer(params[:tracking_interval]) rescue 60),
           }
 
           # main selector to determine which javascript page to generate/send

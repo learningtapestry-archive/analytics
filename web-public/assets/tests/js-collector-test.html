@@ -26,7 +26,9 @@
     var ltTestOrgApiKey = window.getUrlParameter('org_api_key');
     var ltTestUsername = window.getUrlParameter('username');
     var ltHostName = window.getUrlParameter('hostname');
-    ltCollectorScriptTag = '<scr'+'ipt src="//'+ltHostName+'/api/v1/collector.js?username='+ltTestUsername+'&org_api_key='+ltTestOrgApiKey+'"></scr'+'ipt>';
+    var ltTrackingInterval = window.getUrlParameter('tracking_interval');
+    ltCollectorScriptTag = '<scr'+'ipt src="//'+ltHostName+'/api/v1/collector.js?username='+ltTestUsername+
+            '&org_api_key='+ltTestOrgApiKey+'&tracking_interval='+ltTrackingInterval+'"></scr'+'ipt>';
     document.write(ltCollectorScriptTag);
   </script>
 </head>
@@ -42,54 +44,6 @@ QUnit.test("Collector javascript setup test", function( assert){
   assert.equal($.fn.jquery, "2.1.1", "JQuery should be 2.1.1. Ver:" +$.fn.jquery); 
   assert.ok(!(typeof window.lt$ === 'undefined'), "ltG should be present.");
   assert.equal(window.lt$.fn.jquery, "1.11.1", "lt$ should be version 1.11.1." )
-});
-
-QUnit.test("Timer unit and functional tests", function( assert){
-  // verify date diff function works
-  curDate = new Date();
-  oldDate = curDate - 400000;
-  var diff = window.ltG.fCalcDateDifference(oldDate, curDate);
-  assert.equal(diff, "400S");
-
-  // verify MS duration function works
-  //start date 6/1/2012 noon
-  var start = new Date(2012, 6, 1, 12);
-  //end date = 15 minutes later
-  var end = new Date(2012, 6, 1, 12, 16);
-  var diff = window.ltG.fCalcDateDifference(start, end);
-  var duration = window.ltG.fMSToDuration(16*60000);
-  assert.equal(diff, "960S");
-  assert.equal(duration, "960S");
-
-  // we test start/pause/unpause/report functions using
-  // timecop which lets us control Date/time flow
-  Timecop.install();
-
-  // start timer on specific point in time
-  Timecop.freeze(2012, 6, 1, 12, 0);
-  window.ltG.fGetResetTimeOnPage();
-  var activeTime = 0;
-  //move time up 15 minutes
-  Timecop.freeze(2012, 6, 1, 12, 15);
-  activeTime += 15;
-  //pause the timer
-  window.ltG.fPausePageTimer();
-  // move time up 5 minutes
-  Timecop.freeze(2012, 6, 1, 12, 20);
-  //unpause the timer
-  window.ltG.fUnPausePageTimer();
-  // move time up 10 minutes
-  Timecop.freeze(2012, 6, 1, 12, 30);
-  activeTime += 10;
-  // get the total time active
-  var measuredActiveTime = window.ltG.fGetResetTimeOnPage();
-  var actualActiveTime = String(activeTime*60)+"S";
-  assert.equal(measuredActiveTime, actualActiveTime);
-
-  // return time flow to normal
-  Timecop.uninstall();
-  window.ltG.fGetResetTimeOnPage();
-
 });
 
 QUnit.test("Verify that stock jquery ajax does not work (CORS test)", function(assert){

@@ -231,13 +231,31 @@ module Analytics
           visit(collector_test_url)
           html = wait_for_qunit(page)
         end
-        # first message on the stack will be a "viewed" as the previous page unloads
-        message = JSON.parse(messages_queue.pop.force_encoding('UTF-8'))
-        assert_equal 'viewed', message["verb"]
 
         # next message on the stack will be a "click" from arrival onto the most recent page
         message = JSON.parse(messages_queue.pop.force_encoding('UTF-8'))
         assert_equal 'clicked', message["verb"]
+      end
+
+      def test_page_visit_tracking
+        joe_smith_username=CGI::escape(@joe_smith[:username])
+        acme_org_api_key = CGI::escape(@acme_org[:org_api_key])
+        collector_test_url = "/assets/tests/js-collector-test.html"+
+            "?username=#{joe_smith_username}"+
+            "&org_api_key=#{acme_org_api_key}"+
+            "&hostname=#{@lt_host}:#{@port}" +
+            "&tracking_interval=1"
+
+        set_server(@partner_host) do
+          visit(collector_test_url)
+          messages_queue.clear
+          sleep 1
+        end
+
+        message = JSON.parse(messages_queue.pop.force_encoding('UTF-8'))
+
+        assert_equal 'viewed', message['verb']
+        assert_equal '1S', message['action']['time']
       end
 
       def save_load_screenshot(page)

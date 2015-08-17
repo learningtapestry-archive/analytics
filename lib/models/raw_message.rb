@@ -33,6 +33,11 @@ class RawMessage < ActiveRecord::Base
     where(processed_at: nil).order(:captured_at).limit(limit)
   end
 
+  # Finds the most recent 'viewed' message belonging to a visit
+  def self.last_message_in_visit(url, username, heartbeat_id)
+    where(url: url, username: username, heartbeat_id: heartbeat_id).order(captured_at: :desc).first
+  end
+
   #
   # Creates a VideoVisit out of a RawMessage with the proper verb
   #
@@ -53,7 +58,8 @@ class RawMessage < ActiveRecord::Base
   end
 
   #
-  # Creates a Visit out of a RawMessage with the proper verb
+  # Creates a Visit out of a RawMessage with the proper verb.
+  # It may also update the record if it's a visit in progress
   #
   # @return true/false whether raw_message was/wasn't correctly processed
   #
@@ -62,9 +68,10 @@ class RawMessage < ActiveRecord::Base
       page.display_name = page_title
     end
 
-    page_visit = page.visits.create!(time_active: time,
-                                     date_visited: captured_at,
-                                     user: linked_user)
+    visit = page.visits.find_or_initialize_by(heartbeat_id: heartbeat_id)
+    visit.update_attributes!(time_active: time,
+                             date_visited: captured_at,
+                             user: linked_user)
 
     update(processed_at: Time.now)
   end

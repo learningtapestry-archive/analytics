@@ -11,6 +11,7 @@ class Visit < ActiveRecord::Base
 
   belongs_to :page
   validates :page, presence: true
+  validates :heartbeat_id, uniqueness: { scope: :page_id }
 
   delegate :url, :display_name, to: :page
 

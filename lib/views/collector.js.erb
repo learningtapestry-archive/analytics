@@ -85,11 +85,9 @@
 
     // Starts a periodic timer that sends a view message
     window.ltG.fStartPageTimer = function() {
+      window.ltG.priv.timerStartDate = Date.now();
       if (!window.ltG.priv.intervalID) {
-        window.ltG.priv.intervalID = window.setInterval(function () {
-          window.ltG.priv.fUpdateCurrentVisitTime();
-          window.ltG.fSendPageViewMsg();
-        }, window.ltG.trackingInterval * 1000);
+        window.ltG.priv.intervalID = window.setInterval(window.ltG.processVisit, window.ltG.trackingInterval * 1000);
       }
     };
 
@@ -97,6 +95,29 @@
     window.ltG.fStopPageTimer = function() {
       window.clearInterval(window.ltG.priv.intervalID);
       window.ltG.priv.intervalID = undefined;
+      window.ltG.processVisit();
+    };
+
+    window.ltG.processVisit = function () {
+      window.ltG.priv.fUpdateCurrentVisitTime();
+      window.ltG.fSendPageViewMsg();
+      window.ltG.priv.timerStartDate = Date.now();
+    };
+
+    // ### private/utility functions ###
+    window.ltG.priv.fUpdateCurrentVisitTime = function () {
+      window.ltG.currentVisitTime += window.ltG.fCalcDateDifference(window.ltG.priv.timerStartDate, Date.now())
+    };
+
+    // returns a string with interval difference between two dates in seconds
+    window.ltG.fCalcDateDifference = function(oldDate, newDate) {
+      return (window.ltG.fMSToDuration(newDate - oldDate));
+    };
+
+    // returns duration in seconds
+    // takes a duration in milliseconds
+    window.ltG.fMSToDuration = function(milliseconds) {
+      return Math.floor(milliseconds / 1000);
     };
 
     // NOTE: by design this will block UI/user actions, so use only when user is inactive
@@ -105,11 +126,6 @@
       do {
         now = new Date();
       } while (now.getTime() < expireDateTime);
-    };
-
-    // ### private/utility functions ###
-    window.ltG.priv.fUpdateCurrentVisitTime = function () {
-      window.ltG.currentVisitTime += window.ltG.trackingInterval;
     };
 
     window.ltG.priv.fGenActionBaseMsg = function(pageTitle, verb) {
@@ -220,8 +236,10 @@
       //hook document focus/blur events to manage timer
       lt$(function() {
           lt$(window).focus(function() {
+            window.ltG.fStartPageTimer();
           });
           lt$(window).blur(function() {
+            window.ltG.fStopPageTimer();
           });
       });
     }; // ltG.boot

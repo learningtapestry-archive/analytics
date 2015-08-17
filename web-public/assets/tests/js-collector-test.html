@@ -46,6 +46,24 @@ QUnit.test("Collector javascript setup test", function( assert){
   assert.equal(window.lt$.fn.jquery, "1.11.1", "lt$ should be version 1.11.1." )
 });
 
+QUnit.test("Timer unit tests", function( assert){
+  // verify date diff function works
+  curDate = new Date();
+  oldDate = curDate - 400000;
+  var diff = window.ltG.fCalcDateDifference(oldDate, curDate);
+  assert.equal(diff, "400");
+
+  // verify MS duration function works
+  //start date 6/1/2012 noon
+  var start = new Date(2012, 6, 1, 12);
+  //end date = 15 minutes later
+  var end = new Date(2012, 6, 1, 12, 16);
+  var diff = window.ltG.fCalcDateDifference(start, end);
+  var duration = window.ltG.fMSToDuration(16*60000);
+  assert.equal(diff, "960");
+  assert.equal(duration, "960");
+});
+
 QUnit.test("Verify that stock jquery ajax does not work (CORS test)", function(assert){
   // the hostname that we use to load the collector script should be on a remote server
   assert.equal(ltHostName.match(/^(lt.test.learningtapestry.com):[0-9]+/)[1], "lt.test.learningtapestry.com")

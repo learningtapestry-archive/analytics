@@ -35,6 +35,20 @@ class RawMessageImporterTest < LT::Test::DBTestBase
     assert_equal 1, RawMessage.count
   end
 
+  def test_updates_viewed_message_if_already_exists
+    generated_page = page
+    RawMessage.create!(generated_page.merge(captured_at: '01/08/2015 00:00:00', processed_at: '30/08/2015 00:00:00'))
+    last_message = RawMessage.create!(generated_page.merge(captured_at: '02/08/2015 00:00:00'))
+    messages_queue.clear
+    messages_queue.push(generated_page.merge(action: { time: '450S' }, captured_at: '31/08/2015 00:00:00').to_json)
+
+    @importer.import
+    last_message.reload
+
+    assert_equal last_message.action['time'], '450S'
+    assert_equal last_message.captured_at.to_s(:db), '2015-08-31 00:00:00'
+  end
+
   def test_processes_no_more_than_batch_size_messages
     messages_queue.push(unprocessed.to_json)
 

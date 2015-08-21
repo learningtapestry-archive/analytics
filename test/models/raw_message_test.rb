@@ -63,15 +63,26 @@ class RawMessageProcessAsPageTest < RawMessageProcessorTest
     assert_visit_imported(Visit.first)
   end
 
-  def test_process_as_page_when_page_visit_already_exists
+  def test_process_as_page_when_page_visit_is_a_different_one
     page = Page.create!(url: raw_msg.url)
-    page.visits.create!
+    page.visits.create!(heartbeat_id: SecureRandom.hex(36))
 
     raw_msg.process_as_page
 
     assert_equal 2, Visit.count
     assert_visit_imported(Visit.last)
   end
+
+  def test_process_as_page_when_page_visit_is_the_same
+    page = Page.create!(url: raw_msg.url)
+    page.visits.create!(heartbeat_id: raw_msg.heartbeat_id)
+
+    raw_msg.process_as_page
+
+    assert_equal 1, Visit.count
+    assert_visit_imported(Visit.last)
+  end
+
 
   def test_process_as_page_marks_message_as_processed
     raw_msg.process_as_page
@@ -87,6 +98,7 @@ class RawMessageProcessAsPageTest < RawMessageProcessorTest
     assert_includes raw_msg.action['time'], visit.time_active.to_s
     assert_equal raw_msg.captured_at, visit.date_visited
     assert_equal raw_msg.username, visit.user.username
+    assert_equal raw_msg.heartbeat_id, visit.heartbeat_id
   end
 
   def assert_imported(page)

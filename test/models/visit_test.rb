@@ -22,10 +22,10 @@ class VisitModelTest < LT::Test::DBTestBase
   end
 
   def test_summary_by_page_returns_visits_aggregated_by_page
-    Visit.create!(page: @page)
+    Visit.create!(page: @page, heartbeat_id: SecureRandom.hex(36))
     assert_equal 1, Visit.summary_by_page.length
 
-    Visit.create!(page: @page)
+    Visit.create!(page: @page, heartbeat_id: SecureRandom.hex(36))
     assert_equal 1, Visit.summary_by_page.length
 
     Visit.create!(page: Page.create!(url: 'http://site.com/page2'))
@@ -46,7 +46,7 @@ class VisitModelTest < LT::Test::DBTestBase
   end
 
   def test_summary_by_page_aggregates_total_time_by_page
-    2.times { Visit.create!(page: @page, time_active: '2S') }
+    2.times { Visit.create!(page: @page, time_active: '2S', heartbeat_id: SecureRandom.hex(36)) }
 
     res = Visit.summary_by_page
 
@@ -64,10 +64,10 @@ class VisitModelTest < LT::Test::DBTestBase
   end
 
   def test_summary_by_site_returns_visits_aggregated_by_site
-    Visit.create!(page: @page)
+    Visit.create!(page: @page, heartbeat_id: SecureRandom.hex(36))
     assert_equal 1, Visit.summary_by_site.length
 
-    Visit.create!(page: @page)
+    Visit.create!(page: @page, heartbeat_id: SecureRandom.hex(36))
     assert_equal 1, Visit.summary_by_site.length
 
     Visit.create!(page: Page.create!(url: 'http://site.com/page2'))
@@ -90,7 +90,7 @@ class VisitModelTest < LT::Test::DBTestBase
   end
 
   def test_summary_by_site_aggregates_total_time_by_site
-    2.times { Visit.create!(page: @page, time_active: '2S') }
+    2.times { Visit.create!(page: @page, time_active: '2S', heartbeat_id: SecureRandom.hex(36)) }
 
     res = Visit.summary_by_site
 

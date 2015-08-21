@@ -15,12 +15,24 @@
   script.onload = function () {
     window.ltG = {};
     // private functions (in name only - just namespaced to make clear they are internal)
-    window.ltG.priv = {};
+    window.ltG.priv = {
+      randomString: function (length) {
+        var text = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        for (var i = 0; i < length; i++) {
+          text += possible.charAt(Math.floor(Math.random() * possible.length));
+        }
+        return text;
+      }
+    };
     window.lt$ = jQuery.noConflict( true );
     window.ltG.orgApiKey = "<%=org_api_key%>";
     window.ltG.userId = "<%=user_id%>";
     window.ltG.assert_end_point = "<%=assert_end_point%>";
     window.ltG.lt_api_server = "<%=lt_api_server%>";
+    window.ltG.trackingInterval = <%=tracking_interval%>;
+    window.ltG.currentVisitTime = 0;
+    window.ltG.heartbeatId = window.ltG.priv.randomString(36);
 
     window.ltG.toISOString = function(dateObj) {
       function pad(number) {
@@ -39,6 +51,7 @@
         + ':' + pad( dateObj.getUTCSeconds() )
         + 'Z';
     };
+
     // Generate a PageView message suitable for sending via fSendMsg
     window.ltG.fGenPageViewMsg = function(uRL, pageTitle, timeOnPage) {
       var verb = 'viewed';
@@ -51,11 +64,11 @@
       var verb = 'clicked';
       action = window.ltG.priv.fGenActionBaseMsg(pageTitle, verb);
       return window.ltG.priv.fGenRawMsg(uRL, pageTitle, verb, action);
-    }
+    };
 
     // generate a PageView message and send to server
     window.ltG.fSendPageViewMsg = function() {
-      var timeOnPage = window.ltG.fGetResetTimeOnPage();
+      var timeOnPage = window.ltG.currentVisitTime + 'S';
       var uRL = window.ltG.priv.fGetCurURL();
       var pageTitle = window.ltG.priv.fGetCurPageTitle();
       var msg = window.ltG.fGenPageViewMsg(uRL, pageTitle, timeOnPage);
@@ -70,48 +83,41 @@
       window.ltG.priv.fSendMsg(msg);
     };
 
+    // Starts a periodic timer that sends a view message
     window.ltG.fStartPageTimer = function() {
-      window.ltG.priv.timerStartDate = new Date();
-      // this var is used to hold accumulated time during timer pauses
-      if (typeof window.ltG.priv.timerAccumulation == 'undefined') {
-        window.ltG.priv.timerAccumulation = 0;  
+      window.ltG.priv.timerStartDate = Date.now();
+      if (!window.ltG.priv.intervalID) {
+        window.ltG.priv.intervalID = window.setInterval(window.ltG.processVisit, window.ltG.trackingInterval * 1000);
       }
     };
 
-    window.ltG.fPausePageTimer = function() {
-      var now = new Date();
-      var accumulated = now - window.ltG.priv.timerStartDate;
-      window.ltG.priv.timerAccumulation += accumulated;
+    // Stops the periodic timer
+    window.ltG.fStopPageTimer = function() {
+      window.clearInterval(window.ltG.priv.intervalID);
+      window.ltG.priv.intervalID = undefined;
+      window.ltG.processVisit();
     };
 
-    window.ltG.fUnPausePageTimer = function () {
-      window.ltG.fStartPageTimer();
-    }
+    window.ltG.processVisit = function () {
+      window.ltG.priv.fUpdateCurrentVisitTime();
+      window.ltG.fSendPageViewMsg();
+      window.ltG.priv.timerStartDate = Date.now();
+    };
 
-    // returns duration since timer start and restarts timer at 0
-    // see fCalcDateDifference for return value format (e.g. "129S")
-    window.ltG.fGetResetTimeOnPage = function () {
-      // we add any accumulated paused time to current date to get total
-      // time on page
-      currentDate = new Date(new Date().getTime() + window.ltG.priv.timerAccumulation);
-      window.ltG.priv.timerAccumulation = 0;
-      var startDate = window.ltG.priv.timerStartDate;
-      var retVal = window.ltG.fCalcDateDifference(startDate, currentDate);
-      window.ltG.fStartPageTimer();
-      return retVal;
+    // ### private/utility functions ###
+    window.ltG.priv.fUpdateCurrentVisitTime = function () {
+      window.ltG.currentVisitTime += window.ltG.fCalcDateDifference(window.ltG.priv.timerStartDate, Date.now())
     };
 
     // returns a string with interval difference between two dates in seconds
-    // format: NNNS e.g., "129S"
     window.ltG.fCalcDateDifference = function(oldDate, newDate) {
-      //return (Math.floor((newDate - oldDate)/1000) + "S");
       return (window.ltG.fMSToDuration(newDate - oldDate));
     };
 
-    // returns string formatted duration: "NNS"
+    // returns duration in seconds
     // takes a duration in milliseconds
     window.ltG.fMSToDuration = function(milliseconds) {
-      return (Math.floor((milliseconds)/1000) + "S");
+      return Math.floor(milliseconds / 1000);
     };
 
     // NOTE: by design this will block UI/user actions, so use only when user is inactive
@@ -121,8 +127,6 @@
         now = new Date();
       } while (now.getTime() < expireDateTime);
     };
-
-    // ### private/utility functions ###
 
     window.ltG.priv.fGenActionBaseMsg = function(pageTitle, verb) {
       return {
@@ -135,11 +139,11 @@
 
     window.ltG.priv.fGetCurURL = function(){
       return window.location.href
-    }
+    };
 
     window.ltG.priv.fGetCurPageTitle = function(){
       return lt$(document).find("title").text();
-    }
+    };
 
     // generates a URL suitable for contacting remote end point
     window.ltG.priv.fGenMsgEndPoint = function(msg){
@@ -160,6 +164,7 @@
         verb: verb,
         url: uRL,
         page_title: pageTitle,
+        heartbeat_id: window.ltG.heartbeatId,
         captured_at: ltG.toISOString(new Date(lt$.now()))
       };
       msg.action = action;
@@ -219,7 +224,7 @@
             str += '\n';
 
           return str;
-      }
+      };
 
     // ***********************
     // main event handler code
@@ -231,17 +236,11 @@
       //hook document focus/blur events to manage timer
       lt$(function() {
           lt$(window).focus(function() {
+            window.ltG.fStartPageTimer();
           });
           lt$(window).blur(function() {
+            window.ltG.fStopPageTimer();
           });
-      });
-
-      //hook document beforeunload event to send timer data: "pageview" event
-      lt$(window).on("beforeunload", function(){
-        //lt$('#spanid').remove();
-        window.ltG.fSendPageViewMsg();
-        // this ensures no return value is made - any return value could block the page unload
-        null;
       });
     }; // ltG.boot
 

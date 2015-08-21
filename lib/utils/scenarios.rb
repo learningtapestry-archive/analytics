@@ -64,7 +64,8 @@ module Analytics
             verb: 'viewed',
             action: {
               time: '356S'
-            }
+            },
+            heartbeat_id: SecureRandom.hex(36)
           )
         end
 

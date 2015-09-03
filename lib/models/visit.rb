@@ -24,6 +24,8 @@ class Visit < ActiveRecord::Base
       .where("date_visited <= '#{date_end}'")
   }
 
+  scope :by_usernames, -> (usernames) { where(user: User.where(username: usernames)) }
+
   scope :summary, lambda { |type|
     type == 'site_visits' ? summary_by_site : summary_by_page
   }

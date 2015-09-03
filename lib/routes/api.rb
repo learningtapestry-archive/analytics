@@ -96,7 +96,8 @@ module Analytics
           date_range = filters.slice(:date_begin, :date_end)
           entity = filters[:entity]
 
-          summary = Visit.by_dates(*(date_range.values)).summary(entity)
+          usernames = params[:usernames].split(',').map(&:strip)
+          summary = Visit.by_dates(*(date_range.values)).by_usernames(usernames).summary(entity)
           results = @org.users.joins(:visits).merge(summary)
 
           res = { entity: entity, date_range: date_range, results: results }

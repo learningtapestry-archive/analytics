@@ -107,6 +107,22 @@ module Analytics
         end
       end
 
+      def test_obtain_filters_by_usernames
+        create_org_and_user
+        @user.visits.create!(page: Page.create!(url: 'http://page.com'), date_visited: 3.hours.ago.utc)
+        @another_user = @org.users.create!(username: 'johndoe', password: 'pass', first_name: 'John', last_name: 'Doe')
+        @another_user.visits.create!(page: Page.create!(url: 'http://example.com'),
+                                     date_visited: 3.hours.ago.utc,
+                                     heartbeat_id: SecureRandom.hex(36))
+        params = default_params.merge({entity: 'page_visits', usernames: 'johndoe, fake_user'})
+
+        resp = auth_request('/api/v1/obtain', params)
+
+        assert_equal 200, last_response.status
+        assert_equal 1, resp[:results].size
+        assert_equal 'http://example.com', resp[:results].first[:page_url]
+      end
+
       def test_obtain_returns_bad_request_when_no_usernames
         create_org_and_user
 
@@ -183,7 +199,7 @@ module Analytics
         {
           org_api_key: @org.org_api_key,
           org_secret_key: @org.org_secret_key,
-          usernames: [ @user.username ]
+          usernames: @user.username
         }
       end
 

@@ -16,6 +16,7 @@ module Analytics
 
         params[:date_begin] = parse_begin_date(params[:date_begin])
         params[:date_end] = parse_end_date(params[:date_end])
+        params[:usernames] = params[:usernames].split(',').map(&:strip)
 
         params
       end

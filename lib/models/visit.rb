@@ -33,9 +33,10 @@ class Visit < ActiveRecord::Base
   scope :summary_by_site, lambda {
     select('sites.display_name as site_name',
            'sites.url as site_domain',
+           'users.username as username',
            'sum(time_active) as total_time')
-      .joins(page: :site)
-      .group('sites.display_name', 'sites.url')
+      .joins(:user, page: :site)
+      .group('sites.display_name', 'sites.url', 'users.username')
       .order('sites.url')
   }
 
@@ -44,12 +45,14 @@ class Visit < ActiveRecord::Base
            'sites.url as site_domain',
            'pages.display_name as page_name',
            'pages.url as page_url',
+           'users.username as username',
            'sum(time_active) as total_time')
-      .joins(page: :site)
+      .joins(:user, page: :site)
       .group('sites.display_name',
              'sites.url',
              'pages.display_name',
-             'pages.url')
+             'pages.url',
+             'users.username')
       .order('sites.url')
   }
 end

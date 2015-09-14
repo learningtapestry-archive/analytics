@@ -121,20 +121,34 @@ module Analytics
 
         define_method "test_#{path}_filters_by_usernames" do
           create_org_and_user
-          @user.visits.create!(page: Page.create!(url: 'http://page.com', site: Site.create!(url: 'page.com')),
+          @user.visits.create!(page: Page.create!(url: 'http://page.com'),
                                date_visited: 3.hours.ago.utc)
           other_user = @org.users.create!(username: 'johndoe', password: 'pass', first_name: 'John', last_name: 'Doe')
-          other_user.visits.create!(page: Page.create!(url: 'http://example.com',
-                                                       site: Site.create!(url: 'example.com')),
+          other_user.visits.create!(page: Page.create!(url: 'http://example.com'),
                                     date_visited: 3.hours.ago.utc,
                                     heartbeat_id: SecureRandom.hex(36))
           params = default_params.merge(usernames: 'johndoe, fake_user')
 
           resp = auth_request("/api/v2/#{path}", params)
+          results = resp[:results].first[visits_type(path)]
 
           assert_equal 200, last_response.status
-          assert_equal 1, resp[:results].size
-          assert_equal 'example.com', resp[:results].first[visits_type(path)].first[:site_domain]
+          assert_equal 1, results.size
+          assert_equal 'example.com', results.first[:site_domain]
+        end
+
+        define_method "test_#{path}_filters_by_site_domains" do
+          create_org_and_user
+          create_example_visits
+
+          params = default_params.merge(site_domains: 'example.org, example.net')
+          resp = auth_request("/api/v2/#{path}", params)
+          results = resp[:results].first[visits_type(path)].sort_by { |v| v[:site_domain] }
+
+          assert_equal 200, last_response.status
+          assert_equal 2, results.size
+          assert_equal 'example.net', results.first[:site_domain]
+          assert_equal 'example.org', results.last[:site_domain]
         end
 
         define_method "test_#{path}_returns_bad_request_when_no_usernames" do
@@ -162,6 +176,20 @@ module Analytics
           assert_includes first_result[:date_visited], date_visited.strftime('%Y-%m-%dT%H:%M:%S')
           assert_includes first_result[:date_left], (date_visited + 25.seconds).strftime('%Y-%m-%dT%H:%M:%S')
         end
+      end
+
+      def test_pages_filters_by_page_urls
+        create_org_and_user
+        create_example_visits
+
+        params = default_params.merge(page_urls: 'http://example.org, http://example.net')
+        resp = auth_request('/api/v2/pages', params)
+        results = resp[:results].first[:page_visits].sort_by { |v| v[:page_url] }
+
+        assert_equal 200, last_response.status
+        assert_equal 2, results.size
+        assert_equal 'http://example.net', results.first[:page_url]
+        assert_equal 'http://example.org', results.last[:page_url]
       end
 
       def test_users_reports_information_about_organization_users
@@ -204,6 +232,12 @@ module Analytics
             password: 'pass',
             first_name: 'Joe',
             last_name: 'Smith')
+      end
+
+      def create_example_visits
+        @user.visits.create!(page: Page.create!(url: 'http://example.com'), date_visited: 3.hours.ago.utc)
+        @user.visits.create!(page: Page.create!(url: 'http://example.org'), date_visited: 3.hours.ago.utc)
+        @user.visits.create!(page: Page.create!(url: 'http://example.net'), date_visited: 3.hours.ago.utc)
       end
 
       def default_params

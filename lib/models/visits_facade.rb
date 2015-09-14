@@ -28,8 +28,16 @@ class VisitsFacade
 
   def visits
     visits = Visit.by_dates(*(date_range.values)).by_usernames(params[:usernames])
+    visits = filter_by_urls(visits)
     visits = detailed_view? ? visits.detail(params[:entity]) : visits.summary(params[:entity])
     org.users.joins(:visits).merge(visits)
+  end
+
+  def filter_by_urls(visits)
+    visits_to_filter = visits
+    visits_to_filter = visits_to_filter.by_site_domains(params[:site_domains]) if params[:site_domains]
+    visits_to_filter = visits_to_filter.by_page_urls(params[:page_urls]) if params[:page_urls] && page_entity?
+    visits_to_filter
   end
 
   def visit_attributes(visits)
@@ -38,5 +46,9 @@ class VisitsFacade
 
   def detailed_view?
     params[:type] == 'detail'
+  end
+
+  def page_entity?
+    params[:entity] == 'page_visits'
   end
 end

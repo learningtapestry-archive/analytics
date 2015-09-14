@@ -26,6 +26,10 @@ class Visit < ActiveRecord::Base
 
   scope :by_usernames, -> (usernames) { where(user: User.where(username: usernames)) }
 
+  scope :by_site_domains, -> (domain) { joins(page: :site).where(sites: {url: domain}) }
+
+  scope :by_page_urls, -> (url) { joins(:page).where(pages: {url: url}) }
+
   scope :summary, lambda { |type|
     type == 'site_visits' ? summary_by_site : summary_by_page
   }

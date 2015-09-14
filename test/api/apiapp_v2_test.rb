@@ -147,6 +147,21 @@ module Analytics
           assert_equal 400, last_response.status
           assert_equal ':usernames array not provided', resp[:error]
         end
+
+        define_method "test_#{path}_includes_date_visited_when_detail_is_requested" do
+          create_org_and_user
+          date_visited = 3.hours.ago.utc
+          @user.visits.create!(page: Page.create!(url: 'http://example.com'),
+                               date_visited: date_visited,
+                               time_active: '25S')
+
+          resp = auth_request("/api/v2/#{path}", default_params.merge(type: 'detail'))
+          first_result = resp[:results].first[visits_type(path)].first
+
+          assert_equal 200, last_response.status
+          assert_includes first_result[:date_visited], date_visited.strftime('%Y-%m-%dT%H:%M:%S')
+          assert_includes first_result[:date_left], (date_visited + 25.seconds).strftime('%Y-%m-%dT%H:%M:%S')
+        end
       end
 
       def test_users_reports_information_about_organization_users

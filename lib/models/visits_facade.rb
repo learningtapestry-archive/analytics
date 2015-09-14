@@ -27,11 +27,16 @@ class VisitsFacade
   end
 
   def visits
-    summary = Visit.by_dates(*(date_range.values)).by_usernames(params[:usernames]).summary(params[:entity])
-    org.users.joins(:visits).merge(summary)
+    visits = Visit.by_dates(*(date_range.values)).by_usernames(params[:usernames])
+    visits = detailed_view? ? visits.detail(params[:entity]) : visits.summary(params[:entity])
+    org.users.joins(:visits).merge(visits)
   end
 
   def visit_attributes(visits)
     visits.map { |v| v.attributes.symbolize_keys.except(:id, :username) }
+  end
+
+  def detailed_view?
+    params[:type] == 'detail'
   end
 end

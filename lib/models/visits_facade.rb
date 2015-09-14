@@ -21,12 +21,12 @@ class VisitsFacade
   end
 
   def structured_visits
-    visits.group_by(&:username).map do |username, visits|
+    retrieve_visits.group_by(&:username).map do |username, visits|
       {username: username, "#{params[:entity]}" => visit_attributes(visits)}
     end
   end
 
-  def visits
+  def retrieve_visits
     visits = Visit.by_dates(*(date_range.values)).by_usernames(params[:usernames])
     visits = filter_by_urls(visits)
     visits = detailed_view? ? visits.detail(params[:entity]) : visits.summary(params[:entity])

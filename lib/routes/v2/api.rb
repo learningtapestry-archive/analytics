@@ -80,7 +80,7 @@ module Analytics
           post vroute(:assert_key) do
             api_key = request.env['HTTP_X_LT_API_KEY']
 
-            if !api_key.nil? && keys_hash.key?(api_key)
+            if api_key.present? && org_keys_hash.key?(api_key)
               messages_queue.push(request.body.read)
               status 200 # = HTTP Success
             else

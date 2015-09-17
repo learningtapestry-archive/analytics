@@ -16,6 +16,9 @@ module Analytics
 
         params[:date_begin] = parse_begin_date(params[:date_begin])
         params[:date_end] = parse_end_date(params[:date_end])
+        params[:usernames] = parse_array_param(params[:usernames])
+        params[:site_domains] = parse_array_param(params[:site_domains])
+        params[:page_urls] = parse_array_param(params[:page_urls])
 
         params
       end
@@ -54,6 +57,13 @@ module Analytics
         date_str.size < 10 ? parsed_date.end_of_day : parsed_date
       rescue
         bad_request('Invalid date_end parameter')
+      end
+
+      #
+      # Converts a csv string to an array object
+      #
+      def parse_array_param(csv_param)
+        csv_param.split(',').map(&:strip) if csv_param.present?
       end
 
       private

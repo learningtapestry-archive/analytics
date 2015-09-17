@@ -2,7 +2,7 @@ require 'test_helper'
 
 module Analytics
   module Test
-    class ApiAppTest < WebAppTestBase
+    class ApiAppV1Test < WebAppTestBase
       #
       # Define what an ApprovedSite actually is... It seems like a join model
       # for 4 different models...
@@ -78,7 +78,7 @@ module Analytics
 
         assert_equal 1, resp[:results].size
 
-        expected_info = %i(site_name site_domain page_name page_url total_time)
+        expected_info = %i(username site_name site_domain page_name page_url total_time)
         assert_equal resp[:results].first.keys, expected_info
       end
 

@@ -7,6 +7,7 @@ module Analytics
     helpers Helpers::Params
 
     register Helpers::AuthenticationDSL
-    register Routes::Api
+    register Routes::Api::V1
+    register Routes::Api::V2
   end
 end

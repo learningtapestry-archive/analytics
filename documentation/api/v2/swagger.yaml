@@ -1,0 +1,464 @@
+swagger: '2.0'
+info:
+  version: 2.0.0
+  title: Learning Tapestry Analytics API
+  description: |
+    **REST API to access the tracking data collected by the Analytics scripts**
+host: web01-staging.learningtapestry.com
+basePath: /api/v2
+schemes:
+  - http
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /service-status:
+    get:
+      summary: Returns current status of the service and some global operational settings
+      responses:
+        200:
+          description: Service status
+          schema:
+            type: object
+            properties:
+              database:
+                type: boolean
+              redis:
+                type: boolean
+              hashlist_length:
+                type: integer
+                minimum: 0
+              org_api_key_hashlist_length:
+                type: integer
+                minimum: 0
+              raw_message_queue_length:
+                type: integer
+                minimum: 0
+              current_time:
+                type: string
+                format: datetime
+              env:
+                type: string
+              api_version:
+                type: string
+  /approved-sites:
+    get:
+      summary: Lists all collected sites available, along with their actions
+      responses:
+        200:
+          description: Array of approved sites
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                url:
+                  type: string
+                display_name: 
+                  type: string
+                site_uuid:
+                  type: string
+                site_actions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      action_type:
+                        type: string
+                      url_pattern:
+                        type: string
+                      css_selector:
+                        type: string
+  /users:
+    get:
+      summary: Lists collected users
+      parameters:
+        - name: org_api_key
+          in: query
+          description: Your organization API key
+          required: true
+          type: string
+        - name: org_secret_key
+          in: query
+          description: Your organization secret key
+          required: true
+          type: string
+      responses:
+        200:
+          description: Matching users
+          schema:
+            type: object
+            properties:
+              results:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    first_name:
+                      type: string
+                    last_name: 
+                      type: string
+                    username:
+                      type: string
+        401:
+          description: Unknown organization API or secret key
+          schema:
+            type: object
+            properties: 
+              error:
+                type: string
+  /sites:
+    get:
+      summary: Lists collected site visits
+      parameters:
+        - name: org_api_key
+          in: query
+          description: Your organization API key
+          required: true
+          type: string
+        - name: org_secret_key
+          in: query
+          description: Your organization secret key
+          required: true
+          type: string
+        - name: usernames
+          in: query
+          description: Comma separated list of values containing usernames to filter by
+          required: true
+          type: string
+        - name: date_begin
+          in: query
+          description: Start date of collected visits
+          required: false
+          type: string
+          format: date
+        - name: date_end
+          in: query
+          description: End date of collected visits
+          required: false
+          type: string
+          format: date
+        - name: type
+          in: query
+          description: The format of the results. Possible values are `summary` and `detail`. Specifying the latter will add the `date_visited` and `date_left` attributes to the results
+          required: false
+          default: summary
+          type: string
+        - name: site_domains
+          in: query
+          description: Comma separated list of values containing site domains to filter by
+          required: false
+          type: string
+      responses:
+        200:
+          description: Matching site visits
+          schema:
+            type: object
+            properties:
+              entity: 
+                type: string
+                default: site_visits
+              date_range:
+                type: object
+                properties:
+                  date_begin: 
+                    type: string
+                    format: datetime
+                  date_end:
+                    type: string
+                    format: datetime
+              results:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    username:
+                      type: string
+                    site_visits: 
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          site_name:
+                            type: string
+                          site_domain:
+                            type: string
+                          total_time:
+                            type: integer
+                          date_visited: 
+                            type: string
+                            format: datetime
+                          date_left:
+                            type: string
+                            format: datetime
+        401:
+          description: Unknown organization API or secret key
+          schema:
+            type: object
+            properties: 
+              error:
+                type: string
+        400:
+          description: Unknown report type
+          schema:
+            type: object
+            properties: 
+              error:
+                type: string
+  /pages:
+    get:
+      summary: Lists collected page visits
+      parameters:
+        - name: org_api_key
+          in: query
+          description: Your organization API key
+          required: true
+          type: string
+        - name: org_secret_key
+          in: query
+          description: Your organization secret key
+          required: true
+          type: string
+        - name: usernames
+          in: query
+          description: Comma separated list of values containing usernames to filter by
+          required: true
+          type: string
+        - name: date_begin
+          in: query
+          description: Start date of collected visits
+          required: false
+          type: string
+          format: date
+        - name: date_end
+          in: query
+          description: End date of collected visits
+          required: false
+          type: string
+          format: date
+        - name: type
+          in: query
+          description: The format of the results. Possible values are `summary` and `detail`. Specifying the latter will add the `date_visited` and `date_left` attributes to the results
+          required: false
+          default: summary
+          type: string
+        - name: site_domains
+          in: query
+          description: Comma separated list of values containing site domains to filter by
+          required: false
+          type: string
+        - name: page_urls
+          in: query
+          description: Comma separated list of values containing page urls to filter by
+          required: false
+          type: string
+      responses:
+        200:
+          description: Matching page urls
+          schema:
+            type: object
+            properties:
+              entity: 
+                type: string
+                default: page_visits
+              date_range:
+                type: object
+                properties:
+                  date_begin: 
+                    type: string
+                    format: datetime
+                  date_end:
+                    type: string
+                    format: datetime
+              results:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    username:
+                      type: string
+                    page_visits: 
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          site_name:
+                            type: string
+                          site_domain:
+                            type: string
+                          total_time:
+                            type: integer
+                          date_visited: 
+                            type: string
+                            format: datetime
+                          date_left:
+                            type: string
+                            format: datetime
+        401:
+          description: Unknown organization API or secret key
+          schema:
+            type: object
+            properties: 
+              error:
+                type: string
+        400:
+          description: Unknown report type
+          schema:
+            type: object
+            properties: 
+              error:
+                type: string
+  /video-views:
+    get:
+      summary: Lists video visualizations
+      parameters:
+        - name: org_api_key
+          in: query
+          description: Your organization API key
+          required: true
+          type: string
+        - name: org_secret_key
+          in: query
+          description: Your organization secret key
+          required: true
+          type: string
+        - name: date_begin
+          in: query
+          description: Start date of returned visits
+          required: false
+          type: string
+          format: date
+        - name: date_end
+          in: query
+          description: End date of returned visits
+          required: false
+          type: string
+          format: date
+      responses:
+        200:
+          description: Matching video visualizations
+          schema:
+            type: object
+            properties:
+              date_range:
+                type: object
+                properties:
+                  date_begin:
+                    type: string
+                    format: datetime
+                  date_end:
+                    type: string
+                    format: datetime
+              results:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                    url: 
+                      type: string
+                    publisher:
+                      type: string
+                    video_length: 
+                      type: integer
+                    time_viewed:
+                      type: integer
+        401:
+          description: Unknown organization API or secret key
+          schema:
+            type: object
+            properties: 
+              error:
+                type: string
+  /assert:
+    post:
+      summary: Stores a new raw message, usually received from the collection scripts
+      parameters:
+        - in: header
+          name: X-LT-API-Key
+          description: Your organization API key
+          required: true
+          type: string
+        - in: body
+          name: body
+          description: Raw message
+          required: true
+          schema:
+            type: object
+            properties:
+              org_api_key:
+                type: string
+              username:
+                type: string
+              verb:
+                type: string
+                description: Possible values are viewed, clicked and video_action
+              url: 
+                type: string
+              page_title:
+                type: string
+              captured_at:
+                type: string
+                format: dateTime
+              action:
+                type: object
+                properties:
+                  id: 
+                    type: string
+                  display:
+                    type: object
+                    properties:
+                      en-US:
+                        type: string
+                  page_title:
+                    type: string
+                  user_agent:
+                    type: string
+                  time:
+                    type: string
+      responses:
+        200:
+          description: Raw message created
+        401:
+          description: Invalid org api key
+  /{page}:
+    get:
+      summary: Loads a JS script (useful to easily inject the tracking scripts into pages)
+      produces: 
+        - application/javascript
+      parameters:
+        - name: page
+          in: path
+          type: string
+          description: Page to load. Possible values are `loader.js`, `collector.js` and `collector_video.js`
+          required: true
+        - name: username
+          in: query
+          type: string
+          description: A valid username
+          required: true
+        - name: org_api_key
+          in: query
+          type: string
+          description: Your organization API key
+          required: true
+        - name: load
+          in: query
+          type: string
+          description: The only valid value is `collector`
+          required: true
+        - name: autostart
+          in: query
+          type: boolean
+          description: Whether to autoboot the library or not
+          required: false
+      responses:
+        200:
+          description: Sends the javascript code of the page in with content type of `application/javascript;charset=utf-8`
+        400:
+          description: Missing username
+        401: 
+          description: Invalid org api key or parameters

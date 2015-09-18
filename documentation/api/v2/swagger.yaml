@@ -288,6 +288,10 @@ paths:
                             type: string
                           site_domain:
                             type: string
+                          page_name:
+                            type: string
+                          page_url:
+                            type: string
                           total_time:
                             type: integer
                           date_visited: 

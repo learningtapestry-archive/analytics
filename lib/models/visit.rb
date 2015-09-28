@@ -47,8 +47,14 @@ class Visit < ActiveRecord::Base
   }
 
   scope :detail_by_site, -> {
-    summary_by_site.select('min(date_visited) as date_visited',
-                           'min(date_visited) + sum(time_active) * interval \'1 second\' as date_left')
+    select('sites.display_name as site_name',
+           'sites.url as site_domain',
+           'users.username as username',
+           'time_active as total_time',
+           'date_visited',
+           'date_visited + time_active * interval \'1 second\' as date_left')
+        .joins(:user, page: :site)
+        .order('sites.url')
   }
 
   scope :summary_by_page, lambda {
@@ -68,7 +74,7 @@ class Visit < ActiveRecord::Base
   }
 
   scope :detail_by_page, -> {
-    summary_by_page.select('min(date_visited) as date_visited',
-                           'min(date_visited) + sum(time_active) * interval \'1 second\' as date_left')
+    detail_by_site.select('pages.display_name as page_name',
+                          'pages.url as page_url')
   }
 end

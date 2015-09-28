@@ -13,7 +13,7 @@ class YoutubeDataAdapterTest < LT::Test::DBTestBase
   end
 
   def test_correctly_imports_video_information
-    assert_equal 'PSY - GANGNAM STYLE (강남스타일) M/V', @video.title
+    assert_equal "PSY - 'GANGNAM STYLE (강남스타일)' M/V", @video.title
     assert @video.views > 2340830773
     assert_equal 'PT4M13S', @video.video_length
     assert @video.description.size > 10

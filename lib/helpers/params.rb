@@ -33,6 +33,13 @@ module Analytics
         { date_begin: date_begin, date_end: date_end }
       end
 
+      #
+      # Converts a csv string to an array object
+      #
+      def parse_array_param(csv_param)
+        csv_param.split(',').map(&:strip) if csv_param.present?
+      end
+
       private
 
       #
@@ -57,13 +64,6 @@ module Analytics
         date_str.size < 10 ? parsed_date.end_of_day : parsed_date
       rescue
         bad_request('Invalid date_end parameter')
-      end
-
-      #
-      # Converts a csv string to an array object
-      #
-      def parse_array_param(csv_param)
-        csv_param.split(',').map(&:strip) if csv_param.present?
       end
 
       private

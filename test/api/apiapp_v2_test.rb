@@ -205,7 +205,7 @@ module Analytics
         assert_equal [expected], resp[:results]
       end
 
-      def test_video_views_returns_visualizations_by_specified_org_users
+      def test_video_views_returns_available_visualizations
         create_org_and_user
 
         vid = Video.create!(url: 'http://youtube.com?v=1')
@@ -218,6 +218,26 @@ module Analytics
 
         assert_equal 200, last_response.status
         assert_equal 1, resp[:results].size
+      end
+
+      def test_video_views_filters_by_usernames
+        create_org_and_user
+        @user.visualizations.create!(video: Video.create!(url: 'http://youtube.com?v=1'),
+                                     session_id: 'A' * 36,
+                                     date_started: 1.hour.ago.utc,
+                                     date_ended: 30.minutes.ago.utc)
+        other_user = @org.users.create!(username: 'johndoe', password: 'pass', first_name: 'John', last_name: 'Doe')
+        other_user.visualizations.create!(video: Video.create!(url: 'http://youtube.com?v=2'),
+                                          session_id: 'B' * 36,
+                                          date_started: 1.hour.ago.utc,
+                                          date_ended: 30.minutes.ago.utc)
+        params = default_params.merge(usernames: 'johndoe, fake_user')
+
+        resp = auth_request('/api/v2/video_views', params)
+
+        assert_equal 200, last_response.status
+        assert_equal 1, resp[:results].size
+        assert_equal 'http://youtube.com?v=2', resp[:results].first[:url]
       end
 
       private

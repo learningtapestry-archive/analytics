@@ -116,9 +116,11 @@ module Analytics
 
           get vroute(:video_views) do
             date_range = parse_date_range(params)
+            usernames = parse_array_param(params[:usernames])
 
-            report = Visualization.by_dates(*(date_range.values)).summary
-            results = @org.users.joins(:visualizations).merge(report)
+            report = Visualization.by_dates(*(date_range.values))
+            report = report.by_usernames(usernames) if usernames.present?
+            results = @org.users.joins(:visualizations).merge(report.summary)
 
             [200, {date_range: date_range, results: results}.to_json]
           end

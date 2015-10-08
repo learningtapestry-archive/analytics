@@ -20,6 +20,8 @@ class Visualization < ActiveRecord::Base
       .where("date_ended <= '#{date_end}'")
   }
 
+  scope :by_usernames, -> (usernames) { where(user: User.where(username: usernames)) }
+
   scope :summary, lambda {
     select('videos.title',
            'videos.url',

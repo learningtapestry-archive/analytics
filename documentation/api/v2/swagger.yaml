@@ -142,7 +142,7 @@ paths:
           format: date
         - name: type
           in: query
-          description: The format of the results. Possible values are `summary` and `detail`. Specifying the latter will add the `date_visited` and `date_left` attributes to the results
+          description: The format of the results. Possible values are `summary` and `detail`. Specifying the former will group the visits by domain and return the sum of their times. Specifying the latter will list individual visits, and also add the `date_visited` and `date_left` attributes to the results
           required: false
           default: summary
           type: string
@@ -326,6 +326,11 @@ paths:
         - name: org_secret_key
           in: query
           description: Your organization secret key
+          required: true
+          type: string
+        - name: usernames
+          in: query
+          description: Comma separated list of values containing usernames to filter by
           required: true
           type: string
         - name: date_begin

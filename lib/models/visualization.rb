@@ -15,9 +15,9 @@ class Visualization < ActiveRecord::Base
 
   validates :session_id, presence: true, length: { is: 36 }
 
-  scope :by_dates, lambda { |date_begin, date_end|
-    where("date_started >= '#{date_begin}'")
-      .where("date_ended <= '#{date_end}'")
+  scope :by_dates, -> (dates_begin, dates_end) {
+    intervals = dates_begin.zip(dates_end).flatten
+    where((['(date_started >= ? AND date_ended <= ?)'] * dates_begin.size).join(' OR '), *intervals)
   }
 
   scope :by_usernames, -> (usernames) { where(user: User.where(username: usernames)) }

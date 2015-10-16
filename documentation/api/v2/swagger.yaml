@@ -128,15 +128,15 @@ paths:
           description: Comma separated list of values containing usernames to filter by
           required: true
           type: string
-        - name: date_begin
+        - name: date_begin[]
           in: query
-          description: Start date of collected visits
+          description: Start date of collected visits. Accepts multiple instances of the same parameter to specify different time intervals to match
           required: false
           type: string
           format: date
-        - name: date_end
+        - name: date_end[]
           in: query
-          description: End date of collected visits
+          description: End date of collected visits. Accepts multiple instances of the same parameter to specify different time intervals to match
           required: false
           type: string
           format: date
@@ -226,15 +226,15 @@ paths:
           description: Comma separated list of values containing usernames to filter by
           required: true
           type: string
-        - name: date_begin
+        - name: date_begin[]
           in: query
-          description: Start date of collected visits
+          description: Start date of collected visits. Accepts multiple instances of the same parameter to specify different time intervals to match
           required: false
           type: string
           format: date
-        - name: date_end
+        - name: date_end[]
           in: query
-          description: End date of collected visits
+          description: End date of collected visits. Accepts multiple instances of the same parameter to specify different time intervals to match
           required: false
           type: string
           format: date
@@ -333,15 +333,15 @@ paths:
           description: Comma separated list of values containing usernames to filter by
           required: true
           type: string
-        - name: date_begin
+        - name: date_begin[]
           in: query
-          description: Start date of returned visits
+          description: Start date of returned visits. Accepts multiple instances of the same parameter to specify different time intervals to match
           required: false
           type: string
           format: date
-        - name: date_end
+        - name: date_end[]
           in: query
-          description: End date of returned visits
+          description: End date of returned visits. Accepts multiple instances of the same parameter to specify different time intervals to match
           required: false
           type: string
           format: date

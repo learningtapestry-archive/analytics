@@ -16,10 +16,13 @@ class VisitModelTest < LT::Test::DBTestBase
   end
 
   def test_by_dates_filters_visits_by_date
-    visit = Visit.create!(page: @page, user: @joe_smith, date_visited: 1.week.ago)
+    visits = [Visit.create!(page: @page, user: @joe_smith, date_visited: 1.week.ago, heartbeat_id: SecureRandom.hex(36)),
+              Visit.create!(page: @page, user: @joe_smith, date_visited: 10.days.ago, heartbeat_id: SecureRandom.hex(36))]
 
-    assert_equal [visit], Visit.by_dates(1.week.ago.beginning_of_day, Time.now)
-    assert_empty Visit.by_dates(6.days.ago, Time.now)
+    assert_equal visits.first, Visit.by_dates([1.week.ago.beginning_of_day], [Time.now]).first
+    assert_equal visits, Visit.by_dates([15.days.ago.beginning_of_day, 1.week.ago.beginning_of_day],
+                                        [9.days.ago.beginning_of_day, Time.now])
+    assert_empty Visit.by_dates([6.days.ago], [Time.now])
   end
 
   def test_summary_by_page_returns_visits_aggregated_by_page

@@ -14,8 +14,7 @@ module Analytics
         params[:type] = 'summary' unless params[:type]
         bad_request('Unknown report type') unless valid_type?(params[:type])
 
-        params[:date_begin] = parse_begin_date(params[:date_begin])
-        params[:date_end] = parse_end_date(params[:date_end])
+        params.merge!(parse_date_ranges(params))
         params[:usernames] = parse_array_param(params[:usernames])
         params[:site_domains] = parse_array_param(params[:site_domains])
         params[:page_urls] = parse_array_param(params[:page_urls])
@@ -24,13 +23,25 @@ module Analytics
       end
 
       #
-      # Extracts a properly coerced date range from the request params
+      # Extracts one or more properly coerced date ranges from the request params
       #
-      def parse_date_range(params)
-        date_begin = parse_begin_date(params[:date_begin])
-        date_end = parse_end_date(params[:date_end])
+      def parse_date_ranges(params)
+        dates_begin = []
+        dates_end = []
+        params[:date_begin] = Array(params[:date_begin])
+        params[:date_end] = Array(params[:date_end])
 
-        { date_begin: date_begin, date_end: date_end }
+        if params[:date_begin].empty? || params[:date_end].empty?
+          dates_begin << parse_begin_date(nil)
+          dates_end << parse_end_date(nil)
+        else
+          params[:date_begin].zip(params[:date_end]).each do |date_begin, date_end|
+            dates_begin << parse_begin_date(date_begin)
+            dates_end << parse_end_date(date_end)
+          end
+        end
+
+        {date_begin: dates_begin, date_end: dates_end}
       end
 
       #

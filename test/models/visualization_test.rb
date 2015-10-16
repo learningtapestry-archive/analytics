@@ -79,6 +79,16 @@ class VisualizationModelTest < LT::Test::DBTestBase
     assert_equal 6, res.first.attributes['time_viewed']
   end
 
+  def test_by_dates_filters_visualizations_by_date
+    visualizations = [Visualization.create(session_id: 'A' * 36, date_started: 1.week.ago, date_ended: 1.week.ago),
+                      Visualization.create(session_id: 'B' * 36, date_started: 10.days.ago, date_ended: 10.days.ago)]
+
+    assert_equal visualizations.first, Visualization.by_dates([1.week.ago.beginning_of_day], [Time.now]).first
+    assert_equal visualizations, Visualization.by_dates([15.days.ago.beginning_of_day, 1.week.ago.beginning_of_day],
+                                                        [9.days.ago.beginning_of_day, Time.now])
+    assert_empty Visualization.by_dates([6.days.ago], [Time.now])
+  end
+
   private
 
   def create_visualization_with_a_fragment_started

@@ -19,9 +19,9 @@ class Visit < ActiveRecord::Base
     self[:time_active] = ChronicDuration.parse(value).to_i
   end
 
-  scope :by_dates, lambda { |date_begin, date_end|
-    where("date_visited >= '#{date_begin}'")
-      .where("date_visited <= '#{date_end}'")
+  scope :by_dates, -> (dates_begin, dates_end) {
+    intervals = dates_begin.zip(dates_end).flatten
+    where((['(date_visited >= ? AND date_visited <= ?)'] * dates_begin.size).join(' OR '), *intervals)
   }
 
   scope :by_usernames, -> (usernames) { where(user: User.where(username: usernames)) }

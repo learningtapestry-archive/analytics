@@ -102,8 +102,8 @@ module Analytics
           assert_equal 200, last_response.status
 
           assert_equal visits_type(path).to_s, resp[:entity]
-          assert_includes resp[:date_range][:date_begin], '2014-01-01'
-          assert_includes resp[:date_range][:date_end], '2015-01-01'
+          assert_includes resp[:date_range][:date_begin].first, '2014-01-01'
+          assert_includes resp[:date_range][:date_end].first, '2015-01-01'
           assert_empty resp[:results]
         end
 
@@ -115,8 +115,8 @@ module Analytics
           assert_equal 200, last_response.status
 
           date_range = resp[:date_range]
-          assert_includes date_range[:date_begin], 1.day.ago.utc.to_date.to_s
-          assert_includes date_range[:date_end], Time.now.utc.to_date.to_s
+          assert_includes date_range[:date_begin].first, 1.day.ago.utc.to_date.to_s
+          assert_includes date_range[:date_end].first, Time.now.utc.to_date.to_s
         end
 
         define_method "test_#{path}_filters_by_usernames" do

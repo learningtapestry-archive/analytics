@@ -100,13 +100,15 @@ module Analytics
             summary = Visit.by_dates(*(date_range.values)).by_usernames(filters[:usernames]).summary(entity)
             results = @org.users.joins(:visits).merge(summary)
 
-            res = {entity: entity, date_range: date_range, results: results}
+            res = {entity: entity,
+                   date_range: {date_begin: filters[:date_begin].first, date_end: filters[:date_end].first},
+                   results: results}
 
             [200, res.to_json]
           end
 
           get vroute(:video_views) do
-            date_range = parse_date_range(params)
+            date_range = parse_date_ranges(params)
 
             report = Visualization.by_dates(*(date_range.values)).summary
             results = @org.users.joins(:visualizations).merge(report)

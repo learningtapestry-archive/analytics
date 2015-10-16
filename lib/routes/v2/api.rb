@@ -115,7 +115,7 @@ module Analytics
           end
 
           get vroute(:video_views) do
-            date_range = parse_date_range(params)
+            date_range = parse_date_ranges(params)
             usernames = parse_array_param(params[:usernames])
 
             report = Visualization.by_dates(*(date_range.values))

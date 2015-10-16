@@ -67,4 +67,12 @@ class RawMessageImporterTest < LT::Test::DBTestBase
 
     assert_includes @logger.debug_output.string, '1 processed / 0 failures'
   end
+
+  def test_escapes_username_before_creation
+    @importer.import
+    messages_queue.push(page.merge(username: 'escaped%40example.com').to_json)
+    @importer.import
+
+    assert_equal 'escaped@example.com', RawMessage.last.username
+  end
 end

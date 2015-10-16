@@ -28,6 +28,7 @@ module Analytics
 
       def process_one(json_msg)
         message = JSON.parse(json_msg)
+        message['username'] = CGI::unescape(message['username'])
         existing_message = get_existing_view_message(message)
 
         if existing_message

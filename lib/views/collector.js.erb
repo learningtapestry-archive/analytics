@@ -85,8 +85,8 @@
 
     // Starts a periodic timer that sends a view message
     window.ltG.fStartPageTimer = function() {
-      window.ltG.priv.timerStartDate = Date.now();
       if (!window.ltG.priv.intervalID) {
+        window.ltG.priv.timerStartDate = Date.now();
         window.ltG.priv.intervalID = window.setInterval(window.ltG.processVisit, window.ltG.trackingInterval * 1000);
       }
     };
@@ -229,20 +229,35 @@
     // ***********************
     // main event handler code
     // ***********************
-    window.ltG.priv.boot = function(){
+    window.ltG.priv.boot = function () {
       window.ltG.fSendClickMsg();
       window.ltG.fStartPageTimer();
       //start timer that we are on page
       //hook document focus/blur events to manage timer
-      lt$(function() {
-          lt$(window).focus(function() {
-            window.ltG.fStartPageTimer();
-          });
-          lt$(window).blur(function() {
+      lt$(function () {
+        // This event gets fired when the current tab changes, without taking into account whether the window has the
+        // focus or not
+        document.addEventListener('visibilitychange', window.ltG.priv.onVisibilityChange);
+
+        lt$(window).focus(function () {
+          window.ltG.fStartPageTimer();
+        });
+
+        lt$(window).blur(function () {
+          if (!document.hasFocus()) {
             window.ltG.fStopPageTimer();
-          });
+          }
+        });
       });
     }; // ltG.boot
+
+    window.ltG.priv.onVisibilityChange = function () {
+      if (document.hidden) {
+        window.ltG.fStopPageTimer();
+      } else {
+        window.ltG.fStartPageTimer();
+      }
+    };
 
     window.lt$( document ).ready(function() {
       window.ltG.priv.boot();

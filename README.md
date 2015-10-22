@@ -1,5 +1,7 @@
 ## Learning Tapestry - Analytics
 
+[ ![Codeship Status for learningtapestry/analytics](https://codeship.com/projects/82476b30-5a45-0133-8003-66c4f8afce75/status?branch=master)](https://codeship.com/projects/110333)
+
 ### Overview
 
 Ruby project with core Learning Tapestry infrastructure, both worker janitors

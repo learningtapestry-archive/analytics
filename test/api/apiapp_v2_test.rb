@@ -66,7 +66,7 @@ module Analytics
         assert_equal %i(site_name site_domain page_name page_url total_time), first_result[:page_visits].first.keys
       end
 
-      %w(sites pages users video_views).each do |path|
+      %w(sites pages users video-views).each do |path|
         define_method("test_#{path}_returns_unauthorized_when_no_api_key") do
           resp = auth_request("api/v2/#{path}", org_api_key: nil)
 
@@ -214,7 +214,7 @@ module Analytics
                                      date_started: 1.hour.ago.utc,
                                      date_ended: 30.minutes.ago.utc)
 
-        resp = auth_request('/api/v2/video_views', default_params)
+        resp = auth_request('/api/v2/video-views', default_params)
 
         assert_equal 200, last_response.status
         assert_equal 1, resp[:results].size
@@ -233,7 +233,7 @@ module Analytics
                                           date_ended: 30.minutes.ago.utc)
         params = default_params.merge(usernames: 'johndoe, fake_user')
 
-        resp = auth_request('/api/v2/video_views', params)
+        resp = auth_request('/api/v2/video-views', params)
 
         assert_equal 200, last_response.status
         assert_equal 1, resp[:results].size

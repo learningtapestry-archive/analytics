@@ -23,7 +23,7 @@ module Analytics
               sites: 'sites',
               pages: 'pages',
               users: 'users',
-              video_views: 'video_views',
+              video_views: 'video-views',
               page: ':page'
           }
 

@@ -27,13 +27,15 @@ class Visualization < ActiveRecord::Base
            'videos.url',
            'videos.publisher',
            'videos.video_length',
+           'users.username as username',
            'sum(time_viewed) as time_viewed')
-      .joins(:video)
-      .group( 'videos.title',
-             'videos.url',
-             'videos.publisher',
-             'videos.video_length')
-      .order('videos.url')
+        .joins(:user, :video)
+        .group('videos.title',
+               'videos.url',
+               'videos.publisher',
+               'videos.video_length',
+               'users.username')
+        .order('videos.url')
   }
 
   def update_stats(captured_at, state)

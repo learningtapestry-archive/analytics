@@ -1,6 +1,10 @@
 require 'test_helper'
 
 class VisualizationModelTest < LT::Test::DBTestBase
+  def setup
+    @joe_smith = User.create!(username: 'joesmith', password: 'pass', first_name: 'Joe', last_name: 'Smith')
+  end
+
   def test_update_stats_on_playing_fills_the_start_date
     visualization = Visualization.create(session_id: 'A' * 36)
 
@@ -44,15 +48,15 @@ class VisualizationModelTest < LT::Test::DBTestBase
   def test_summary_returns_visualizations_aggregated_by_video
     video = Video.create!(url: 'http://youtube.com?v=1')
 
-    video.visualizations.create!(session_id: 'A' * 36)
+    video.visualizations.create!(session_id: 'A' * 36, user: @joe_smith)
     assert_equal 1, Visualization.summary.length
 
-    video.visualizations.create!(session_id: 'A' * 36)
+    video.visualizations.create!(session_id: 'A' * 36, user: @joe_smith)
     assert_equal 1, Visualization.summary.length
 
     video2 = Video.create!(url: 'http://youtube.com?v=2')
 
-    video2.visualizations.create!(session_id: 'A' * 36)
+    video2.visualizations.create!(session_id: 'A' * 36, user: @joe_smith)
     assert_equal 2, Visualization.summary.length
   end
 
@@ -63,7 +67,7 @@ class VisualizationModelTest < LT::Test::DBTestBase
                    'video_length' => '00:00:37' }
 
     video = Video.create!(attributes)
-    video.visualizations.create!(session_id: 'A' * 36)
+    video.visualizations.create!(session_id: 'A' * 36, user: @joe_smith)
 
     res = Visualization.summary
 
@@ -72,7 +76,7 @@ class VisualizationModelTest < LT::Test::DBTestBase
 
   def test_summary_aggregates_total_viewed_time_by_video
     vid = Video.create!(url: 'http://youtube.com?v=1')
-    2.times { vid.visualizations.create!(session_id: 'A' * 36, time_viewed: 3) }
+    2.times { vid.visualizations.create!(session_id: 'A' * 36, user: @joe_smith, time_viewed: 3) }
 
     res = Visualization.summary
 

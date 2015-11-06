@@ -60,6 +60,12 @@ namespace :lt do
       require 'utils/csv_database_loader'
       Analytics::Utils::CsvDatabaseLoader.load_directory(args[:csvpath])
     end
+
+    desc 'Imports random data from some predefined Excel files in Open XML format'
+    task :import_random_data => :'lt:boot' do |t,args|
+      require 'utils/random_data_importer'
+      Analytics::Utils::RandomDataImporter.new.import!
+    end
   end
 end
 

@@ -33,6 +33,7 @@ group :dev_test do
   gem 'database_cleaner', '>= 1.3.0'
   gem 'poltergeist', '>= 1.5.1'
   gem 'byebug'
+  gem 'simple_xlsx_reader'
 end
 
 gem 'lt-core',

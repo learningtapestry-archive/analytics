@@ -74,9 +74,11 @@ function onPlayerStateChange(event) {
 function trackHTML5Videos() {
   var videos = document.getElementsByTagName("video");
   for (var i = 0; i < videos.length; i++) {
-    ['playing', 'pause', 'ended'].forEach(function (eventType) {
+    ['play', 'pause', 'ended'].forEach(function (eventType) {
       videos[i].addEventListener(eventType, function (e) {
-        sendMessage(e.type, e.target.currentSrc)
+        var state = e.type === 'play' ? 'playing' : e.type;
+        var url = e.target.currentSrc.match(/^https?/) ? e.target.currentSrc : e.target.baseURI;
+        sendMessage(state, url);
       }, true);
     });
   }

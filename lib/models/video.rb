@@ -16,13 +16,15 @@ class Video < ActiveRecord::Base
     return unless string
 
     uri = URI(string)
-    return unless uri.host.include?('youtube')
+    if uri.host.include?('youtube')
+      self.service_id = 'youtube'
+      uri.query.split('&').each do |param|
+        next unless param.split('=').size == 2 && param.split('=')[0] == 'v'
 
-    self.service_id = 'youtube'
-    uri.query.split('&').each do |param|
-      next unless param.split('=').size == 2 && param.split('=')[0] == 'v'
-
-      self.external_id = param.split('=')[1]
+        self.external_id = param.split('=')[1]
+      end
+    else
+      self.service_id = 'video-element'
     end
   end
 

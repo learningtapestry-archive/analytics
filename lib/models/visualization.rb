@@ -28,7 +28,8 @@ class Visualization < ActiveRecord::Base
            'videos.publisher',
            'videos.video_length',
            'users.username as username',
-           'sum(time_viewed) as time_viewed')
+           'sum(time_viewed) as time_viewed',
+           'min(visualizations.date_started) as date_started')
         .joins(:user, :video)
         .group('videos.title',
                'videos.url',

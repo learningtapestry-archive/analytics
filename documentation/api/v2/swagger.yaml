@@ -375,6 +375,8 @@ paths:
                       type: integer
                     time_viewed:
                       type: integer
+                    date_started:
+                      type: datetime
         401:
           description: Unknown organization API or secret key
           schema:

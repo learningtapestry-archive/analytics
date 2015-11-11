@@ -44,10 +44,12 @@ module Analytics
 
       def create_visualization
         start_date = random_start_date
+        end_date = random_end_date(start_date)
         create_video.visualizations.create!(user: create_user,
                                             session_id: SecureRandom.uuid,
                                             date_started: start_date,
-                                            date_ended: random_end_date(start_date))
+                                            date_ended: end_date,
+                                            time_viewed: Integer((end_date - start_date) * 1.day))
 
       end
 

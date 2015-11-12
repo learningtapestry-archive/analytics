@@ -53,7 +53,7 @@
   //this function should be called to initiate the async load/boot process for LT libraries
   lt.init = function(callback) {
     <%lt_api_libs.each do |lt_api_lib|%>
-      var scriptUrl = '<%=lt_api_server%>/api/v1/<%=lt_api_lib%>.js?username=<%=user_id%>&org_api_key=<%=org_api_key%>';
+      var scriptUrl = '<%=lt_api_server%>/api/v2/<%=lt_api_lib%>.js?username=<%=user_id%>&org_api_key=<%=org_api_key%>';
       <% if lt_api_lib == 'collector' %>
         scriptUrl += '&tracking_interval=<%=tracking_interval%>';
       <% end %>

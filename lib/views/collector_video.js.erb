@@ -10,6 +10,7 @@ firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
 // HTML5 video
 trackHTML5Videos();
+checkExistingYoutubeVideo();
 
 function guid() {
   function s4() {
@@ -31,7 +32,6 @@ function onYouTubeIframeAPIReady() {
           'onStateChange': onPlayerStateChange
         }
       });
-      console.log (player);
     }
   }
 }
@@ -74,13 +74,21 @@ function onPlayerStateChange(event) {
 function trackHTML5Videos() {
   var videos = document.getElementsByTagName("video");
   for (var i = 0; i < videos.length; i++) {
-    ['play', 'pause', 'ended'].forEach(function (eventType) {
+    ['playing', 'pause', 'ended'].forEach(function (eventType) {
       videos[i].addEventListener(eventType, function (e) {
-        var state = e.type === 'play' ? 'playing' : e.type;
         var url = e.target.currentSrc.match(/^https?/) ? e.target.currentSrc : e.target.baseURI;
-        sendMessage(state, url);
+        sendMessage(eventType, url);
       }, true);
     });
+  }
+}
+
+// This function is only useful when injecting the scripts via the chrome extension.
+// In this case, we can not control the order in which the tracking scripts are added and we might miss the initial
+// 'playing' event, so we make the chrome extension set a boolean flag to inform the video tracking script.
+function checkExistingYoutubeVideo() {
+  if (typeof LearnTap !== 'undefined' && LearnTap.videoIsPlaying) {
+    sendMessage('playing', LearnTap.videoUrl);
   }
 }
 

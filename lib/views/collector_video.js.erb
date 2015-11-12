@@ -87,8 +87,12 @@ function trackHTML5Videos() {
 // In this case, we can not control the order in which the tracking scripts are added and we might miss the initial
 // 'playing' event, so we make the chrome extension set a boolean flag to inform the video tracking script.
 function checkExistingYoutubeVideo() {
-  if (typeof LearnTap !== 'undefined' && LearnTap.videoIsPlaying) {
-    sendMessage('playing', LearnTap.videoUrl);
+  if (window.ltG === undefined) {
+    setTimeout(checkExistingYoutubeVideo, 250);
+  } else {
+    if (typeof LearnTap !== 'undefined' && LearnTap.videoIsPlaying) {
+      sendMessage('playing', LearnTap.videoUrl);
+    }
   }
 }
 

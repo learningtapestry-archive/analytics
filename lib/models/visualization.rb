@@ -17,7 +17,7 @@ class Visualization < ActiveRecord::Base
 
   scope :by_dates, -> (dates_begin, dates_end) {
     intervals = dates_begin.zip(dates_end).flatten
-    where((['(date_started >= ? AND date_ended <= ?)'] * dates_begin.size).join(' OR '), *intervals)
+    where((['(date_started >= ? AND (date_ended <= ? OR date_ended IS NULL))'] * dates_begin.size).join(' OR '), *intervals)
   }
 
   scope :by_usernames, -> (usernames) { where(user: User.where(username: usernames)) }

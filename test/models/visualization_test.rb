@@ -93,6 +93,13 @@ class VisualizationModelTest < LT::Test::DBTestBase
     assert_empty Visualization.by_dates([6.days.ago], [Time.now])
   end
 
+  def test_by_dates_considers_unset_end_dates
+    Visualization.create(session_id: 'A' * 36, date_started: 1.week.ago, date_ended: 1.week.ago)
+    Visualization.create(session_id: 'B' * 36, date_started: 10.days.ago, date_ended: nil)
+
+    assert_equal 2, Visualization.by_dates([10.days.ago.beginning_of_day], [Time.now]).count
+  end
+
   private
 
   def create_visualization_with_a_fragment_started

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150815) do
+ActiveRecord::Schema.define(version: 20151116) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -137,6 +137,12 @@ ActiveRecord::Schema.define(version: 20150815) do
     t.integer  "organization_id"
     t.string   "heartbeat_id"
   end
+
+  add_index "raw_messages", ["captured_at"], name: "index_raw_messages_on_captured_at", order: {"captured_at"=>:desc}, using: :btree
+  add_index "raw_messages", ["heartbeat_id"], name: "index_raw_messages_on_heartbeat_id", using: :btree
+  add_index "raw_messages", ["url"], name: "index_raw_messages_on_url", using: :btree
+  add_index "raw_messages", ["username"], name: "index_raw_messages_on_username", using: :btree
+  add_index "raw_messages", ["verb"], name: "index_raw_messages_on_verb", using: :btree
 
   create_table "schools", force: :cascade do |t|
     t.string   "state_id"

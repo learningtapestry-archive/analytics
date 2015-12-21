@@ -43,7 +43,7 @@ namespace :lt do
     task fill_video_youtube_information: :'lt:boot' do
       require 'janitors/video_metadata_extractor'
 
-      config = LT.env.load_optional_config('youtube.yml')
+      config = LT.env.load_file_config('youtube.yml')
       Analytics::Janitors::VideoMetadataExtractor.new(LT.env.logger, 2000, config).extract
     end
   end

@@ -18,7 +18,6 @@ run from cron jobs.
 operations
 * zz-archives - Projects used to prototype, no longer in active use
 
-### Copyright
+##LICENSING
 
-(c) 2014 - Learning Tapestry is a proprietary project and jointly owned by
-Hoekstra/Midgley
+Analytics Engine is licensed under the Apache License, Version 2.0 by Learning Tapestry, Inc. See LICENSE.md for full license text and rights.

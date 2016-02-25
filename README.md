@@ -18,6 +18,6 @@ run from cron jobs.
 operations
 * zz-archives - Projects used to prototype, no longer in active use
 
-##LICENSING
+### Licensing
 
 Analytics Engine is licensed under the Apache License, Version 2.0 by Learning Tapestry, Inc. See LICENSE.md for full license text and rights.

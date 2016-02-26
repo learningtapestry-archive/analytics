@@ -1,6 +1,6 @@
 # Apache 2 License
 
-Copyright (c) 2012 Learning Tapestry, Inc.
+Copyright (c) 2016 Learning Tapestry, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

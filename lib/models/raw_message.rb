@@ -73,7 +73,7 @@ class RawMessage < ActiveRecord::Base
                              date_visited: captured_at,
                              user: linked_user)
 
-    update(processed_at: Time.now)
+    update!(processed_at: Time.now)
   end
 
   private

@@ -91,11 +91,13 @@ module Analytics
         collector_test_url = "/assets/tests/js-collector-test.html"+
           "?username=#{joe_smith_username}"+
           "&org_api_key=#{acme_org_api_key}"+
-          "&hostname=#{@lt_host}:#{@port}"
+          "&hostname=#{@lt_host}:#{@port}"+
+          "&tracking_interval=1"
 
         html = nil
         set_server(@partner_host) do
           visit(collector_test_url)
+          sleep 1
           html = wait_for_qunit(page)
         end
 
@@ -104,7 +106,7 @@ module Analytics
 
         # show that an initial "on page load" click message has been sent
         message = JSON.parse(messages_queue.pop)
-        assert_equal 'clicked', message["verb"]
+        assert_equal 'viewed', message["verb"]
       end # test_js_collector_qunit
 
       def test_js_display_via_qunit
@@ -215,26 +217,30 @@ module Analytics
         collector_test_url = "/assets/tests/js-collector-test.html"+
          "?username=#{joe_smith_username}"+
          "&org_api_key=#{acme_org_api_key}"+
-         "&hostname=#{@lt_host}:#{@port}"
+         "&hostname=#{@lt_host}:#{@port}"+
+         "&tracking_interval=1"
 
         assert_nil messages_queue.pop
         set_server(@partner_host) do
           visit(collector_test_url)
+          sleep 1
           html = wait_for_qunit(page)
         end
         message = JSON.parse(messages_queue.pop.force_encoding('UTF-8'))
-        assert_equal 'clicked', message["verb"]
+        assert_equal 'viewed', message["verb"]
 
         # we visit a new url in the same browser window, which kicks off
         # a js unload event
         set_server(@partner_host) do
           visit(collector_test_url)
+          messages_queue.clear
+          sleep 1
           html = wait_for_qunit(page)
         end
 
-        # next message on the stack will be a "click" from arrival onto the most recent page
+        # next message on the stack will be a "viewed" from arrival onto the most recent page
         message = JSON.parse(messages_queue.pop.force_encoding('UTF-8'))
-        assert_equal 'clicked', message["verb"]
+        assert_equal 'viewed', message["verb"]
       end
 
       def test_page_visit_tracking

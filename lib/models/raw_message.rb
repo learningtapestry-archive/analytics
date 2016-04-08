@@ -16,14 +16,23 @@ class RawMessage < ActiveRecord::Base
   # Video visits yet to be processed into VideoVisit objects
   #
   def self.video_msgs(limit)
-    video_action.unprocessed(limit)
+    video_action.processable.unprocessed(limit)
   end
 
   #
   # Page visits yet to be processed into Visit objects
   #
   def self.page_msgs(limit)
-    viewed.unprocessed(limit)
+    viewed.processable.unprocessed(limit)
+  end
+
+  #
+  # Filters processable raw_messages
+  #
+  # Messages that result in processing errors are marked as unprocessable
+  #
+  def self.processable
+    where(processable: nil)
   end
 
   #
@@ -44,17 +53,19 @@ class RawMessage < ActiveRecord::Base
   # @return true/false whether raw_message was/wasn't correctly processed
   #
   def process_as_video
-    video = Video.find_or_create_by!(url: video_id)
+    mark_processable do
+      video = Video.find_or_create_by!(url: video_id)
 
-    visualization =
-      video.visualizations.find_or_create_by!(session_id: session_id).tap do |v|
-      v.page = linked_page
-      v.user = linked_user
+      visualization =
+        video.visualizations.find_or_create_by!(session_id: session_id).tap do |v|
+        v.page = linked_page
+        v.user = linked_user
+      end
+
+      visualization.update_stats(captured_at, action['state'])
+
+      update!(processed_at: Time.now)
     end
-
-    visualization.update_stats(captured_at, action['state'])
-
-    update!(processed_at: Time.now)
   end
 
   #
@@ -64,16 +75,27 @@ class RawMessage < ActiveRecord::Base
   # @return true/false whether raw_message was/wasn't correctly processed
   #
   def process_as_page
-    page = Page.find_or_create_by!(url: url) do |page|
-      page.display_name = page_title
+    mark_processable do
+      page = Page.find_or_create_by!(url: url) do |page|
+        page.display_name = page_title
+      end
+
+      visit = page.visits.find_or_initialize_by(heartbeat_id: heartbeat_id)
+      visit.update_attributes!(time_active: time,
+                               date_visited: captured_at,
+                               user: linked_user)
+
+      update!(processed_at: Time.now)
     end
+  end
 
-    visit = page.visits.find_or_initialize_by(heartbeat_id: heartbeat_id)
-    visit.update_attributes!(time_active: time,
-                             date_visited: captured_at,
-                             user: linked_user)
+  protected
 
-    update!(processed_at: Time.now)
+  def mark_processable
+    yield
+  rescue => e
+    update!(processable: false)
+    raise e
   end
 
   private

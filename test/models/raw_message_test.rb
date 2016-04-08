@@ -18,12 +18,6 @@ class RawMessageModelTest < LT::Test::DBTestBase
     assert_equal [unprocessed_msg], RawMessage.unprocessed(100)
   end
 
-  def test_unprocessed_returns_oldest_messages_first
-    first_msg, last_msg = RawMessage.create!(old), RawMessage.create!(recent)
-
-    assert_equal [first_msg, last_msg], RawMessage.unprocessed(100)
-  end
-
   def test_unprocessed_can_return_a_specific_number_of_messages
     2.times { RawMessage.create!(unprocessed) }
 

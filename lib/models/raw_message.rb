@@ -39,7 +39,7 @@ class RawMessage < ActiveRecord::Base
   # Filters unprocessed raw_messages
   #
   def self.unprocessed(limit)
-    where(processed_at: nil).order(:captured_at).limit(limit)
+    where(processed_at: nil).limit(limit)
   end
 
   # Finds the most recent 'viewed' message belonging to a visit

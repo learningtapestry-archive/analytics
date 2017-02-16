@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2016040802) do
+ActiveRecord::Schema.define(version: 2017011604) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -217,6 +217,7 @@ ActiveRecord::Schema.define(version: 2016040802) do
   end
 
   add_index "users", ["username", "organization_id"], name: "index_users_on_username_and_organization_id", unique: true, using: :btree
+  add_index "users", ["username"], name: "idx_users_username_any", using: :btree
   add_index "users", ["username"], name: "index_users_on_username", unique: true, where: "(organization_id IS NULL)", using: :btree
 
   create_table "videos", force: :cascade do |t|
@@ -249,7 +250,10 @@ ActiveRecord::Schema.define(version: 2016040802) do
     t.string   "heartbeat_id"
   end
 
+  add_index "visits", ["date_visited"], name: "index_visits_on_date_visited", using: :btree
   add_index "visits", ["page_id", "heartbeat_id"], name: "index_visits_on_page_id_and_heartbeat_id", unique: true, using: :btree
+  add_index "visits", ["page_id"], name: "index_visits_on_page_id", using: :btree
+  add_index "visits", ["user_id"], name: "index_visits_on_user_id", using: :btree
 
   create_table "visualizations", force: :cascade do |t|
     t.datetime "date_started"

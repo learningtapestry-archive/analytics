@@ -5,6 +5,7 @@ gem 'rake'
 # Core gems
 gem 'activerecord', '~> 4.2.1'
 gem 'activesupport', '~> 4.2.1'
+gem 'lt-core', git: 'https://github.com/learningtapestry/core', ref: 'a8431f1'
 gem 'sinatra', '~> 1.4.5'
 
 # Additional gems
@@ -35,9 +36,4 @@ group :dev_test do
   gem 'byebug'
   gem 'simple_xlsx_reader'
 end
-
-gem 'lt-core',
-    git: 'https://792de6a69ea9f5e82e17ca9d46d920b19462cfe4@github.com/learningtapestry/core',
-    # :path => "~/dev/core"
-    ref: 'c2d530b'
 

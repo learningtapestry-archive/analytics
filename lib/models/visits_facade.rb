@@ -11,7 +11,11 @@ class VisitsFacade
   end
 
   def results
-    {entity: params[:entity], date_range: date_range, results: structured_visits}
+    {
+      entity: params[:entity],
+      date_range: date_range,
+      results: structured_visits
+    }
   end
 
   private
@@ -21,8 +25,11 @@ class VisitsFacade
   end
 
   def structured_visits
-    retrieve_visits.group_by(&:username).map do |username, visits|
-      {username: username, "#{params[:entity]}" => visit_attributes(visits)}
+    retrieve_visits.group_by{ |user_visit| user_visit['username'] }.map do |username, visits|
+      {
+        username: username,
+        "#{params[:entity]}" => visit_attributes(visits)
+      }
     end
   end
 
@@ -30,7 +37,9 @@ class VisitsFacade
     visits = Visit.by_dates(*(date_range.values)).by_usernames(params[:usernames])
     visits = filter_by_urls(visits)
     visits = detailed_view? ? visits.detail(params[:entity]) : visits.summary(params[:entity])
-    org.users.joins(:visits).merge(visits)
+    visits = org.users.joins(:visits).merge(visits)
+
+    ActiveRecord::Base.connection.select_all(visits.to_sql)
   end
 
   def filter_by_urls(visits)
@@ -41,7 +50,7 @@ class VisitsFacade
   end
 
   def visit_attributes(visits)
-    visits.map { |v| v.attributes.symbolize_keys.except(:id, :username) }
+    visits.map { |v| v.except('username') }
   end
 
   def detailed_view?

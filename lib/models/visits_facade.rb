@@ -50,7 +50,12 @@ class VisitsFacade
   end
 
   def visit_attributes(visits)
-    visits.map { |v| v.except('username') }
+    visits.map do |v|
+      v['date_visited'] = DateTime.parse(v['date_visited']) if v.has_key?('date_visited')
+      v['date_left'] = DateTime.parse(v['date_left']) if v.has_key?('date_left')
+      v.delete('username')
+      v
+    end
   end
 
   def detailed_view?

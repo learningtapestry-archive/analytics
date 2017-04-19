@@ -53,6 +53,7 @@ class VisitsFacade
     visits.map do |v|
       v['date_visited'] = DateTime.parse(v['date_visited']) if v.has_key?('date_visited')
       v['date_left'] = DateTime.parse(v['date_left']) if v.has_key?('date_left')
+      v['total_time'] = v['total_time'].to_i if v.has_key?('total_time')
       v.delete('username')
       v
     end

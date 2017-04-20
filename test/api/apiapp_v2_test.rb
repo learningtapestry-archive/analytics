@@ -244,21 +244,18 @@ module Analytics
 
       def test_pages_heavy_load
         create_org_and_user
-        puts Time.now
         create_visits_for_load_test
-        puts Time.now
 
         params = default_params.merge(
           type: 'detail',
           usernames: @org.users.pluck(:username).join(',')
         )
         started_at = Time.now
-        puts started_at
-        resp = auth_request("/api/v2/pages", params)
+        auth_request("/api/v2/pages", params)
         finished_at = Time.now
-        puts finished_at
+        time_taken = finished_at - started_at
 
-        assert (finished_at - started_at) < 6, 'too slow'
+        assert time_taken < 7, "too slow #{time_taken}s > 7s"
       end
 
       private

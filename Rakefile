@@ -1,6 +1,7 @@
 $LOAD_PATH << File.expand_path('../lib', __FILE__)
 
 require 'lt/tasks'
+Dir["./lib/tasks/*.rake"].each {|file| import file }
 
 namespace :lt do
   task :deploy do

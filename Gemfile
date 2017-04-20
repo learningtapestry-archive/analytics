@@ -15,6 +15,7 @@ gem 'htmlentities', '>= 4.3.2'
 gem 'nokogiri', '>= 1.6.3.1'
 gem 'redis', '>= 3.1.0'
 gem 'bcrypt', '>= 3.1.7'
+gem 'oj'
 
 gem 'chronic', '>= 0.10.2'
 gem 'chronic_duration', '>= 0.10.6'

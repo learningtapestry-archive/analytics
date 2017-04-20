@@ -1,3 +1,5 @@
+require 'oj'
+
 module Analytics
   module Routes
     module Api
@@ -111,7 +113,7 @@ module Analytics
             params[:entity] = 'page_visits'
             results = VisitsFacade.new(@org, parse_visit_params(params)).results
 
-            [200, results.to_json]
+            [200, Oj.dump(results, mode: :compat, time_format: :ruby)]
           end
 
           get vroute(:video_views) do

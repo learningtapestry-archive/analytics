@@ -35,5 +35,6 @@ group :dev_test do
   gem 'poltergeist', '>= 1.5.1'
   gem 'byebug'
   gem 'simple_xlsx_reader'
+  gem 'ffaker'
 end
 

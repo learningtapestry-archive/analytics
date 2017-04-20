@@ -1,4 +1,6 @@
 require 'test_helper'
+require 'ffaker'
+require 'byebug'
 
 module Analytics
   module Test
@@ -240,6 +242,25 @@ module Analytics
         assert_equal 'http://youtube.com?v=2', resp[:results].first[:url]
       end
 
+      def test_pages_heavy_load
+        create_org_and_user
+        puts Time.now
+        create_visits_for_load_test
+        puts Time.now
+
+        params = default_params.merge(
+          type: 'detail',
+          usernames: @org.users.pluck(:username).join(',')
+        )
+        started_at = Time.now
+        puts started_at
+        resp = auth_request("/api/v2/pages", params)
+        finished_at = Time.now
+        puts finished_at
+
+        assert (finished_at - started_at) < 6, 'too slow'
+      end
+
       private
 
       def create_org_and_user
@@ -258,6 +279,21 @@ module Analytics
         @user.visits.create!(page: Page.create!(url: 'http://example.com'), date_visited: 3.hours.ago.utc)
         @user.visits.create!(page: Page.create!(url: 'http://example.org'), date_visited: 3.hours.ago.utc)
         @user.visits.create!(page: Page.create!(url: 'http://example.net'), date_visited: 3.hours.ago.utc)
+      end
+
+      def create_visits_for_load_test
+        connection = ActiveRecord::Base.connection
+        time_active = 10
+        date_visited = 3.hours.ago.utc
+        site_id = Site.create!(url: 'http://example.com').id
+        5.times do
+          user_id = connection.insert_sql("INSERT INTO users (username, organization_id) VALUES('#{FFaker::Internet.user_name}', #{@org.id})")
+          10000.times do
+            url = "http://example.com/#{FFaker::Lorem.word}#{rand}.html"
+            page_id = connection.insert_sql("INSERT INTO pages (site_id, url) VALUES(#{site_id}, '#{url}')")
+            connection.insert_sql("INSERT INTO visits (user_id, page_id, time_active, date_visited, heartbeat_id) VALUES(#{user_id}, #{page_id}, #{time_active}, '#{date_visited}', '#{SecureRandom.hex(36)}')")
+          end
+        end
       end
 
       def default_params

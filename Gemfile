@@ -34,7 +34,7 @@ group :dev_test do
   gem 'minitest', '~> 5.7'
   gem 'database_cleaner', '>= 1.3.0'
   gem 'poltergeist', '>= 1.5.1'
-  gem 'byebug'
+  gem 'byebug', '~> 9.0', '>= 9.0.6'
   gem 'simple_xlsx_reader'
   gem 'ffaker'
 end

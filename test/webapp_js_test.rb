@@ -39,7 +39,6 @@ module Analytics
       end
 
       def test_js_loader_collector_via_qunit
-        skip "skipping tests with live network connections until we can recreate the test logic"
         # set up data to make collector test work
         joe_smith_username = CGI::escape(@joe_smith[:username])
         acme_org_api_key = CGI::escape(@acme_org[:org_api_key])
@@ -75,7 +74,6 @@ module Analytics
       # It will also save a screenshot of the failing qUnit test results page (to LT::tmp_dir)
       # It will try to open that screenshot in chrome
       def test_js_collector_via_qunit
-        skip "skipping tests with live network connections until we can recreate the test logic"
         # set up data to make collector test work
         joe_smith_username= CGI::escape(@joe_smith[:username])
         acme_org_api_key = CGI::escape(@acme_org[:org_api_key])
@@ -112,7 +110,6 @@ module Analytics
       end # test_js_collector_qunit
 
       def test_js_display_via_qunit
-        skip "skipping tests with live network connections until we can recreate the test logic"
         # set up data to make collector test work
         joe_smith_username=CGI::escape(@joe_smith[:username])
         acme_org_api_key = CGI::escape(@acme_org[:org_api_key])
@@ -142,7 +139,6 @@ module Analytics
 
       # collector.js unit and functional tests
       def test_js_collector_directly
-        skip "skipping tests with live network connections until we can recreate the test logic"
         joe_smith_username=CGI::escape(@joe_smith[:username])
         acme_org_api_key = CGI::escape(@acme_org[:org_api_key])
         collector_test_url = "/assets/tests/js-collector-test.html"+
@@ -216,7 +212,6 @@ module Analytics
       end
 
       def test_window_close_events
-        skip "skipping tests with live network connections until we can recreate the test logic"
         joe_smith_username=CGI::escape(@joe_smith[:username])
         acme_org_api_key = CGI::escape(@acme_org[:org_api_key])
         collector_test_url = "/assets/tests/js-collector-test.html"+
@@ -249,7 +244,6 @@ module Analytics
       end
 
       def test_page_visit_tracking
-        skip "skipping tests with live network connections until we can recreate the test logic"
         joe_smith_username=CGI::escape(@joe_smith[:username])
         acme_org_api_key = CGI::escape(@acme_org[:org_api_key])
         collector_test_url = "/assets/tests/js-collector-test.html"+

@@ -1,0 +1,6 @@
+last_thing:
+  - command: chmod g+w $STACK_BASE/shared/log/*.log
+    target: sinatra
+    run_on: all_servers
+    execute: true
+    sudo: true

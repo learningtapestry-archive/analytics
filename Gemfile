@@ -5,7 +5,7 @@ gem 'rake'
 # Core gems
 gem 'activerecord', '~> 4.2.1'
 gem 'activesupport', '~> 4.2.1'
-gem 'lt-core', git: 'https://github.com/learningtapestry/core', ref: 'a8431f1'
+gem 'lt-core', git: 'https://github.com/learningtapestry/core', ref: '72a5e74'
 gem 'sinatra', '~> 1.4.5'
 
 # Additional gems

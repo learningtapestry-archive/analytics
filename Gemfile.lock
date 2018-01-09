@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/learningtapestry/core
-  revision: a8431f1fc3a5f4d5229593f14ad5fff40a9c6d1a
-  ref: a8431f1
+  revision: 72a5e746bf4f95d549fc90886ed03709c8e85ba7
+  ref: 72a5e74
   specs:
     lt-core (0.1.0)
       actionpack (~> 4.2.0)
@@ -58,10 +58,10 @@ GEM
       minitest (~> 5.1)
       thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
-    addressable (2.5.0)
-      public_suffix (~> 2.0, >= 2.0.2)
+    addressable (2.5.2)
+      public_suffix (>= 2.0.2, < 4.0)
     arel (6.0.0)
-    backports (3.6.8)
+    backports (3.11.0)
     bcrypt (3.1.10)
     builder (3.2.2)
     byebug (4.0.3)
@@ -72,29 +72,31 @@ GEM
       rack (>= 1.0.0)
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
-    childprocess (0.6.1)
+    childprocess (0.8.0)
       ffi (~> 1.0, >= 1.0.11)
     chronic (0.10.2)
     chronic_duration (0.10.6)
       numerizer (~> 0.1.1)
     cliver (0.3.2)
     columnize (0.9.0)
+    crass (1.0.3)
     daemons (1.2.3)
     database_cleaner (1.4.1)
-    dotenv (2.2.0)
-    edge (0.5.0)
+    dotenv (2.2.1)
+    edge (0.5.1)
       activerecord (>= 4.1.0)
     erubis (2.7.0)
     eventmachine (1.0.7)
     ffaker (2.5.0)
-    ffi (1.9.17)
+    ffi (1.9.18)
     htmlentities (4.3.3)
     i18n (0.7.0)
     json (1.8.3)
     launchy (2.4.3)
       addressable (~> 2.3)
     log4r (1.1.10)
-    loofah (2.0.3)
+    loofah (2.1.1)
+      crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mime-types (2.6.1)
     mini_portile (0.6.2)
@@ -111,7 +113,7 @@ GEM
       cliver (~> 0.3.1)
       multi_json (~> 1.0)
       websocket-driver (>= 0.2.0)
-    public_suffix (2.0.5)
+    public_suffix (3.0.1)
     rack (1.6.4)
     rack-protection (1.5.3)
       rack
@@ -119,8 +121,8 @@ GEM
       rack (>= 1.0)
     rails-deprecated_sanitizer (1.0.3)
       activesupport (>= 4.2.0.alpha)
-    rails-dom-testing (1.0.8)
-      activesupport (>= 4.2.0.beta, < 5.0)
+    rails-dom-testing (1.0.9)
+      activesupport (>= 4.2.0, < 5.0)
       nokogiri (~> 1.6)
       rails-deprecated_sanitizer (>= 1.0.1)
     rails-html-sanitizer (1.0.3)
@@ -128,10 +130,9 @@ GEM
     rake (10.4.2)
     redis (3.2.1)
     rubyzip (1.1.7)
-    selenium-webdriver (3.2.0)
+    selenium-webdriver (3.8.0)
       childprocess (~> 0.5)
       rubyzip (~> 1.0)
-      websocket (~> 1.0)
     simple_xlsx_reader (1.0.2)
       nokogiri
       rubyzip
@@ -165,7 +166,6 @@ GEM
       thread_safe (~> 0.1)
     warden (1.2.7)
       rack (>= 1.0)
-    websocket (1.2.4)
     websocket-driver (0.5.4)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.2)
@@ -204,4 +204,4 @@ DEPENDENCIES
   whenever
 
 BUNDLED WITH
-   1.14.4
+   1.16.1

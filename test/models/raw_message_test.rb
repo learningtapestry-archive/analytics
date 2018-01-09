@@ -98,7 +98,7 @@ class RawMessageProcessAsPageTest < RawMessageProcessorTest
   def assert_imported(page)
     assert_equal 1, Page.count
     assert_equal raw_msg.url, page.url
-    assert_equal raw_msg.page_title, page.display_name
+    assert_nil raw_msg.page_title
   end
 end
 

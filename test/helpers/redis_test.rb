@@ -36,7 +36,7 @@ module Analytics
       end
 
       def test_set
-        assert_equal nil, connection.hget('a_hash', 'my_key')
+        assert_nil connection.hget('a_hash', 'my_key')
         @hash_wrapper.set('my_key', '5')
         assert_equal '5', connection.hget('a_hash', 'my_key')
 

@@ -47,7 +47,7 @@ class OrganizationTest < LT::Test::DBTestBase
     # show that the org_api_key queue didn't get longer
     # and doesn't have our new BS key in it
     assert_equal 1, org_keys_hash.length
-    assert_equal nil, org_keys_hash.get("foobar")
+    assert_nil org_keys_hash.get("foobar")
   end
 
   def test_locked_account

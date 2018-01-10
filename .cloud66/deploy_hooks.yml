@@ -1,4 +1,4 @@
-last_thing:
+first_thing:
   - command: chmod g+w $STACK_BASE/shared/log/*.log
     target: sinatra
     run_on: all_servers

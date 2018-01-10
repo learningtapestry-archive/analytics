@@ -9,5 +9,8 @@ module Analytics
     register Helpers::AuthenticationDSL
     register Routes::Api::V1
     register Routes::Api::V2
+
+    get '/' do
+    end
   end
 end

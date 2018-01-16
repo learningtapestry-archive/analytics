@@ -102,6 +102,12 @@
       window.ltG.priv.fUpdateCurrentVisitTime();
       window.ltG.fSendPageViewMsg();
       window.ltG.priv.timerStartDate = Date.now();
+
+      if(typeof window.callPhantom === 'function') {
+        window.callPhantom({
+          visitMessageSent: true
+        });
+      }
     };
 
     // ### private/utility functions ###

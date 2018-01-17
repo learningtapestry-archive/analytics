@@ -17,7 +17,8 @@
       LT_API_KEY = '00000000-0000-4000-8000-000000000000';
 
       var ltUserName = 'joesmith';
-      var ltAnaliticsUrl = LT_URL + "/api/v1/loader.js?username=" + ltUserName + "&org_api_key=" + LT_API_KEY + "&load=collector&autostart=true";
+      var ltAnaliticsUrl = LT_URL + "/api/v1/loader.js?username=" + ltUserName + "&org_api_key=" + LT_API_KEY + "&load=collector&autostart=true" + "&tracking_interval=1";
+
       $('body').append('<script src="' + ltAnaliticsUrl + '">');
     </script>
   </body>

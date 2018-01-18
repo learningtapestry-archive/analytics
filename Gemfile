@@ -7,7 +7,7 @@ gem 'rake'
 # Core gems
 gem 'activerecord', '>= 4.2.10'
 gem 'activesupport', '>= 4.2.10'
-gem 'lt-core', git: 'https://github.com/learningtapestry/core', branch: 'jw/gem_security_updates'
+gem 'lt-core', git: 'https://github.com/learningtapestry/core', branch: 'profiling'
 gem 'sinatra', '~> 1.4.5'
 
 # Additional gems

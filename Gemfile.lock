@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/learningtapestry/core
-  revision: ff28f37cd14e23accb256aca128962869811baf9
-  branch: jw/gem_security_updates
+  revision: fbe5698bf677e94b09343398bbc5be72f22e758a
+  branch: profiling
   specs:
     lt-core (0.1.0)
       actionpack (~> 4.2.10)
@@ -17,6 +17,7 @@ GIT
       minitest-profile
       nokogiri (~> 1.8.1)
       poltergeist (>= 1.5.1)
+      rack-mini-profiler
       rack-test (~> 0.6.3)
       redis (>= 3.2.0)
       selenium-webdriver (>= 2.43.0)
@@ -102,7 +103,7 @@ GEM
     mini_portile2 (2.3.0)
     minitest (5.11.1)
     minitest-profile (0.0.2)
-    multi_json (1.13.0)
+    multi_json (1.13.1)
     nokogiri (1.8.1)
       mini_portile2 (~> 2.3.0)
     numerizer (0.1.1)
@@ -114,6 +115,8 @@ GEM
       websocket-driver (>= 0.2.0)
     public_suffix (3.0.1)
     rack (1.6.8)
+    rack-mini-profiler (0.10.7)
+      rack (>= 1.2.0)
     rack-protection (1.5.3)
       rack
     rack-test (0.6.3)

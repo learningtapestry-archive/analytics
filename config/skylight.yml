@@ -1,3 +1,2 @@
 authentication: szHPjbJhgAT6MTLaKlE3lDc0W204-jVVTRzQlPlMERI
-daemon.pidfile_path: <%= LT.environment.tmp_path %>
 daemon.sockdir_path: <%= LT.environment.tmp_path %>

@@ -1,7 +1,7 @@
 require 'lt/webapp'
 
 require "skylight/sinatra"
-Skylight.start!
+Skylight.start!('config/skylight.yml')
 
 module Analytics
   class WebApp < LT::WebApp::Base

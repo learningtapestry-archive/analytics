@@ -26,6 +26,8 @@ gem 'whenever', require: false
 # Allows printing with colors to terminal
 gem 'term-ansicolor', '>= 1.3.0'
 
+gem 'skylight'
+
 # TODO: Enable in order to fix #165
 # gem 'public_suffix'
 

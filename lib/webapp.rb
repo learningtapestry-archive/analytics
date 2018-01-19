@@ -1,5 +1,8 @@
 require 'lt/webapp'
 
+require "skylight/sinatra"
+Skylight.start!
+
 module Analytics
   class WebApp < LT::WebApp::Base
     helpers Helpers::Redis

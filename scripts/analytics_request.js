@@ -9,13 +9,18 @@ function uuidv4() {
 
 var requestUuid = uuidv4();
 
+var startTime = Date.now();
+var requestCompleteTime;
+
 page.onConsoleMessage = function(msg) {
   console.log('[' + requestUuid + ', ' + Date.now() + ']: ' + 'console: ' + msg);
 };
 
 page.onCallback = function(message) {
   if(message.visitMessageSent) {
-    console.log('[' + requestUuid + ', ' + Date.now() + ']: ' + 'visit sent to analytics server, exiting');
+    console.log('[' + requestUuid + ', ' + Date.now() + ']: ' +
+      'visit sent to analytics server, exiting' +
+      ' (duration: ' + (Date.now() - requestCompleteTime) + ')');
 
     phantom.exit();
   }
@@ -29,10 +34,11 @@ page.onError = function(msg, trace) {
   });
 };
 
-var startTime = Date.now();
-
 console.log('[' + requestUuid + ', ' + Date.now() + ']: ' + 'start');
 
-page.open('http://localhost:8080/partner-sites/content-site/index.html', function(status) {
-  console.log('[' + requestUuid + ', ' + Date.now() + ']: ' + 'request status: ' + status);
+page.open('http://cobra.analytics.qa.c66.me/partner-sites/content-site/index.html', function(status) {
+  console.log('[' + requestUuid + ', ' + Date.now() + ']: ' + 'request status: ' + status +
+    ' (duration: ' + (Date.now() - startTime) + ')');
+
+  requestCompleteTime = Date.now();
 });

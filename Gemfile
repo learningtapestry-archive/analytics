@@ -7,7 +7,7 @@ gem 'rake'
 # Core gems
 gem 'activerecord', '>= 4.2.10'
 gem 'activesupport', '>= 4.2.10'
-gem 'lt-core', git: 'https://github.com/learningtapestry/core', branch: 'profiling'
+gem 'lt-core', git: 'https://github.com/learningtapestry/core', branch: 'master'
 gem 'sinatra', '~> 1.4.5'
 
 # Additional gems
@@ -21,7 +21,6 @@ gem 'oj'
 
 gem 'chronic', '>= 0.10.2'
 gem 'chronic_duration', '>= 0.10.6'
-gem 'whenever', require: false
 
 # Allows printing with colors to terminal
 gem 'term-ansicolor', '>= 1.3.0'

@@ -4,11 +4,6 @@ require 'lt/tasks'
 Dir["./lib/tasks/*.rake"].each {|file| import file }
 
 namespace :lt do
-  task :deploy do
-    require 'whenever'
-    Whenever::CommandLine.execute(update: true)
-  end
-
   namespace :janitors do
     desc 'Process page visits workload from Redis to data tables'
     task process_redis_page_messages: [:import_raw_messages, :extract_page_visits] do

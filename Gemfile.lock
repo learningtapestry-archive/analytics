@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/learningtapestry/core
-  revision: d61757c82c8a1cea6a5b774750062be25c67ac79
-  branch: profiling
+  revision: ca06aacc08ede235b720d6b8bed8c8875dcaee66
+  branch: master
   specs:
     lt-core (0.1.0)
       actionpack (~> 4.2.10)

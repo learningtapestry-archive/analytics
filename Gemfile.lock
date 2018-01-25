@@ -77,6 +77,7 @@ GEM
       numerizer (~> 0.1.1)
     cliver (0.3.2)
     concurrent-ruby (1.0.5)
+    connection_pool (2.2.1)
     crass (1.0.3)
     daemons (1.2.6)
     database_cleaner (1.6.2)
@@ -132,6 +133,11 @@ GEM
     selenium-webdriver (3.8.0)
       childprocess (~> 0.5)
       rubyzip (~> 1.0)
+    sidekiq (5.0.5)
+      concurrent-ruby (~> 1.0)
+      connection_pool (~> 2.2, >= 2.2.0)
+      rack-protection (>= 1.5.0)
+      redis (>= 3.3.4, < 5)
     simple_xlsx_reader (1.0.2)
       nokogiri
       rubyzip
@@ -196,6 +202,7 @@ DEPENDENCIES
   poltergeist (>= 1.17.0)
   rake
   redis (>= 3.1.0)
+  sidekiq
   simple_xlsx_reader
   sinatra (~> 1.4.5)
   skylight

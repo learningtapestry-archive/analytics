@@ -26,6 +26,7 @@ gem 'chronic_duration', '>= 0.10.6'
 gem 'term-ansicolor', '>= 1.3.0'
 
 gem 'skylight'
+gem 'sidekiq'
 
 # TODO: Enable in order to fix #165
 # gem 'public_suffix'

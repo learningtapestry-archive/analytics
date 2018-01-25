@@ -19,10 +19,8 @@ page.onConsoleMessage = function(msg) {
 page.onCallback = function(message) {
   if(message.visitMessageSent) {
     console.log('[' + requestUuid + ', ' + Date.now() + ']: ' +
-      'visit sent to analytics server, exiting' +
+      'visit sent to analytics server' +
       ' (duration: ' + (Date.now() - requestCompleteTime) + ')');
-
-    phantom.exit();
   }
 };
 

@@ -1,4 +1,5 @@
 require 'sidekiq'
+require 'sidekiq-cron'
 
 class RawMessageImporter
   include Sidekiq::Worker
@@ -23,3 +24,7 @@ class VideoViewExtractor
     `bundle exec rake lt:janitors:extract_video_views`
   end
 end
+
+Sidekiq::Cron::Job.create(name: 'Raw Message Importer', cron: '*/5 * * * *', class: 'RawMessageImporter')
+Sidekiq::Cron::Job.create(name: 'Page Visit Extractor', cron: '*/5 * * * *', class: 'PageVisitExtractor')
+Sidekiq::Cron::Job.create(name: 'Video View Extractor', cron: '*/5 * * * *', class: 'VideoViewExtractor')

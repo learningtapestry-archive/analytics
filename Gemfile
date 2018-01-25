@@ -27,6 +27,7 @@ gem 'term-ansicolor', '>= 1.3.0'
 
 gem 'skylight'
 gem 'sidekiq'
+gem 'sidekiq-cron'
 
 # TODO: Enable in order to fix #165
 # gem 'public_suffix'

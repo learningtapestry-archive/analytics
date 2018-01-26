@@ -19,20 +19,20 @@ namespace :lt do
     task import_raw_messages: :'lt:boot' do
       require 'janitors/raw_message_importer'
 
-      Analytics::Janitors::RawMessageImporter.new(LT.env.logger, 20000).import
+      Analytics::Janitors::RawMessageImporter.new(LT.env.logger, 30000).import
     end
 
     desc 'Extract page views from raw_messages'
     task extract_page_visits: :'lt:boot' do
       require 'janitors/visit_extractor'
 
-      Analytics::Janitors::VisitExtractor.new(LT.env.logger, 20000).extract
+      Analytics::Janitors::VisitExtractor.new(LT.env.logger, 30000).extract
     end
     desc "Convert raw_messages to video_views"
     task extract_video_views: :'lt:boot' do
       require 'janitors/visualization_extractor'
 
-      Analytics::Janitors::VisualizationExtractor.new(LT.env.logger, 20000).extract
+      Analytics::Janitors::VisualizationExtractor.new(LT.env.logger, 30000).extract
     end
 
     desc "Fill YouTube Information"
@@ -40,7 +40,7 @@ namespace :lt do
       require 'janitors/video_metadata_extractor'
 
       config = LT.env.load_file_config('youtube.yml')
-      Analytics::Janitors::VideoMetadataExtractor.new(LT.env.logger, 20000, config).extract
+      Analytics::Janitors::VideoMetadataExtractor.new(LT.env.logger, 30000, config).extract
     end
   end
 

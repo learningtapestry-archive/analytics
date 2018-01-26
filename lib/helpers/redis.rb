@@ -61,6 +61,17 @@ module Analytics
         def empty?
           @redis.llen(@queue) == 0
         end
+
+        def fetch_batch(batch_size)
+          batch = nil
+
+          @redis.multi do
+            batch = @redis.lrange(@queue, -batch_size, -1)
+            @redis.ltrim(@queue, 0, -(batch_size + 1))
+          end
+
+          batch.value
+        end
       end
 
       #

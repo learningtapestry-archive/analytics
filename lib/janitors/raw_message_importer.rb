@@ -16,11 +16,11 @@ module Analytics
       def import
         processed, errors = 0, 0
 
-        loop do
-          errors += 1 unless partial_report(messages_queue.pop)
-          processed += 1
+        messages = messages_queue.fetch_batch(batch_size)
 
-          break if messages_queue.empty? || processed >= batch_size
+        messages.each do |message|
+          errors += 1 unless partial_report(message)
+          processed += 1
         end
 
         final_report(processed, errors)

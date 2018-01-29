@@ -1,9 +1,9 @@
 adapter: postgresql
 encoding: UTF8
-database: <%= ENV['POSTGRESQL_DATABASE'] %>
+database: <%= ENV['POSTGRESQL_DATABASE'] || 'analytics_development' %>
 pool: 5
 host: <%= ENV['POSTGRESQL_ADDRESS'] %>
 port: 5432
 template: template0
-username: <%= ENV['POSTGRESQL_USERNAME'] %>
+username: <%= ENV['POSTGRESQL_USERNAME'] || 'analytics_development_user' %>
 password: <%= ENV['POSTGRESQL_PASSWORD'] %>

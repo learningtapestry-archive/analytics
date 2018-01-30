@@ -1,0 +1,22 @@
+<script>
+  var data = <%= data.to_json(:include => :page) %>;
+</script>
+
+<h2 class="section-title">Total visits:</h2>
+
+<div class="total-visits section">
+  <p>Total visits: <%= data[:visits].count %></p>
+  <p>Most recent visit: <%= data[:visits].last.date_visited %></p>
+</div>
+
+<h2 class="section-title">Visit breakdown by page:</h2>
+
+<div class="page-chart section"></div>
+
+<script src="underscore/underscore.js"></script>
+<script src="d3/d3.js"></script>
+
+<% stamp = LT.environment.run_env == 'development' ? SecureRandom.urlsafe_base64 : `git rev-parse HEAD`.chomp %>
+
+<link rel="stylesheet" type="text/css" href="visualizer/css/visualizer.css?<%= stamp %>">
+<script src="visualizer/javascript/visualizer.js?<%= stamp %>"></script>

@@ -77,7 +77,9 @@ namespace :generate do
               page_id: page_ids.sample,
               time_active: rand * 1000,
               date_visited: date,
-              heartbeat_id: SecureRandom.hex(36)
+              heartbeat_id: SecureRandom.hex(36),
+              created_at: date,
+              updated_at: date
             )
           end
         end

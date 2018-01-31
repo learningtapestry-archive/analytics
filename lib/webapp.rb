@@ -17,14 +17,15 @@ module Analytics
     end
 
     get '/visualizer' do
-      visits = Visit.includes(:page).order('updated_at desc').first(1000)
+      recentVisits = Visit.includes(:page).order('updated_at desc').first(1000)
 
       erb :visualizer,
         :views => 'lib/visualizer/views',
         :locals => {
           data: {
-            visits: visits,
-            visitsByPage: visits.group_by(&:page_id)
+            totalVisitCount: Visit.count,
+            recentVisits: recentVisits,
+            recentVisitsByPage: recentVisits.group_by(&:page_id)
           }
         }
     end

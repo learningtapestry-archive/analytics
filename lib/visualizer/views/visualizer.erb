@@ -5,8 +5,8 @@
 <h2 class="section-title">Total visits:</h2>
 
 <div class="total-visits section">
-  <p>Total visits: <%= data[:visits].count %></p>
-  <p>Most recent visit: <%= data[:visits].last.date_visited %></p>
+  <p>Total visits: <%= data[:totalVisitCount] %></p>
+  <p>Most recent visit: <%= data[:recentVisits].last.date_visited %></p>
 </div>
 
 <h2 class="section-title">Visit breakdown by page:</h2>

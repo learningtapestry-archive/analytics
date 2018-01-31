@@ -9,14 +9,27 @@
   <p>Most recent visit: <%= data[:recentVisits].last.date_visited %></p>
 </div>
 
-<h2 class="section-title">Visit breakdown by page:</h2>
+<h2 class="section-title">Time range:</h2>
+
+<div class="time-range-selection section">
+  <div class="btn-group" role="group">
+    <button type="button" class="btn btn-default active">1 day</button>
+    <button type="button" class="btn btn-default">7 days</button>
+    <button type="button" class="btn btn-default">30 days</button>
+  </div>
+</div>
 
 <div class="page-chart section"></div>
 
-<script src="underscore/underscore.js"></script>
-<script src="d3-4.13.0/d3.min.js"></script>
-
 <% stamp = LT.environment.run_env == 'development' ? SecureRandom.urlsafe_base64 : `git rev-parse HEAD`.chomp %>
 
+<!-- load css -->
+<link rel="stylesheet" type="text/css" href="bootstrap-3.3.7/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="visualizer/css/visualizer.css?<%= stamp %>">
+
+<!-- load js -->
+<script src="underscore/underscore.js"></script>
+<script src="d3-4.13.0/d3.min.js"></script>
+<script src="jquery-3.3.1/jquery-3.3.1.min.js"></script>
+<script src="bootstrap-3.3.7/js/bootstrap.min.js"></script>
 <script src="visualizer/javascript/visualizer.js?<%= stamp %>"></script>

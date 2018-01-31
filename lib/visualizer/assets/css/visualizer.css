@@ -1,5 +1,7 @@
 body {
+  background-color: #eee;
   color: #444;
+  padding: 0px 10px;
 }
 
 .section-title {
@@ -8,6 +10,10 @@ body {
 
 .section {
   margin-left: 20px;
+}
+
+.time-range-selection {
+  margin-bottom: 30px;
 }
 
 .page-chart div {

@@ -4,3 +4,5 @@ Layout/DotPosition:
   EnforcedStyle: trailing
 Layout/MultilineMethodCallIndentation:
   EnforcedStyle: indented
+Style/Documentation:
+  Enabled: false

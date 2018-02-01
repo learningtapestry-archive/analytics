@@ -1,7 +1,10 @@
+# frozen_string_literal: true
+
 require 'lt/webapp'
 require 'visualizer/app'
+require 'visualizer/helpers'
 
-require "skylight/sinatra"
+require 'skylight/sinatra'
 Skylight.start!(file: 'config/skylight.yml')
 
 module Analytics
@@ -13,6 +16,8 @@ module Analytics
     register Helpers::AuthenticationDSL
     register Routes::Api::V1
     register Routes::Api::V2
+
+    helpers Helpers::Visualizer
     register Visualizer::App
 
     get '/' do

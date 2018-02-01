@@ -2,7 +2,6 @@
 
 module Analytics
   module Visualizer
-    # entry point and API endpoints for the visualizer
     module App
       include LT::WebApp::Registerable
 
@@ -24,13 +23,16 @@ module Analytics
 
           halt 401, { error: 'Invalid date range' }.to_json unless start_times[range]
 
-          recent_visits = Visit.where(date_visited: start_times[range]..Time.now).all
+          recent_visits = Visit.
+            order('date_visited desc').
+            where(date_visited: start_times[range]..Time.now).
+            all
 
-          return {
-            totalVisitCount: Visit.count,
-            recentVisits: recent_visits,
-            recentVisitsByPage: recent_visits.group_by(&:page_id)
-          }.to_json(include: :page)
+          {
+            total_visit_count: Visit.count,
+            most_recent_visit_date: Visit.first.date_visited,
+            recent_visits_by_page: recent_visits_by_page(recent_visits.to_a)
+          }.to_json
         end
       end
     end

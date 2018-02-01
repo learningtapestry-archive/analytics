@@ -9,6 +9,10 @@
     "d3": false
   },
   "rules": {
-    "max-len": ["error", { "code": 80 }]
+    "max-len": [
+      "error", {
+        "code": 90
+      }
+    ]
   }
 }

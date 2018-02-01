@@ -1,17 +1,13 @@
-<script>
-  var data = <%= data.to_json(:include => :page) %>;
-</script>
-
 <h2 class="section-title">Total visits:</h2>
 
-<div class="total-visits section">
-  <p>Total visits: <%= data[:totalVisitCount] %></p>
-  <p>Most recent visit: <%= data[:recentVisits].last.date_visited %></p>
+<div class="total-visits-section section">
+  <p>Total visits: <span class="total-visits"></span></p>
+  <p>Most recent visit: <span class="most-recent-visit"></span></p>
 </div>
 
 <h2 class="section-title">Time range:</h2>
 
-<div class="time-range-selection section">
+<div class="time-range-section section">
   <div class="btn-group" role="group">
     <button type="button" class="btn btn-default active">1 day</button>
     <button type="button" class="btn btn-default">7 days</button>
@@ -19,7 +15,7 @@
   </div>
 </div>
 
-<div class="page-chart section"></div>
+<div class="page-chart-section section"></div>
 
 <% stamp = LT.environment.run_env == 'development' ? SecureRandom.urlsafe_base64 : `git rev-parse HEAD`.chomp %>
 

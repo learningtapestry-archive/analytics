@@ -12,16 +12,16 @@ body {
   margin-left: 20px;
 }
 
-.time-range-selection {
+.time-range-section {
   margin-bottom: 30px;
 }
 
-.page-chart div {
+.page-chart-section div {
   background-color: #ccc;
   padding: 3px;
   margin: 3px;
 }
 
-.page-chart div .count {
+.page-chart-section div .count {
   float: right;
 }

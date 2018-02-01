@@ -1,4 +1,5 @@
 require 'lt/webapp'
+require 'visualizer/app'
 
 require "skylight/sinatra"
 Skylight.start!(file: 'config/skylight.yml')
@@ -12,22 +13,9 @@ module Analytics
     register Helpers::AuthenticationDSL
     register Routes::Api::V1
     register Routes::Api::V2
+    register Visualizer::App
 
     get '/' do
-    end
-
-    get '/visualizer' do
-      recentVisits = Visit.includes(:page).order('updated_at desc').first(1000)
-
-      erb :visualizer,
-        :views => 'lib/visualizer/views',
-        :locals => {
-          data: {
-            totalVisitCount: Visit.count,
-            recentVisits: recentVisits,
-            recentVisitsByPage: recentVisits.group_by(&:page_id)
-          }
-        }
     end
   end
 end

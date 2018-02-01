@@ -1,2 +1,6 @@
 Metrics/LineLength:
   Max: 90
+Layout/DotPosition:
+  EnforcedStyle: trailing
+Layout/MultilineMethodCallIndentation:
+  EnforcedStyle: indented

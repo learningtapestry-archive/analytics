@@ -12,7 +12,7 @@ gem 'sinatra', '~> 1.4.5'
 
 # Additional gems
 gem 'log4r', '>= 1.1.10'
-gem 'pg', '>= 0.17.1'
+gem 'pg', '0.20'
 gem 'htmlentities', '>= 4.3.2'
 gem 'nokogiri', '>= 1.8.1'
 gem 'redis', '>= 3.1.0'

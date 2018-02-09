@@ -30,7 +30,7 @@ module Analytics
 
           {
             total_visit_count: Visit.count,
-            most_recent_visit_date: Visit.first.date_visited,
+            most_recent_visit_date: Visit.first&.date_visited,
             recent_visits_by_page: recent_visits_by_page(recent_visits.to_a)
           }.to_json
         end

@@ -4,5 +4,4 @@ log/
 .env.staging
 .env.production
 .env.demo
-skylight.pid
 package.json

@@ -179,8 +179,6 @@ GEM
       sinatra (~> 1.3)
     sinatra-redirect-with-flash (0.2.1)
       sinatra (>= 1.0.0)
-    skylight (1.5.0)
-      activesupport (>= 3.0.0)
     term-ansicolor (1.6.0)
       tins (~> 1.0)
     thin (1.7.2)
@@ -229,7 +227,6 @@ DEPENDENCIES
   sidekiq-cron
   simple_xlsx_reader
   sinatra (~> 1.4.5)
-  skylight
   term-ansicolor (>= 1.3.0)
   thin (>= 1.6.3)
 

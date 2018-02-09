@@ -4,9 +4,6 @@ require 'lt/webapp'
 require 'visualizer/app'
 require 'visualizer/helpers'
 
-require 'skylight/sinatra'
-Skylight.start!(file: 'config/skylight.yml')
-
 module Analytics
   class WebApp < LT::WebApp::Base
     helpers Helpers::Redis

@@ -25,7 +25,6 @@ gem 'chronic_duration', '>= 0.10.6'
 # Allows printing with colors to terminal
 gem 'term-ansicolor', '>= 1.3.0'
 
-gem 'skylight'
 gem 'sidekiq'
 gem 'sidekiq-cron'
 gem 'rubocop'

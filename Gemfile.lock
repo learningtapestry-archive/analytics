@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/learningtapestry/core
-  revision: ca06aacc08ede235b720d6b8bed8c8875dcaee66
-  branch: master
+  revision: a0213c23434ac0c0018b3afdf57f11349225038e
+  ref: a0213c2
   specs:
     lt-core (0.1.0)
       actionpack (~> 4.2.10)
@@ -61,7 +61,7 @@ GEM
       public_suffix (>= 2.0.2, < 4.0)
     arel (6.0.4)
     ast (2.4.0)
-    backports (3.11.0)
+    backports (3.11.1)
     bcrypt (3.1.11)
     builder (3.2.3)
     byebug (9.1.0)
@@ -91,7 +91,7 @@ GEM
       tzinfo
     eventmachine (1.2.5)
     ffaker (2.8.0)
-    ffi (1.9.18)
+    ffi (1.9.21)
     htmlentities (4.3.4)
     i18n (0.9.1)
       concurrent-ruby (~> 1.0)
@@ -153,9 +153,9 @@ GEM
     rubyzip (1.2.1)
     rufus-scheduler (3.4.2)
       et-orbi (~> 1.0)
-    selenium-webdriver (3.8.0)
+    selenium-webdriver (3.9.0)
       childprocess (~> 0.5)
-      rubyzip (~> 1.0)
+      rubyzip (~> 1.2)
     sidekiq (5.0.5)
       concurrent-ruby (~> 1.0)
       connection_pool (~> 2.2, >= 2.2.0)

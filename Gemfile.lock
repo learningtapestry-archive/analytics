@@ -77,6 +77,7 @@ GEM
     chronic_duration (0.10.6)
       numerizer (~> 0.1.1)
     cliver (0.3.2)
+    coderay (1.1.2)
     concurrent-ruby (1.0.5)
     connection_pool (2.2.1)
     crass (1.0.3)
@@ -100,6 +101,7 @@ GEM
     loofah (2.1.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
+    method_source (0.9.0)
     mime-types (3.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2016.0521)
@@ -120,6 +122,9 @@ GEM
       cliver (~> 0.3.1)
       websocket-driver (>= 0.2.0)
     powerpack (0.1.1)
+    pry (0.11.3)
+      coderay (~> 1.1.0)
+      method_source (~> 0.9.0)
     public_suffix (3.0.1)
     rack (1.6.8)
     rack-protection (1.5.3)
@@ -220,6 +225,7 @@ DEPENDENCIES
   oj
   pg (= 0.20)
   poltergeist (>= 1.17.0)
+  pry
   rake
   redis (>= 3.1.0)
   rubocop

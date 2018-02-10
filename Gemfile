@@ -42,4 +42,5 @@ group :dev_test do
   gem 'byebug'
   gem 'simple_xlsx_reader'
   gem 'ffaker'
+  gem 'pry'
 end

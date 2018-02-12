@@ -16,7 +16,7 @@ class RawMessageImporterTest < LT::Test::DBTestBase
 
     messages_queue.push(unprocessed.to_json)
     @logger = TestLogger.new
-    @importer = RawMessageImporter.new(@logger, 1)
+    @importer = RawMessageImporter.new(@logger, 2)
   end
 
   def test_removes_messages_from_redis_if_import_succeeds
@@ -49,8 +49,26 @@ class RawMessageImporterTest < LT::Test::DBTestBase
     assert_equal last_message.captured_at.to_s(:db), '2015-08-31 00:00:00'
   end
 
+  def test_processes_viewed_messages_in_correct_order
+    generated_page = page
+    RawMessage.create!(generated_page.merge(captured_at: '01/08/2015 00:00:00', processed_at: '30/08/2015 00:00:00'))
+    last_message = RawMessage.create!(generated_page.merge(captured_at: '02/08/2015 00:00:00'))
+    messages_queue.clear
+    messages_queue.push(generated_page.merge(action: { time: '40S' }, captured_at: '31/08/2015 00:00:00').to_json)
+    messages_queue.push(generated_page.merge(action: { time: '50S' }, captured_at: '31/08/2015 00:00:00').to_json)
+
+    @importer.import
+    last_message.reload
+
+    assert_equal '50S', last_message.action['time']
+    assert_equal '2015-08-31 00:00:00', last_message.captured_at.to_s(:db)
+  end
+
   def test_processes_no_more_than_batch_size_messages
     messages_queue.push(unprocessed.to_json)
+    messages_queue.push(unprocessed.to_json)
+
+    puts messages_queue.length
 
     @importer.import
     assert_equal 1, messages_queue.length

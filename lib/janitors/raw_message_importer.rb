@@ -18,7 +18,7 @@ module Analytics
 
         messages = messages_queue.fetch_batch(batch_size)
 
-        messages.each do |message|
+        messages.reverse_each do |message|
           errors += 1 unless partial_report(message)
           processed += 1
         end

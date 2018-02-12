@@ -55,7 +55,7 @@ namespace :generate do
         user_ids << id
       end
 
-      page_ids = (site_ids * 15).map do |site_id|
+      page_ids = (site_ids * 10).map do |site_id|
         create_page(
           site_id: site_id,
           url: "#{FFaker::Internet.http_url}/#{FFaker::Lorem.word}.html"
@@ -77,9 +77,7 @@ namespace :generate do
               page_id: page_ids.sample,
               time_active: rand * 1000,
               date_visited: date,
-              heartbeat_id: SecureRandom.hex(36),
-              created_at: date,
-              updated_at: date
+              heartbeat_id: SecureRandom.hex(36)
             )
           end
         end

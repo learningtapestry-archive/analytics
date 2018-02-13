@@ -26,12 +26,13 @@ module Analytics
           recent_visits = Visit.
             order('date_visited desc').
             where(date_visited: start_times[range]..Time.now).
+            includes(:page).
             all
 
           {
             total_visit_count: Visit.count,
             most_recent_visit_date: Visit.first&.date_visited,
-            recent_visits_by_page: recent_visits_by_page(recent_visits.to_a)
+            recent_visits_by_page: recent_visits_by_page(recent_visits)
           }.to_json
         end
       end

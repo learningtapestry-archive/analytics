@@ -6,10 +6,9 @@ module Analytics
       def recent_visits_by_page(recent_visits)
         recent_visits_by_page = {}
 
-        recent_visits.map(&:page).map(&:url).uniq.each do |url|
-          recent_visits_by_page[url] = recent_visits.count do |visit|
-            visit.page.url == url
-          end
+        recent_visits.each do |visit|
+          recent_visits_by_page[visit.page.url] ||= 0
+          recent_visits_by_page[visit.page.url] += 1
         end
 
         recent_visits_by_page

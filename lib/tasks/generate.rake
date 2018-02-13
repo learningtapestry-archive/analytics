@@ -55,7 +55,7 @@ namespace :generate do
         user_ids << id
       end
 
-      page_ids = (site_ids * 10).map do |site_id|
+      page_ids = (site_ids * 5).map do |site_id|
         create_page(
           site_id: site_id,
           url: "#{FFaker::Internet.http_url}/#{FFaker::Lorem.word}.html"

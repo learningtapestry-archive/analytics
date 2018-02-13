@@ -1,21 +1,29 @@
-<h2 class="section-title">Total visits:</h2>
+<div class="total-visits panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Total visits:</h1>
+  </div>
 
-<div class="total-visits-section section">
-  <p>Total visits: <span class="total-visits"></span></p>
-  <p>Most recent visit: <span class="most-recent-visit"></span></p>
-</div>
-
-<h2 class="section-title">Time range:</h2>
-
-<div class="time-range-section section">
-  <div class="btn-group" role="group">
-    <button type="button" id="day-button" class="btn btn-default active">1 day</button>
-    <button type="button" id="week-button" class="btn btn-default">7 days</button>
-    <button type="button" id="month-button" class="btn btn-default">30 days</button>
+  <div class="panel-body">
+    <p>Total visits: <span class="total-visit-count"></span></p>
+    <p>Most recent visit: <span class="most-recent-visit"></span></p>
   </div>
 </div>
 
-<div class="page-chart-section section"></div>
+<div class="time-range panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Page view breakdown:</h1>
+  </div>
+
+  <div class="panel-body">
+    <div class="btn-group" role="group">
+      <button type="button" id="day-button" class="btn btn-default active">1 day</button>
+      <button type="button" id="week-button" class="btn btn-default">7 days</button>
+      <button type="button" id="month-button" class="btn btn-default">30 days</button>
+    </div>
+  </div>
+
+  <div class="page-chart"></div>
+</div>
 
 <% stamp = LT.environment.run_env == 'development' ? SecureRandom.urlsafe_base64 : `git rev-parse HEAD`.chomp %>
 

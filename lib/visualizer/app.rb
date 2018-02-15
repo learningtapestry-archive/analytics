@@ -10,7 +10,7 @@ module Analytics
           erb :visualizer, views: 'lib/visualizer/views'
         end
 
-        get '/visualizer/data/visits_by_page' do
+        get '/data/visits_by_page' do
           content_type 'application/json'
 
           range = params['range'] || 'day'
@@ -32,7 +32,7 @@ module Analytics
           recent_visits_by_page(recent_visits).to_json
         end
 
-        get '/visualizer/data/overview' do
+        get '/data/overview' do
           {
             total_visit_count: Visit.count,
             most_recent_visit_date: Visit.first&.date_visited

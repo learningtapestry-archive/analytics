@@ -38,11 +38,11 @@ module Analytics
         get '/data/user_history' do
           user = User.find_by(username: params[:user])
 
-          halt 404, { error: 'User not found' }.to_json unless user
-
-          user.to_json
-
-          user.visits.order('id desc').last(10).to_json
+          if user
+            user.visits.order('id desc').last(10).to_json
+          else
+            [].to_json
+          end
         end
       end
     end

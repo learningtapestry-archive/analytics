@@ -2,7 +2,7 @@
 
 module Analytics
   module Helpers
-    module Visualizer
+    module Dashboard
       def recent_visits_by_page(recent_visits)
         recent_visits_by_page = {}
 

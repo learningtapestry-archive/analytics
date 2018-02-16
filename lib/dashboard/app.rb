@@ -1,15 +1,11 @@
 # frozen_string_literal: true
 
 module Analytics
-  module Visualizer
+  module Dashboard
     module App
       include LT::WebApp::Registerable
 
       registered do
-        get '/visualizer' do
-          erb :visualizer, views: 'lib/visualizer/views'
-        end
-
         get '/data/visits_by_page' do
           content_type 'application/json'
 

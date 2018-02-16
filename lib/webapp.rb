@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 require 'lt/webapp'
-require 'visualizer/app'
-require 'visualizer/helpers'
+require 'dashboard/app'
+require 'dashboard/helpers'
 
 module Analytics
   class WebApp < LT::WebApp::Base
@@ -14,8 +14,8 @@ module Analytics
     register Routes::Api::V1
     register Routes::Api::V2
 
-    helpers Helpers::Visualizer
-    register Visualizer::App
+    helpers Helpers::Dashboard
+    register Dashboard::App
 
     get '/' do
     end

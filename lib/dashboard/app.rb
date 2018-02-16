@@ -19,13 +19,13 @@ module Analytics
 
           halt 401, { error: 'Invalid date range' }.to_json unless start_times[range]
 
-          recent_visits = Visit.
+          visits = Visit.
             order('date_visited desc').
             where(date_visited: start_times[range]..Time.now).
             includes(:page).
             all
 
-          recent_visits_by_page(recent_visits).to_json
+          recent_visits_by_page(visits).to_json
         end
 
         get '/data/overview' do
@@ -39,7 +39,13 @@ module Analytics
           user = User.find_by(username: params[:user])
 
           if user
-            user.visits.order('id desc').last(10).to_json
+            visits = user.
+              visits.
+              order('id desc').
+              includes(:page).
+              last(20)
+
+            recent_visits_by_user(visits).to_json
           else
             [].to_json
           end

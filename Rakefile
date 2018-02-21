@@ -42,6 +42,13 @@ namespace :lt do
       config = LT.env.load_file_config('youtube.yml')
       Analytics::Janitors::VideoMetadataExtractor.new(LT.env.logger, 20000, config).extract
     end
+
+    desc 'Delete old raw messages that we\'ve already processed'
+    task delete_raw_messages: :'lt:boot' do
+      require 'janitors/raw_message_deleter'
+
+      Analytics::Janitors::RawMessageDeleter.new.run
+    end
   end
 
   namespace :utility do

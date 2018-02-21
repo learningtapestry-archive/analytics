@@ -68,8 +68,6 @@ class RawMessageImporterTest < LT::Test::DBTestBase
     messages_queue.push(unprocessed.to_json)
     messages_queue.push(unprocessed.to_json)
 
-    puts messages_queue.length
-
     @importer.import
     assert_equal 1, messages_queue.length
   end

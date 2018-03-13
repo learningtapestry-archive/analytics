@@ -77,4 +77,15 @@ class Visit < ActiveRecord::Base
     detail_by_site.select('pages.display_name as page_name',
                           'pages.url as page_url')
   }
+
+  def self.group_by_page(time_range)
+    Visit.
+      select('url, count(*)').
+      from(Visit.
+        select('*').
+        where(date_visited: time_range).
+        joins(:page)).
+      group(:url).
+      all
+  end
 end

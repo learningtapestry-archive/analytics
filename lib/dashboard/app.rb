@@ -19,14 +19,7 @@ module Analytics
 
           halt 401, { error: 'Invalid date range' }.to_json unless start_times[range]
 
-          visits = Visit.
-            select('url, count(*)').
-            from(Visit.
-              select('*').
-              where(date_visited: start_times[range]..Time.now).
-              joins(:page)).
-            group(:url).
-            all
+          visits = Visit.group_by_page(start_times[range]..Time.now)
 
           {}.tap do |hash|
             visits.map do |visit|

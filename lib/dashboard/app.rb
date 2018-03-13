@@ -38,7 +38,7 @@ module Analytics
         get '/data/overview' do
           {
             total_visit_count: Visit.count,
-            most_recent_visit_date: Visit.first&.date_visited
+            most_recent_visit_date: Visit.order(:date_visited).last&.date_visited
           }.to_json
         end
 

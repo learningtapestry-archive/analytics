@@ -5,8 +5,20 @@ module Analytics
     module App
       include LT::WebApp::Registerable
 
+      # rubocop:disable Metrics/BlockLength
       registered do
-        get '/data/visits_by_page' do
+        post '/data/overview' do
+          authenticate!
+
+          {
+            total_visit_count: Visit.count,
+            most_recent_visit_date: Visit.order(:date_visited).last&.date_visited
+          }.to_json
+        end
+
+        post '/data/visits_by_page' do
+          authenticate!
+
           content_type 'application/json'
 
           range = params['range'] || 'day'
@@ -28,14 +40,9 @@ module Analytics
           end.to_json
         end
 
-        get '/data/overview' do
-          {
-            total_visit_count: Visit.count,
-            most_recent_visit_date: Visit.order(:date_visited).last&.date_visited
-          }.to_json
-        end
+        post '/data/user_history' do
+          authenticate!
 
-        get '/data/user_history' do
           user = User.find_by(username: params[:user])
 
           if user
@@ -51,6 +58,7 @@ module Analytics
           end
         end
       end
+      # rubocop:enable Metrics/BlockLength
     end
   end
 end

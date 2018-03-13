@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2017041702) do
+ActiveRecord::Schema.define(version: 2018031302) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -34,6 +34,13 @@ ActiveRecord::Schema.define(version: 2017041702) do
 
   add_index "approved_sites", ["site_id"], name: "index_approved_sites_on_site_id", using: :btree
 
+  create_table "auth_tokens", force: :cascade do |t|
+    t.integer  "dashboard_id"
+    t.string   "value",        null: false
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+  end
+
   create_table "course_offerings", force: :cascade do |t|
     t.integer  "course_id",  null: false
     t.string   "sis_id"
@@ -54,6 +61,12 @@ ActiveRecord::Schema.define(version: 2017041702) do
     t.boolean  "high_school_requirement"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "dashboards", force: :cascade do |t|
+    t.string   "name",       null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "districts", force: :cascade do |t|
@@ -271,4 +284,5 @@ ActiveRecord::Schema.define(version: 2017041702) do
     t.datetime "updated_at"
   end
 
+  add_foreign_key "auth_tokens", "dashboards", on_delete: :cascade
 end

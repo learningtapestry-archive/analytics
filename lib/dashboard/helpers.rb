@@ -12,6 +12,20 @@ module Analytics
           }
         end
       end
+
+      def authenticate_dashboard!(authorization_header)
+        token = authorization_header&.split&.last
+        unauthorized('Authorization token not provided') unless token
+
+        dashboard = ::Dashboard.find_by_token(token)
+        unauthorized('Unknown dashboard authorization token') unless dashboard
+      end
+
+      private
+
+      def unauthorized(msg)
+        halt(401, json(error: msg))
+      end
     end
   end
 end

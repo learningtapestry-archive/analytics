@@ -7,8 +7,18 @@ module Analytics
 
       # rubocop:disable Metrics/BlockLength
       registered do
+        before do
+          response.headers['Access-Control-Allow-Origin'] = '*'
+          response.headers['Access-Control-Allow-Methods'] = 'GET, PUT, POST, DELETE'
+          response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        end
+
+        # cors preflight request
+        options '/data/overview' do
+        end
+
         post '/data/overview' do
-          authenticate!
+          authenticate_dashboard!(request.env['HTTP_AUTHORIZATION'])
 
           {
             total_visit_count: Visit.count,
@@ -16,8 +26,12 @@ module Analytics
           }.to_json
         end
 
+        # cors preflight request
+        options '/data/visits_by_page' do
+        end
+
         post '/data/visits_by_page' do
-          authenticate!
+          authenticate_dashboard!(request.env['HTTP_AUTHORIZATION'])
 
           content_type 'application/json'
 
@@ -40,8 +54,12 @@ module Analytics
           end.to_json
         end
 
+        # cors preflight request
+        options '/data/user_history' do
+        end
+
         post '/data/user_history' do
-          authenticate!
+          authenticate_dashboard!(request.env['HTTP_AUTHORIZATION'])
 
           user = User.find_by(username: params[:user])
 

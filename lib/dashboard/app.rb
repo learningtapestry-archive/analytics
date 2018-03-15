@@ -17,7 +17,7 @@ module Analytics
         options '/data/overview' do
         end
 
-        post '/data/overview' do
+        get '/data/overview' do
           authenticate_dashboard!(request.env['HTTP_AUTHORIZATION'])
 
           {
@@ -30,7 +30,7 @@ module Analytics
         options '/data/visits_by_page' do
         end
 
-        post '/data/visits_by_page' do
+        get '/data/visits_by_page' do
           authenticate_dashboard!(request.env['HTTP_AUTHORIZATION'])
 
           content_type 'application/json'
@@ -58,7 +58,7 @@ module Analytics
         options '/data/user_history' do
         end
 
-        post '/data/user_history' do
+        get '/data/user_history' do
           authenticate_dashboard!(request.env['HTTP_AUTHORIZATION'])
 
           user = User.find_by(username: params[:user])

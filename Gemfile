@@ -8,7 +8,7 @@ gem 'rake'
 gem 'activerecord', '~> 4.2.10'
 gem 'activesupport', '~> 4.2.10'
 gem 'lt-core', git: 'https://github.com/learningtapestry/core'
-gem 'sinatra', '~> 1.4.7'
+gem 'sinatra', '~> 1.4.8'
 
 # Additional gems
 gem 'log4r', '>= 1.1.10'

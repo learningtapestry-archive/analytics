@@ -211,7 +211,7 @@ DEPENDENCIES
   sidekiq
   sidekiq-cron
   simple_xlsx_reader
-  sinatra (~> 1.4.7)
+  sinatra (~> 1.4.8)
   skylight
   term-ansicolor (>= 1.3.0)
   thin (>= 1.6.3)

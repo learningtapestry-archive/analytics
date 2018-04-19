@@ -5,16 +5,16 @@ ruby '2.4.1'
 gem 'rake'
 
 # Core gems
-gem 'activerecord', '>= 4.2.10'
-gem 'activesupport', '>= 4.2.10'
-gem 'lt-core', git: 'https://github.com/learningtapestry/core', branch: 'master'
-gem 'sinatra', '~> 1.4.5'
+gem 'activerecord', '~> 4.2.10'
+gem 'activesupport', '~> 4.2.10'
+gem 'lt-core', git: 'https://github.com/learningtapestry/core'
+gem 'sinatra', '~> 1.4.7'
 
 # Additional gems
 gem 'log4r', '>= 1.1.10'
 gem 'pg', '>= 0.17.1'
 gem 'htmlentities', '>= 4.3.2'
-gem 'nokogiri', '>= 1.8.1'
+gem 'nokogiri', '~> 1.8.2'
 gem 'redis', '>= 3.1.0'
 gem 'bcrypt', '>= 3.1.7'
 gem 'oj'

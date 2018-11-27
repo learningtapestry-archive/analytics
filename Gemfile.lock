@@ -95,7 +95,7 @@ GEM
     launchy (2.4.3)
       addressable (~> 2.3)
     log4r (1.1.10)
-    loofah (2.2.2)
+    loofah (2.2.3)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mime-types (3.1)
@@ -105,7 +105,7 @@ GEM
     minitest (5.11.1)
     minitest-profile (0.0.2)
     multi_json (1.13.1)
-    nokogiri (1.8.2)
+    nokogiri (1.8.5)
       mini_portile2 (~> 2.3.0)
     numerizer (0.1.1)
     oj (3.3.10)
@@ -115,7 +115,7 @@ GEM
       cliver (~> 0.3.1)
       websocket-driver (>= 0.2.0)
     public_suffix (3.0.2)
-    rack (1.6.9)
+    rack (1.6.11)
     rack-protection (1.5.5)
       rack
     rack-test (0.6.3)
@@ -130,7 +130,7 @@ GEM
       loofah (~> 2.2, >= 2.2.2)
     rake (12.3.0)
     redis (4.0.1)
-    rubyzip (1.2.1)
+    rubyzip (1.2.2)
     rufus-scheduler (3.4.2)
       et-orbi (~> 1.0)
     selenium-webdriver (3.11.0)
@@ -220,4 +220,4 @@ RUBY VERSION
    ruby 2.4.1p111
 
 BUNDLED WITH
-   1.15.4
+   1.17.1

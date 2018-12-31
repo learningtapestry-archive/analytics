@@ -200,3 +200,13 @@ Thin-rack-ruby 502 failure
   Possible explanation: when ruby raises an exception, it causes thin to terminate which leaves sockets open from nginx but no handler to process requests
 
 Chrome: Advanced REST client
+
+### Migrating to a new environment
+
+When switching hardware instances to a new production stack there are a series of steps that you need to take:
+
+- [ ] Make sure production has the latest code from the master branch and that tests pass
+- [ ] Make sure production Cloud66 database environment variables match staging (RDS). You may need to migrate data if you are also pointing to a new database.
+- [ ] Load cert from old stack to the new load balancer
+- [ ] From a console in the new environment, call [this script](https://github.com/learningtapestry/analytics/blob/master/lib/models/organization.rb#L39) for all active organizations. You can just run `Organization.all.each.update_redis_org_api_key`
+- [ ] Update DNS for edhesive analytics to point to production load balancer
